@@ -5,9 +5,13 @@ services:
       - "${FRONTEND_PORT:-3000}:80"
 
   backend:
-    build: ./backend/nest-project
+    build: ./backend
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:-app_password}@database:5432/${POSTGRES_DB:-app}
+      DB_HOST: database
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:-app}
+      DB_PASSWORD: ${DB_PASSWORD:-app_password}
+      DB_NAME: ${DB_NAME:-app}
     ports:
       - "${BACKEND_PORT:-3001}:3000"
     depends_on:
@@ -17,9 +21,9 @@ services:
   database:
     image: postgres:17-alpine
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-app}
-      POSTGRES_USER: ${POSTGRES_USER:-app}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-app_password}
+      POSTGRES_DB: ${DB_NAME:-app}
+      POSTGRES_USER: ${DB_USER:-app}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-app_password}
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:

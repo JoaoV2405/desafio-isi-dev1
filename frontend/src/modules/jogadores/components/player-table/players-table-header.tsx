@@ -1,4 +1,4 @@
-import type { PlayersScope, PlayersSort } from '../types/players-query'
+import type { PlayersScope, PlayersSort } from '../../types/players-query'
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select'
 import { TabsList, TabsTrigger } from '@/components/ui/tabs'
 
@@ -12,7 +12,6 @@ export function PlayersTableHeader({
   return (
     <div className="flex items-center justify-between gap-4">
       <TabsList variant="line" aria-label="Vínculo dos jogadores">
-        {/* Contadores por aba dependem de consultas futuras à API. */}
         {(
           [
             ['all', 'Todos'],

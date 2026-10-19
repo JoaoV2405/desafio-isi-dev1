@@ -1,14 +1,16 @@
 import { useMemo, useState } from 'react'
+import { useForm, useWatch } from 'react-hook-form'
 import { X } from 'lucide-react'
 import type {
   PlayersFilterValues,
   PlayersScope,
   PlayersSort,
-} from '../types/players-query'
-import { DEFAULT_PLAYER_FILTERS } from '../types/players-query'
-import { mockClubs } from '../data/mock-players'
-import { usePlayers } from '../hooks/use-players'
+} from '../../types/players-query'
+import { DEFAULT_PLAYER_FILTERS } from '../../types/players-query'
+import { mockClubs } from '../../data/mock-players'
+import { usePlayers } from '../../hooks/use-players'
 import { createPlayerColumns } from './player-columns'
+import type { PlayerActionsMenuProps } from '../player-actions-menu'
 import { PlayersFilters } from './players-filters'
 import { PlayersTableHeader } from './players-table-header'
 import { DataTable } from '@/components/data-table/data-table'
@@ -21,13 +23,24 @@ import { PLAYER_CONDITIONS, PLAYER_POSITIONS } from '@/shared/types/player'
 
 const PAGE_SIZE = 10
 
-export function PlayersTable() {
-  const [filters, setFilters] = useState(DEFAULT_PLAYER_FILTERS)
+interface PlayersTableProps {
+  onPlayerAction?: PlayerActionsMenuProps['onAction']
+}
+
+export function PlayersTable({ onPlayerAction }: PlayersTableProps) {
+  // Centraliza os filtros e observa alterações para manter consulta e indicadores sincronizados.
+  const { register, control, setValue, reset } = useForm<PlayersFilterValues>({
+    defaultValues: DEFAULT_PLAYER_FILTERS,
+  })
+  const filters = { ...DEFAULT_PLAYER_FILTERS, ...useWatch({ control }) }
   const [scope, setScope] = useState<PlayersScope>('all')
   const [sort, setSort] = useState<PlayersSort>('name')
   const [page, setPage] = useState(1)
   // TODO: substituir mockClubs pela consulta GET /clubs ao ativar a integração.
-  const columns = useMemo(() => createPlayerColumns({ clubs: mockClubs }), [])
+  const columns = useMemo(
+    () => createPlayerColumns({ clubs: mockClubs, onPlayerAction }),
+    [onPlayerAction],
+  )
   const search = filters.search.trim()
   const filterLabels: Record<keyof PlayersFilterValues, string> = {
     search: search.length >= 2 ? `Busca: ${search}` : '',
@@ -49,9 +62,9 @@ export function PlayersTable() {
       ? `Valor máximo: ${formatMoney(Number(filters.maxValue))}`
       : '',
   }
-  const activeFilters = Object.entries(filterLabels).filter(
-    ([, label]) => label,
-  )
+  const activeFilters = (
+    Object.entries(filterLabels) as [keyof PlayersFilterValues, string][]
+  ).filter(([, label]) => label)
   const hasActiveFilters = activeFilters.length > 0 || scope !== 'all'
   const { data, isPending, isError, error } = usePlayers({
     page,
@@ -68,15 +81,16 @@ export function PlayersTable() {
     max_value: filters.maxValue ? Number(filters.maxValue) : undefined,
   })
 
-  function changeFilters(nextFilters: PlayersFilterValues) {
-    setFilters(nextFilters)
+  // Limpa um campo pelo formulário para atualizar também o controle exibido na tela.
+  function removeFilter(key: keyof PlayersFilterValues) {
+    setValue(key, '')
     setPage(1)
   }
 
   function changeScope(nextScope: PlayersScope) {
     setScope(nextScope)
-    if (nextScope === 'free')
-      setFilters((current) => ({ ...current, clubId: '' }))
+    // Mantém a incompatibilidade entre clube selecionado e a aba de jogadores livres.
+    if (nextScope === 'free') setValue('clubId', '')
     setPage(1)
   }
 
@@ -86,7 +100,8 @@ export function PlayersTable() {
   }
 
   function clearFilters() {
-    setFilters(DEFAULT_PLAYER_FILTERS)
+    // reset restaura todos os controles e o estado interno dos filtros de uma vez.
+    reset(DEFAULT_PLAYER_FILTERS)
     setScope('all')
     setPage(1)
   }
@@ -94,8 +109,8 @@ export function PlayersTable() {
   return (
     <div className="space-y-6">
       <PlayersFilters
-        value={filters}
-        onChange={changeFilters}
+        register={register}
+        onFilterChange={() => setPage(1)}
         scope={scope}
         clubs={mockClubs}
       />
@@ -116,7 +131,7 @@ export function PlayersTable() {
                   variant="ghost"
                   size="icon-xs"
                   aria-label={`Remover filtro ${label}`}
-                  onClick={() => changeFilters({ ...filters, [key]: '' })}
+                  onClick={() => removeFilter(key)}
                 >
                   <X aria-hidden="true" />
                 </Button>

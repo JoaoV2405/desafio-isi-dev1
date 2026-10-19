@@ -1,0 +1,309 @@
+{
+  "clubs": [
+    {
+      "id": 1,
+      "name": "Águias FC",
+      "acronym": "AGU"
+    },
+    {
+      "id": 2,
+      "name": "Estrela Azul",
+      "acronym": "EAZ"
+    },
+    {
+      "id": 3,
+      "name": "União Atlético",
+      "acronym": "UNA"
+    }
+  ],
+  "players": [
+    {
+      "id": 1,
+      "name": "André Silva",
+      "position": "GOL",
+      "overall": 78,
+      "agility": 35,
+      "age": 28,
+      "condition": "APTO",
+      "base_value": 105.5,
+      "market_value": 126.6,
+      "club_id": null
+    },
+    {
+      "id": 2,
+      "name": "Bruno Costa",
+      "position": "ZAG",
+      "overall": 82,
+      "agility": 36,
+      "age": 25,
+      "condition": "MAL_CONDICIONADO",
+      "base_value": 134.2,
+      "market_value": 120.78,
+      "club_id": 1
+    },
+    {
+      "id": 3,
+      "name": "Carlos Mendes",
+      "position": "LAT",
+      "overall": 75,
+      "agility": 79,
+      "age": 22,
+      "condition": "DOENTE",
+      "base_value": 98.0,
+      "market_value": 68.6,
+      "club_id": null
+    },
+    {
+      "id": 4,
+      "name": "Daniel Souza",
+      "position": "MEI",
+      "overall": 88,
+      "agility": 80,
+      "age": 24,
+      "condition": "APTO",
+      "base_value": 180.0,
+      "market_value": 216.0,
+      "club_id": 2
+    },
+    {
+      "id": 5,
+      "name": "Eduardo Lima",
+      "position": "ATA",
+      "overall": 91,
+      "agility": 100,
+      "age": 21,
+      "condition": "APTO",
+      "base_value": 225.0,
+      "market_value": 270.0,
+      "club_id": null
+    },
+    {
+      "id": 6,
+      "name": "Felipe Rocha",
+      "position": "GOL",
+      "overall": 73,
+      "agility": 20,
+      "age": 31,
+      "condition": "DOENTE",
+      "base_value": 76.5,
+      "market_value": 53.55,
+      "club_id": 3
+    },
+    {
+      "id": 7,
+      "name": "Gabriel Santos",
+      "position": "ZAG",
+      "overall": 80,
+      "agility": 65,
+      "age": 26,
+      "condition": "APTO",
+      "base_value": 121.0,
+      "market_value": 145.2,
+      "club_id": null
+    },
+    {
+      "id": 8,
+      "name": "Henrique Alves",
+      "position": "LAT",
+      "overall": 77,
+      "agility": 85,
+      "age": 23,
+      "condition": "MAL_CONDICIONADO",
+      "base_value": 109.9,
+      "market_value": 98.91,
+      "club_id": 1
+    },
+    {
+      "id": 9,
+      "name": "Igor Pereira",
+      "position": "MEI",
+      "overall": 84,
+      "agility": 90,
+      "age": 27,
+      "condition": "APTO",
+      "base_value": 146.0,
+      "market_value": 175.2,
+      "club_id": null
+    },
+    {
+      "id": 10,
+      "name": "João Oliveira",
+      "position": "ATA",
+      "overall": 89,
+      "agility": 95,
+      "age": 20,
+      "condition": "APTO",
+      "base_value": 200.0,
+      "market_value": 240.0,
+      "club_id": 2
+    },
+    {
+      "id": 11,
+      "name": "Lucas Ferreira",
+      "position": "GOL",
+      "overall": 72,
+      "agility": 1,
+      "age": 35,
+      "condition": "MAL_CONDICIONADO",
+      "base_value": 70.0,
+      "market_value": 63.0,
+      "club_id": null
+    },
+    {
+      "id": 12,
+      "name": "Marcos Ribeiro",
+      "position": "ZAG",
+      "overall": 79,
+      "agility": 42,
+      "age": 29,
+      "condition": "APTO",
+      "base_value": 112.0,
+      "market_value": 134.4,
+      "club_id": 3
+    },
+    {
+      "id": 13,
+      "name": "Nicolas Martins",
+      "position": "LAT",
+      "overall": 76,
+      "agility": 78,
+      "age": 19,
+      "condition": "APTO",
+      "base_value": 102.0,
+      "market_value": 122.4,
+      "club_id": null
+    },
+    {
+      "id": 14,
+      "name": "Otávio Barbosa",
+      "position": "MEI",
+      "overall": 86,
+      "agility": 81,
+      "age": 30,
+      "condition": "DOENTE",
+      "base_value": 165.0,
+      "market_value": 115.5,
+      "club_id": 1
+    },
+    {
+      "id": 15,
+      "name": "Pedro Carvalho",
+      "position": "ATA",
+      "overall": 92,
+      "agility": 88,
+      "age": 24,
+      "condition": "APTO",
+      "base_value": 250.0,
+      "market_value": 300.0,
+      "club_id": null
+    },
+    {
+      "id": 16,
+      "name": "Rafael Gomes",
+      "position": "GOL",
+      "overall": 81,
+      "agility": 30,
+      "age": 32,
+      "condition": "APTO",
+      "base_value": 129.0,
+      "market_value": 154.8,
+      "club_id": 2
+    },
+    {
+      "id": 17,
+      "name": "Samuel Nunes",
+      "position": "ZAG",
+      "overall": 74,
+      "agility": 55,
+      "age": 18,
+      "condition": "MAL_CONDICIONADO",
+      "base_value": 90.0,
+      "market_value": 81.0,
+      "club_id": null
+    },
+    {
+      "id": 18,
+      "name": "Thiago Azevedo",
+      "position": "LAT",
+      "overall": 83,
+      "agility": 82,
+      "age": 26,
+      "condition": "APTO",
+      "base_value": 140.0,
+      "market_value": 168.0,
+      "club_id": 3
+    },
+    {
+      "id": 19,
+      "name": "Vinícius Teixeira",
+      "position": "MEI",
+      "overall": 87,
+      "agility": 77,
+      "age": 23,
+      "condition": "APTO",
+      "base_value": 173.5,
+      "market_value": 208.2,
+      "club_id": null
+    },
+    {
+      "id": 20,
+      "name": "William Dias",
+      "position": "ATA",
+      "overall": 85,
+      "agility": 94,
+      "age": 28,
+      "condition": "DOENTE",
+      "base_value": 155.0,
+      "market_value": 108.5,
+      "club_id": 1
+    },
+    {
+      "id": 21,
+      "name": "Xavier Melo",
+      "position": "GOL",
+      "overall": 70,
+      "agility": 34,
+      "age": 40,
+      "condition": "APTO",
+      "base_value": 60.0,
+      "market_value": 72.0,
+      "club_id": null
+    },
+    {
+      "id": 22,
+      "name": "Yago Freitas",
+      "position": "ZAG",
+      "overall": 78,
+      "agility": 50,
+      "age": 22,
+      "condition": "MAL_CONDICIONADO",
+      "base_value": 106.0,
+      "market_value": 95.4,
+      "club_id": 2
+    },
+    {
+      "id": 23,
+      "name": "Zé Almeida",
+      "position": "LAT",
+      "overall": 82,
+      "agility": 79,
+      "age": 16,
+      "condition": "APTO",
+      "base_value": 135.0,
+      "market_value": 162.0,
+      "club_id": null
+    },
+    {
+      "id": 24,
+      "name": "Álvaro Monteiro",
+      "position": "MEI",
+      "overall": 90,
+      "agility": 80,
+      "age": 45,
+      "condition": "APTO",
+      "base_value": 210.0,
+      "market_value": 252.0,
+      "club_id": 3
+    }
+  ]
+}

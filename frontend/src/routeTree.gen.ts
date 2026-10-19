@@ -10,33 +10,115 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LigaClassificacaoRouteImport } from './routes/liga.classificacao'
+import { Route as LigaPartidasRouteImport } from './routes/liga.partidas'
+import { Route as MercadoClubesRouteImport } from './routes/mercado.clubes'
+import { Route as MercadoJogadoresRouteImport } from './routes/mercado.jogadores'
+import { Route as LigaPartidasPartidaIdRouteImport } from './routes/liga.partidas_.$partidaId'
+import { Route as MercadoClubesClubeIdRouteImport } from './routes/mercado.clubes_.$clubeId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LigaClassificacaoRoute = LigaClassificacaoRouteImport.update({
+  id: '/liga/classificacao',
+  path: '/liga/classificacao',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LigaPartidasRoute = LigaPartidasRouteImport.update({
+  id: '/liga/partidas',
+  path: '/liga/partidas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MercadoClubesRoute = MercadoClubesRouteImport.update({
+  id: '/mercado/clubes',
+  path: '/mercado/clubes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MercadoJogadoresRoute = MercadoJogadoresRouteImport.update({
+  id: '/mercado/jogadores',
+  path: '/mercado/jogadores',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LigaPartidasPartidaIdRoute = LigaPartidasPartidaIdRouteImport.update({
+  id: '/liga/partidas_/$partidaId',
+  path: '/liga/partidas/$partidaId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MercadoClubesClubeIdRoute = MercadoClubesClubeIdRouteImport.update({
+  id: '/mercado/clubes_/$clubeId',
+  path: '/mercado/clubes/$clubeId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/liga/classificacao': typeof LigaClassificacaoRoute
+  '/liga/partidas': typeof LigaPartidasRoute
+  '/mercado/clubes': typeof MercadoClubesRoute
+  '/mercado/jogadores': typeof MercadoJogadoresRoute
+  '/liga/partidas/$partidaId': typeof LigaPartidasPartidaIdRoute
+  '/mercado/clubes/$clubeId': typeof MercadoClubesClubeIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/liga/classificacao': typeof LigaClassificacaoRoute
+  '/liga/partidas': typeof LigaPartidasRoute
+  '/mercado/clubes': typeof MercadoClubesRoute
+  '/mercado/jogadores': typeof MercadoJogadoresRoute
+  '/liga/partidas/$partidaId': typeof LigaPartidasPartidaIdRoute
+  '/mercado/clubes/$clubeId': typeof MercadoClubesClubeIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/liga/classificacao': typeof LigaClassificacaoRoute
+  '/liga/partidas': typeof LigaPartidasRoute
+  '/mercado/clubes': typeof MercadoClubesRoute
+  '/mercado/jogadores': typeof MercadoJogadoresRoute
+  '/liga/partidas_/$partidaId': typeof LigaPartidasPartidaIdRoute
+  '/mercado/clubes_/$clubeId': typeof MercadoClubesClubeIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/liga/classificacao'
+    | '/liga/partidas'
+    | '/mercado/clubes'
+    | '/mercado/jogadores'
+    | '/liga/partidas/$partidaId'
+    | '/mercado/clubes/$clubeId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/liga/classificacao'
+    | '/liga/partidas'
+    | '/mercado/clubes'
+    | '/mercado/jogadores'
+    | '/liga/partidas/$partidaId'
+    | '/mercado/clubes/$clubeId'
+  id:
+    | '__root__'
+    | '/'
+    | '/liga/classificacao'
+    | '/liga/partidas'
+    | '/mercado/clubes'
+    | '/mercado/jogadores'
+    | '/liga/partidas_/$partidaId'
+    | '/mercado/clubes_/$clubeId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LigaClassificacaoRoute: typeof LigaClassificacaoRoute
+  LigaPartidasRoute: typeof LigaPartidasRoute
+  MercadoClubesRoute: typeof MercadoClubesRoute
+  MercadoJogadoresRoute: typeof MercadoJogadoresRoute
+  LigaPartidasPartidaIdRoute: typeof LigaPartidasPartidaIdRoute
+  MercadoClubesClubeIdRoute: typeof MercadoClubesClubeIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +130,59 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/liga/classificacao': {
+      id: '/liga/classificacao'
+      path: '/liga/classificacao'
+      fullPath: '/liga/classificacao'
+      preLoaderRoute: typeof LigaClassificacaoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/liga/partidas': {
+      id: '/liga/partidas'
+      path: '/liga/partidas'
+      fullPath: '/liga/partidas'
+      preLoaderRoute: typeof LigaPartidasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mercado/clubes': {
+      id: '/mercado/clubes'
+      path: '/mercado/clubes'
+      fullPath: '/mercado/clubes'
+      preLoaderRoute: typeof MercadoClubesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mercado/jogadores': {
+      id: '/mercado/jogadores'
+      path: '/mercado/jogadores'
+      fullPath: '/mercado/jogadores'
+      preLoaderRoute: typeof MercadoJogadoresRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/liga/partidas_/$partidaId': {
+      id: '/liga/partidas_/$partidaId'
+      path: '/liga/partidas/$partidaId'
+      fullPath: '/liga/partidas/$partidaId'
+      preLoaderRoute: typeof LigaPartidasPartidaIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mercado/clubes_/$clubeId': {
+      id: '/mercado/clubes_/$clubeId'
+      path: '/mercado/clubes/$clubeId'
+      fullPath: '/mercado/clubes/$clubeId'
+      preLoaderRoute: typeof MercadoClubesClubeIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LigaClassificacaoRoute: LigaClassificacaoRoute,
+  LigaPartidasRoute: LigaPartidasRoute,
+  MercadoClubesRoute: MercadoClubesRoute,
+  MercadoJogadoresRoute: MercadoJogadoresRoute,
+  LigaPartidasPartidaIdRoute: LigaPartidasPartidaIdRoute,
+  MercadoClubesClubeIdRoute: MercadoClubesClubeIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

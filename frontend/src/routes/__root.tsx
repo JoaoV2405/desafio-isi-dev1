@@ -1,29 +1,27 @@
-import { Outlet, createRootRoute } from '@tanstack/react-router'
+import { createRootRoute, Outlet, useRouterState } from '@tanstack/react-router'
 
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
+import { AppLayout } from '@/components/layout/app-layout'
+import { RoutePaths } from '@/router/route-paths'
 
-import '../styles.css'
+export function RootLayout() {
+  const isHome = useRouterState({
+    select: (state) => state.location.pathname === RoutePaths.home,
+  })
 
-export const Route = createRootRoute({
-  component: RootComponent,
-})
-
-function RootComponent() {
   return (
     <>
-      <Outlet />
-      <TanStackDevtools
-        config={{
-          position: 'bottom-right',
-        }}
-        plugins={[
-          {
-            name: 'TanStack Router',
-            render: <TanStackRouterDevtoolsPanel />,
-          },
-        ]}
-      />
+      {isHome ? (
+        <Outlet />
+      ) : (
+        <AppLayout>
+          <Outlet />
+        </AppLayout>
+      )}
+      {import.meta.env.DEV && (
+        <TanStackRouterDevtools position="bottom-right" />
+      )}
     </>
   )
 }
+export const Route = createRootRoute({ component: RootLayout })

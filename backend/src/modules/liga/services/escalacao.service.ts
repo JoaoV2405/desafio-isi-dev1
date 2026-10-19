@@ -1,15 +1,17 @@
 import {
-  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { Clube, FormacaoClube } from '../../clubes/entities/clube.entity.js';
+import { Clube } from '../../clubes/entities/clube.entity.js';
 import {
   CondicaoJogador,
   Jogador,
 } from '../../jogadores/entities/jogador.entity.js';
+import { JogadoresService } from '../../jogadores/services/jogadores.service.js';
+import { EscalacaoResponse } from '../dto/escalacao.response.js';
+import { SubstituirEscalacaoDto } from '../dto/substituir-escalacao.dto.js';
 import { Escalacao } from '../entities/escalacao.entity.js';
 import {
   isComposicaoEscalacaoValida,
@@ -18,19 +20,45 @@ import {
 
 @Injectable()
 export class EscalacoesService {
-  constructor(private readonly dataSource: DataSource) {}
+  constructor(
+    private readonly dataSource: DataSource,
+    private readonly jogadoresService: JogadoresService,
+  ) {}
 
-  async substituirEscalacao(
-    clubeId: number,
-    formacao: FormacaoClube,
-    jogadoresIds: number[],
-  ): Promise<void> {
-    if (!isFormacaoClube(formacao)) {
-      throw new BadRequestException('Formação inválida');
+  async findByClubId(clubeId: number): Promise<EscalacaoResponse> {
+    // Uma única consulta mantém formação e titulares no mesmo retrato do banco.
+    const clube = await this.dataSource
+      .getRepository(Clube)
+      .createQueryBuilder('clube')
+      .leftJoin(Escalacao, 'escalacao', 'escalacao.clube_id = clube.id')
+      .leftJoinAndSelect(
+        'clube.jogadores',
+        'jogador',
+        'jogador.id = escalacao.jogador_id',
+      )
+      .where('clube.id = :clubeId', { clubeId })
+      .getOne();
+
+    if (!clube) {
+      throw new NotFoundException('Clube não encontrado');
     }
 
-    await this.dataSource.transaction(async (manager) => {
-      // Carrega os jogadores em lote sob lock e detecta IDs inexistentes ou excluídos.
+    return this.present(clube, clube.jogadores);
+  }
+
+  async replace(
+    clubeId: number,
+    dto: SubstituirEscalacaoDto,
+  ): Promise<EscalacaoResponse> {
+    const { formation: formacao, player_ids: jogadoresIds } = dto;
+
+    if (jogadoresIds.some((id) => id > 2_147_483_647)) {
+      throw new NotFoundException('Um ou mais jogadores não foram encontrados');
+    }
+
+    return this.dataSource.transaction(async (manager) => {
+      // Bloqueia jogadores por id antes do clube, na mesma ordem usada pela venda.
+      // Assim, venda ou doença não podem invalidar os titulares entre validação e gravação.
       const jogadoresRepository = manager.getRepository(Jogador);
       const jogadores = await jogadoresRepository
         .createQueryBuilder('jogador')
@@ -39,10 +67,16 @@ export class EscalacoesService {
         .andWhere('jogador.excluido_em IS NULL')
         .orderBy('jogador.id', 'ASC')
         .getMany();
-      const jogadoresEncontrados = new Set(jogadores.map((jogador) => jogador.id));
-      const idsAusentes = jogadoresIds.filter((id) => !jogadoresEncontrados.has(id));
+      const jogadoresEncontrados = new Set(
+        jogadores.map((jogador) => jogador.id),
+      );
+      const idsAusentes = jogadoresIds.filter(
+        (id) => !jogadoresEncontrados.has(id),
+      );
       if (idsAusentes.length > 0) {
-        throw new NotFoundException('Um ou mais jogadores não foram encontrados');
+        throw new NotFoundException(
+          'Um ou mais jogadores não foram encontrados',
+        );
       }
 
       const clubesRepository = manager.getRepository(Clube);
@@ -55,12 +89,13 @@ export class EscalacoesService {
         throw new NotFoundException('Clube não encontrado');
       }
 
-      // Valida vínculo, condição física e composição antes de substituir qualquer dado.
       const jogadorDeOutroClube = jogadores.find(
         (jogador) => jogador.clubeId !== clube.id,
       );
       if (jogadorDeOutroClube) {
-        throw new ConflictException('Todos os jogadores devem pertencer ao clube');
+        throw new ConflictException(
+          'Todos os jogadores devem pertencer ao clube',
+        );
       }
 
       const jogadorDoente = jogadores.find(
@@ -87,6 +122,29 @@ export class EscalacoesService {
         }),
       );
       await escalacoesRepository.save(novasEscalacoes);
+
+      return this.present(clube, jogadores);
     });
+  }
+
+  private present(
+    clube: Clube,
+    jogadores: readonly Jogador[],
+  ): EscalacaoResponse {
+    return {
+      club_id: clube.id,
+      formation: clube.formacao,
+      complete:
+        jogadores.length === 5 &&
+        isFormacaoClube(clube.formacao) &&
+        jogadores.every(
+          (jogador) =>
+            jogador.clubeId === clube.id &&
+            jogador.condicao !== CondicaoJogador.Doente &&
+            jogador.excluidoEm === null,
+        ) &&
+        isComposicaoEscalacaoValida(clube.formacao, jogadores),
+      players: this.jogadoresService.presentRoster(jogadores),
+    };
   }
 }

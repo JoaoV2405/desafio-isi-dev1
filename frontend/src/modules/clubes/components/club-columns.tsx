@@ -22,12 +22,19 @@ export const clubColumns: ColumnDef<Club>[] = [
   {
     accessorKey: 'squad_value',
     header: 'Valor do elenco',
-    cell: ({ row }) => formatMoney(row.original.squad_value),
+    // Mantém os indicadores sem inventar valores quando a resposta atual não os fornece.
+    cell: ({ row }) =>
+      row.original.squad_value === undefined
+        ? '—'
+        : formatMoney(row.original.squad_value),
   },
   {
     accessorKey: 'net_worth',
     header: 'Patrimônio',
-    cell: ({ row }) => formatMoney(row.original.net_worth),
+    cell: ({ row }) =>
+      row.original.net_worth === undefined
+        ? '—'
+        : formatMoney(row.original.net_worth),
   },
   {
     id: 'actions',

@@ -13,10 +13,8 @@ import { JogadoresService } from '../../jogadores/services/jogadores.service.js'
 import { EscalacaoResponse } from '../dto/escalacao.response.js';
 import { SubstituirEscalacaoDto } from '../dto/substituir-escalacao.dto.js';
 import { Escalacao } from '../entities/escalacao.entity.js';
-import {
-  isComposicaoEscalacaoValida,
-  isFormacaoClube,
-} from './formacao-validation.service.js';
+import { isEscalacaoCompleta } from '../validators/escalacao-completa.js';
+import { isComposicaoEscalacaoValida } from './formacao-validation.service.js';
 
 @Injectable()
 export class EscalacoesService {
@@ -134,16 +132,7 @@ export class EscalacoesService {
     return {
       club_id: clube.id,
       formation: clube.formacao,
-      complete:
-        jogadores.length === 5 &&
-        isFormacaoClube(clube.formacao) &&
-        jogadores.every(
-          (jogador) =>
-            jogador.clubeId === clube.id &&
-            jogador.condicao !== CondicaoJogador.Doente &&
-            jogador.excluidoEm === null,
-        ) &&
-        isComposicaoEscalacaoValida(clube.formacao, jogadores),
+      complete: isEscalacaoCompleta(clube, jogadores),
       players: this.jogadoresService.presentRoster(jogadores),
     };
   }

@@ -15,8 +15,8 @@ export type PlayerAttributeKey = (typeof PLAYER_ATTRIBUTE_FIELDS)[number]['key']
 
 // O cadastro acrescenta atributos e potencial aos quatro campos compartilhados.
 export interface CreatePlayerFormValues
-  extends PlayerFormValues, Record<PlayerAttributeKey, string> {
-  potential: string
+  extends PlayerFormValues, Record<PlayerAttributeKey, number> {
+  potential: number
 }
 
 // Os valores iniciais de um novo jogador pertencem somente ao fluxo de cadastro.
@@ -24,15 +24,15 @@ export function getDefaultCreatePlayerFormValues(): CreatePlayerFormValues {
   return {
     name: '',
     position: '',
-    age: '18',
-    agility: '50',
-    pace: '50',
-    shooting: '50',
-    passing: '50',
-    dribbling: '50',
-    defending: '50',
-    physical: '50',
-    potential: '75',
+    age: 18,
+    agility: 50,
+    pace: 50,
+    shooting: 50,
+    passing: 50,
+    dribbling: 50,
+    defending: 50,
+    physical: 50,
+    potential: 75,
   }
 }
 

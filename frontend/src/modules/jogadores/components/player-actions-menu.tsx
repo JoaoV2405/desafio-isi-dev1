@@ -9,8 +9,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import type { PlayerAction } from '../pages/players-page'
 
-export type PlayerAction = 'details' | 'edit' | 'condition' | 'delete'
 
 export interface PlayerActionsMenuProps {
   player: Player

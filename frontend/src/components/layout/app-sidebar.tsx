@@ -19,7 +19,15 @@ import {
 } from '@/components/ui/sidebar'
 import { RoutePaths } from '@/router/route-paths'
 
-export function AppSidebar({ clubs }: { clubs: SidebarClub[] }) {
+export function AppSidebar({
+  clubs,
+  isLoading = false,
+  error,
+}: {
+  clubs: SidebarClub[]
+  isLoading?: boolean
+  error?: string
+}) {
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   })
@@ -88,35 +96,47 @@ export function AppSidebar({ clubs }: { clubs: SidebarClub[] }) {
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
-            {clubs.length === 0 && (
-              <p className="px-2 py-1 text-xs text-muted-foreground">
-                Os clubes aparecerão aqui.
+            {isLoading ? (
+              <p
+                role="status"
+                className="px-2 py-1 text-xs text-muted-foreground"
+              >
+                Carregando clubes...
               </p>
+            ) : error ? (
+              <p role="alert" className="px-2 py-1 text-xs text-destructive">
+                {error}
+              </p>
+            ) : (
+              clubs.length === 0 && (
+                <p className="px-2 py-1 text-xs text-muted-foreground">
+                  Nenhum clube cadastrado.
+                </p>
+              )
             )}
           </SidebarGroupContent>
         </SidebarGroup>
         {/* novo grupo, no fim da sidebar, 3 itens seguindo o mesmo formato, mas nao são clicaveis  */}
-        
       </SidebarContent>
-      <SidebarFooter className='m-2 rounded-xl border bg-white p-3'>
-          <SidebarGroup>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {['Liga Ficticia', 'Ultimo jogo'].map((label) => (
-                    <SidebarMenuItem key={label}>
-                      <SidebarMenuButton
-                        render={<div />}
-                        className="hover:bg-transparent hover:text-inherit"
-                      >
-                        <IconPlaceholder />
-                        <span>{label}</span>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
-                </SidebarMenu>
-              </SidebarGroupContent>
-          </SidebarGroup>
-        </SidebarFooter>
+      <SidebarFooter className="m-2 rounded-xl border bg-white p-3">
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {['Liga Ficticia', 'Ultimo jogo'].map((label) => (
+                <SidebarMenuItem key={label}>
+                  <SidebarMenuButton
+                    render={<div />}
+                    className="hover:bg-transparent hover:text-inherit"
+                  >
+                    <IconPlaceholder />
+                    <span>{label}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarFooter>
     </Sidebar>
   )
 }

@@ -1,5 +1,6 @@
 import { useEffect, useId, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
+import { useQuery } from '@tanstack/react-query'
 import type { PlayerFormValues } from '../../lib/player-form'
 import {
   getEditPlayerFormRules,
@@ -13,17 +14,27 @@ import { cn } from '@/lib/utils'
 import { PlayerConditionBadge } from '@/shared/components/player-condition-badge'
 import { PlayerIdentity } from '@/shared/components/player-identity'
 import { PLAYER_CONDITIONS } from '@/shared/types/player'
+import { getClubLineup } from '@/modules/clubes/services/clubs-api'
+import { useClubs } from '@/modules/clubes/hooks/use-clubs'
+import { Button } from '@/components/ui/button'
+import type { EditPlayerInput } from '../../types/player-input'
 
 interface EditPlayerModalProps {
   open: boolean
   player: Player
   onOpenChange: (open: boolean) => void
+  onConfirm: (input: EditPlayerInput) => void
+  isSubmitting?: boolean
+  error?: string
 }
 
 export function EditPlayerModal({
   open,
   player,
   onOpenChange,
+  onConfirm,
+  isSubmitting = false,
+  error,
 }: EditPlayerModalProps) {
   const formId = useId()
   // Carrega os dados atuais sem incluir os indicadores exclusivos do cadastro.
@@ -31,25 +42,19 @@ export function EditPlayerModal({
     defaultValues: getEditPlayerFormValues(player),
     mode: 'onTouched',
   })
-  // Este estado controla somente o aviso visual; os dados ficam no React Hook Form.
-  const [isValidated, setIsValidated] = useState(false)
   const { reset } = form
 
   // Reabre o formulário com os dados recebidos e descarta alterações e erros da abertura anterior.
   useEffect(() => {
     if (open) {
       reset(getEditPlayerFormValues(player))
-      setIsValidated(false)
     }
   }, [open, player, reset])
-  // handleSubmit bloqueia dados inválidos e foca o primeiro erro antes de executar a ação.
-  const submitForm = form.handleSubmit(
-    () => {
-      // Integração da edição será adicionada em uma próxima etapa.
-      setIsValidated(true)
-    },
-    () => setIsValidated(false),
-  )
+  // Mantém as restrições da edição antes de entregar os quatro campos ao PUT.
+  const submitForm = form.handleSubmit((values) => {
+    if (isSubmitting || !values.position) return
+    onConfirm({ ...values, position: values.position })
+  })
 
   return (
     <Modal
@@ -60,7 +65,7 @@ export function EditPlayerModal({
       className="max-w-2xl"
       primaryAction={{ label: 'Salvar alterações', formId }}
       // Usa o estado de envio do formulário para bloquear ações do modal durante o envio.
-      isSubmitting={form.formState.isSubmitting}
+      isSubmitting={isSubmitting || form.formState.isSubmitting}
     >
       {/* Compartilha o formulário e aplica as restrições da edição aos quatro campos editáveis. */}
       <FormProvider {...form}>
@@ -68,23 +73,23 @@ export function EditPlayerModal({
           id={formId}
           noValidate
           onSubmit={submitForm}
-          // Invalida o aviso anterior quando qualquer dado é alterado.
-          onChange={() => setIsValidated(false)}
           className="space-y-6"
         >
-          <PlayerGeneralFields
-            rules={getEditPlayerFormRules(player)}
-            minAge={player.age}
-            lockedPosition={
-              player.club_id !== null ? player.position : undefined
-            }
-          />
-          {isValidated && (
+          <fieldset disabled={isSubmitting}>
+            <PlayerGeneralFields
+              rules={getEditPlayerFormRules(player)}
+              minAge={player.age}
+              lockedPosition={
+                player.club_id !== null ? player.position : undefined
+              }
+            />
+          </fieldset>
+          {error && (
             <p
-              role="status"
-              className="rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-800"
+              role="alert"
+              className="whitespace-pre-line text-sm text-destructive"
             >
-              Dados preenchidos corretamente.
+              {error}
             </p>
           )}
         </form>
@@ -102,9 +107,11 @@ const conditionOptions: { value: PlayerCondition; description: string }[] = [
   { value: 'DOENTE', description: 'Indisponível para jogar.' },
 ]
 
-interface EditPlayerConditionModalProps extends EditPlayerModalProps {
-  onConfirm?: (player: Player, condition: PlayerCondition) => void
-  isSubmitting?: boolean
+interface EditPlayerConditionModalProps extends Omit<
+  EditPlayerModalProps,
+  'onConfirm'
+> {
+  onConfirm: (player: Player, condition: PlayerCondition) => void
 }
 
 export function EditPlayerConditionModal({
@@ -113,6 +120,7 @@ export function EditPlayerConditionModal({
   onOpenChange,
   onConfirm,
   isSubmitting = false,
+  error,
 }: EditPlayerConditionModalProps) {
   const groupId = useId()
   // Uma única escolha é suficiente; não há necessidade de um formulário para este fluxo.
@@ -127,11 +135,40 @@ export function EditPlayerConditionModal({
   const isSick = player.condition === 'DOENTE'
   const isInvalidTransition = isSick && condition === 'APTO'
   const hasChanged = condition !== player.condition
+  const shouldCheckLineup =
+    open && condition === 'DOENTE' && hasChanged && player.club_id !== null
+  const { data: clubs = [] } = useClubs()
+  const lineup = useQuery({
+    queryKey: ['clubs', 'lineup', player.club_id],
+    queryFn: ({ signal }) => {
+      if (player.club_id === null) throw new Error('Jogador sem clube.')
+      return getClubLineup(player.club_id, signal)
+    },
+    enabled: shouldCheckLineup,
+    // Confere a escalação atual antes de apresentar o aviso e habilitar a confirmação.
+    staleTime: 0,
+  })
+  const isCheckingLineup =
+    shouldCheckLineup && (lineup.isPending || lineup.isFetching)
+  const hasLineupError = shouldCheckLineup && lineup.isError
+  const isStarter =
+    shouldCheckLineup &&
+    lineup.data?.players.some((starter) => starter.id === player.id)
+  const clubName =
+    clubs.find((club) => club.id === player.club_id)?.name ??
+    `Clube ${player.club_id}`
 
   function confirmCondition() {
     // Reforça o bloqueio na confirmação, além de desabilitar a opção na interface.
-    if (isSubmitting || !hasChanged || isInvalidTransition) return
-    onConfirm?.(player, condition)
+    if (
+      isSubmitting ||
+      !hasChanged ||
+      isInvalidTransition ||
+      isCheckingLineup ||
+      hasLineupError
+    )
+      return
+    onConfirm(player, condition)
   }
 
   return (
@@ -144,8 +181,11 @@ export function EditPlayerConditionModal({
         label: 'Salvar condição',
         pendingLabel: 'Salvando...',
         onClick: confirmCondition,
-        // A operação será habilitada quando o callback de integração estiver disponível.
-        disabled: !onConfirm || !hasChanged || isInvalidTransition,
+        disabled:
+          !hasChanged ||
+          isInvalidTransition ||
+          isCheckingLineup ||
+          hasLineupError,
       }}
       isSubmitting={isSubmitting}
     >
@@ -220,6 +260,36 @@ export function EditPlayerConditionModal({
           })}
         </div>
       </fieldset>
+      {isCheckingLineup && (
+        <p role="status" className="text-sm text-muted-foreground">
+          Verificando a escalação do clube...
+        </p>
+      )}
+      {hasLineupError && (
+        <div role="alert" className="space-y-2 text-sm text-destructive">
+          <p>{lineup.error.message}</p>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => void lineup.refetch()}
+          >
+            Tentar novamente
+          </Button>
+        </div>
+      )}
+      {!isCheckingLineup && !hasLineupError && isStarter && (
+        <p role="status" className="rounded-lg border bg-muted/30 p-3 text-sm">
+          Ao confirmar, {player.name} será removido da escalação de {clubName}.
+        </p>
+      )}
+      {error && (
+        <p
+          role="alert"
+          className="whitespace-pre-line text-sm text-destructive"
+        >
+          {error}
+        </p>
+      )}
     </Modal>
   )
 }

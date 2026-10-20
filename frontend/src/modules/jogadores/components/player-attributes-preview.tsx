@@ -29,8 +29,8 @@ export function PlayerAttributesPreview() {
           <AttributeProgressRow
             key={key}
             label={label}
-            value={Number(values[index])}
-            potential={Number(values[6])}
+            value={values[index]}
+            potential={values[6]}
           />
         ))}
       </div>

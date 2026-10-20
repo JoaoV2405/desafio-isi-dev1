@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { X } from 'lucide-react'
 import type {
@@ -7,7 +7,6 @@ import type {
   PlayersSort,
 } from '../../types/players-query'
 import { DEFAULT_PLAYER_FILTERS } from '../../types/players-query'
-import { mockClubs } from '../../data/mock-players'
 import { usePlayers } from '../../hooks/use-players'
 import { createPlayerColumns } from './player-columns'
 import type { PlayerActionsMenuProps } from '../player-actions-menu'
@@ -20,8 +19,11 @@ import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent } from '@/components/ui/tabs'
 import { formatMoney } from '@/shared/lib/format-money'
 import { PLAYER_CONDITIONS, PLAYER_POSITIONS } from '@/shared/types/player'
+import type { Club } from '@/shared/types/club'
+import { useClubs } from '@/modules/clubes/hooks/use-clubs'
 
 const PAGE_SIZE = 10
+const EMPTY_CLUBS: Club[] = []
 
 interface PlayersTableProps {
   onPlayerAction?: PlayerActionsMenuProps['onAction']
@@ -36,10 +38,15 @@ export function PlayersTable({ onPlayerAction }: PlayersTableProps) {
   const [scope, setScope] = useState<PlayersScope>('all')
   const [sort, setSort] = useState<PlayersSort>('name')
   const [page, setPage] = useState(1)
-  // TODO: substituir mockClubs pela consulta GET /clubs ao ativar a integração.
+  // Nomes e opções de clube vêm da mesma consulta usada no restante da interface.
+  const {
+    data: clubs = EMPTY_CLUBS,
+    isPending: clubsPending,
+    error: clubsError,
+  } = useClubs()
   const columns = useMemo(
-    () => createPlayerColumns({ clubs: mockClubs, onPlayerAction }),
-    [onPlayerAction],
+    () => createPlayerColumns({ clubs, onPlayerAction }),
+    [clubs, onPlayerAction],
   )
   const search = filters.search.trim()
   const filterLabels: Record<keyof PlayersFilterValues, string> = {
@@ -51,7 +58,7 @@ export function PlayersTable({ onPlayerAction }: PlayersTableProps) {
       ? `Condição: ${PLAYER_CONDITIONS[filters.condition]}`
       : '',
     clubId: filters.clubId
-      ? `Clube: ${mockClubs.find((club) => String(club.id) === filters.clubId)?.name ?? filters.clubId}`
+      ? `Clube: ${clubs.find((club) => String(club.id) === filters.clubId)?.name ?? filters.clubId}`
       : '',
     minAge: filters.minAge ? `Idade mínima: ${filters.minAge}` : '',
     maxAge: filters.maxAge ? `Idade máxima: ${filters.maxAge}` : '',
@@ -80,6 +87,13 @@ export function PlayersTable({ onPlayerAction }: PlayersTableProps) {
     min_value: filters.minValue ? Number(filters.minValue) : undefined,
     max_value: filters.maxValue ? Number(filters.maxValue) : undefined,
   })
+
+  // A exclusão do último item de uma página pode reduzir a quantidade de páginas da consulta.
+  useEffect(() => {
+    if (data && page > Math.max(1, data.meta.total_pages)) {
+      setPage(Math.max(1, data.meta.total_pages))
+    }
+  }, [data, page])
 
   // Limpa um campo pelo formulário para atualizar também o controle exibido na tela.
   function removeFilter(key: keyof PlayersFilterValues) {
@@ -112,8 +126,16 @@ export function PlayersTable({ onPlayerAction }: PlayersTableProps) {
         register={register}
         onFilterChange={() => setPage(1)}
         scope={scope}
-        clubs={mockClubs}
+        clubs={clubs}
+        clubsLoading={clubsPending}
+        clubsUnavailable={Boolean(clubsError)}
       />
+      {clubsError && (
+        <Alert variant="destructive">
+          <AlertTitle>Não foi possível carregar os clubes</AlertTitle>
+          <AlertDescription>{clubsError.message}</AlertDescription>
+        </Alert>
+      )}
       {hasActiveFilters && (
         <div
           aria-label="Filtros ativos"

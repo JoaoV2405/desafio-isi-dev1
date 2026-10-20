@@ -6,8 +6,8 @@ import { PLAYER_POSITIONS } from '@/shared/types/player'
 export interface PlayerFormValues {
   name: string
   position: PlayerPosition | ''
-  age: string
-  agility: string
+  age: number
+  agility: number
 }
 
 // Permite que cada fluxo acrescente suas restrições aos campos compartilhados.
@@ -15,16 +15,13 @@ export type PlayerFormRules = {
   [Key in keyof PlayerFormValues]: RegisterOptions<PlayerFormValues, Key>
 }
 
-// Reutiliza a validação de inteiros nos campos gerais e técnicos, incluindo valores vazios.
+// Converte os inputs para números antes da validação e do envio; campos vazios viram NaN e são recusados.
 export function integerRules(min: number, max: number) {
   return {
-    validate: (value: string) => {
-      const number = Number(value)
+    valueAsNumber: true as const,
+    validate: (value: number) => {
       return (
-        (Boolean(value.trim()) &&
-          Number.isInteger(number) &&
-          number >= min &&
-          number <= max) ||
+        (Number.isInteger(value) && value >= min && value <= max) ||
         `Informe um número inteiro de ${min} a ${max}.`
       )
     },

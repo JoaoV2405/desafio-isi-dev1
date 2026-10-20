@@ -13,6 +13,8 @@ interface PlayersFiltersProps {
   onFilterChange: () => void
   scope: PlayersScope
   clubs: ClubSummary[]
+  clubsLoading?: boolean
+  clubsUnavailable?: boolean
 }
 
 export function PlayersFilters({
@@ -20,6 +22,8 @@ export function PlayersFilters({
   onFilterChange,
   scope,
   clubs,
+  clubsLoading = false,
+  clubsUnavailable = false,
 }: PlayersFiltersProps) {
   // Cada campo passa seu valor ao React Hook Form e reinicia a paginação ao mudar.
   const registerFilter = (name: keyof PlayersFilterValues) =>
@@ -65,9 +69,16 @@ export function PlayersFilters({
         <NativeSelect
           {...registerFilter('clubId')}
           className="w-full"
-          disabled={scope === 'free'}
+          // Evita oferecer opções vazias enquanto a consulta não terminou ou falhou.
+          disabled={scope === 'free' || clubsLoading || clubsUnavailable}
         >
-          <NativeSelectOption value="">Todos os clubes</NativeSelectOption>
+          <NativeSelectOption value="">
+            {clubsLoading
+              ? 'Carregando clubes...'
+              : clubsUnavailable
+                ? 'Clubes indisponíveis'
+                : 'Todos os clubes'}
+          </NativeSelectOption>
           {clubs.map((club) => (
             <NativeSelectOption key={club.id} value={club.id}>
               {club.name}

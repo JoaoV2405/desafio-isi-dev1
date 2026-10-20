@@ -7,8 +7,8 @@ export function getEditPlayerFormValues(player: Player): PlayerFormValues {
   return {
     name: player.name,
     position: player.position,
-    age: String(player.age),
-    agility: String(player.agility),
+    age: player.age,
+    agility: player.agility,
   }
 }
 
@@ -28,11 +28,13 @@ export function getEditPlayerFormRules(player: Player): PlayerFormRules {
       },
     },
     age: {
+      // Preserva a conversão numérica ao acrescentar a restrição de idade da edição.
+      ...PLAYER_FORM_RULES.age,
       validate: (value) => {
         const result = PLAYER_FORM_RULES.age.validate(value)
         if (result !== true) return result
         return (
-          Number(value) >= player.age ||
+          value >= player.age ||
           `A idade não pode ser menor que a idade atual (${player.age} anos).`
         )
       },

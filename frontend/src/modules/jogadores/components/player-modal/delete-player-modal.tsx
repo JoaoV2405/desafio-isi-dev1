@@ -7,8 +7,9 @@ interface DeletePlayerModalProps {
   open: boolean
   player: Player
   onOpenChange: (open: boolean) => void
-  onConfirm?: (player: Player) => void
+  onConfirm: (player: Player) => void
   isSubmitting?: boolean
+  error?: string
 }
 
 export function DeletePlayerModal({
@@ -17,12 +18,13 @@ export function DeletePlayerModal({
   onOpenChange,
   onConfirm,
   isSubmitting = false,
+  error,
 }: DeletePlayerModalProps) {
   const isFree = player.club_id === null
 
   // A confirmação usa um callback; a operação e seu estado de envio ficam na camada de integração.
   function confirmDelete() {
-    if (isFree && !isSubmitting) onConfirm?.(player)
+    if (isFree && !isSubmitting) onConfirm(player)
   }
 
   return (
@@ -36,8 +38,8 @@ export function DeletePlayerModal({
         pendingLabel: 'Excluindo...',
         variant: 'destructive',
         onClick: confirmDelete,
-        // Só permite confirmar jogadores livres quando a operação de exclusão estiver conectada.
-        disabled: !isFree || !onConfirm,
+        // A exclusão só é permitida para jogadores livres.
+        disabled: !isFree,
       }}
       isSubmitting={isSubmitting}
     >
@@ -56,6 +58,14 @@ export function DeletePlayerModal({
       {!isFree && (
         <p role="alert" className="text-sm text-destructive">
           Apenas jogadores livres podem ser excluídos.
+        </p>
+      )}
+      {error && (
+        <p
+          role="alert"
+          className="whitespace-pre-line text-sm text-destructive"
+        >
+          {error}
         </p>
       )}
     </Modal>

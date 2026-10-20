@@ -1,11 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
-import type { ClubsQuery } from '../types/clubs-query'
-import { getMockClubs } from '../data/mock-clubs'
+import { getClubs } from '../services/clubs-api'
 
-export function useClubs(query: ClubsQuery = {}) {
+export function useClubs() {
   return useQuery({
-    queryKey: ['clubs', query],
-    // TODO: substituir pela consulta GET /clubs?sort=... ao ativar a integração.
-    queryFn: () => getMockClubs(query),
+    queryKey: ['clubs', 'list'],
+    // A mesma consulta abastece listagem, filtros e sidebar, compartilhando o cache.
+    queryFn: ({ signal }) => getClubs(signal),
   })
 }

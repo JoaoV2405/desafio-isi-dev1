@@ -6,6 +6,6 @@ export interface ClubSummary {
 
 export interface Club extends ClubSummary {
   cash: number
-  squad_value: number
-  net_worth: number
+  squad_value?: number
+  net_worth?: number
 }

@@ -7,6 +7,7 @@ import { ClubesModule } from './modules/clubes/clubes.module.js';
 import { TypeOrmConfigService } from './infrastructure/db/typeorm-config.service.js';
 import { JogadoresModule } from './modules/jogadores/jogadores.module.js';
 import { MercadoModule } from './modules/mercado/mercado.module.js';
+import { LigaModule } from './modules/liga/liga.module.js';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { MercadoModule } from './modules/mercado/mercado.module.js';
     JogadoresModule,
     ClubesModule,
     MercadoModule,
+    LigaModule,
   ],
   controllers: [AppController],
   providers: [AppService],

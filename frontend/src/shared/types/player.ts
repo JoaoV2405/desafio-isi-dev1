@@ -28,3 +28,13 @@ export interface Player {
   market_value: number
   club_id: number | null
 }
+
+export interface PlayerDetails extends Player {
+  pace: number
+  shooting: number
+  passing: number
+  dribbling: number
+  defending: number
+  physical: number
+  potential: number
+}

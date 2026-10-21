@@ -35,7 +35,7 @@ export function AppSidebar({
   return (
     <Sidebar collapsible="offcanvas">
       <SidebarHeader>
-        <Link to={RoutePaths.home} aria-label="Passe — Início">
+        <Link to={RoutePaths.home} aria-label="Passe. Início">
           <img src={logo} alt="Passe" className="h-auto w-40 p-2" />
         </Link>
       </SidebarHeader>
@@ -118,11 +118,11 @@ export function AppSidebar({
         </SidebarGroup>
         {/* novo grupo, no fim da sidebar, 3 itens seguindo o mesmo formato, mas nao são clicaveis  */}
       </SidebarContent>
-      <SidebarFooter className="m-2 rounded-xl border bg-white p-3">
+      <SidebarFooter className="m-2 rounded-xl border bg-card p-3">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {['Liga Ficticia', 'Ultimo jogo'].map((label) => (
+              {['Liga fictícia', 'Último jogo'].map((label) => (
                 <SidebarMenuItem key={label}>
                   <SidebarMenuButton
                     render={<div />}

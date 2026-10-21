@@ -60,7 +60,7 @@ export function DataTable<TData, TValue = unknown>({
       data-slot="data-table"
       className={cn(
         'flex w-full min-w-0 flex-col',
-        contained ? 'gap-0 overflow-hidden rounded-lg border' : 'gap-4',
+        contained ? 'gap-0 overflow-hidden rounded-xl border' : 'gap-4',
         className,
       )}
     >
@@ -72,7 +72,7 @@ export function DataTable<TData, TValue = unknown>({
           {toolbar}
         </div>
       )}
-      <div className={cn('overflow-hidden', !contained && 'rounded-lg border')}>
+      <div className={cn('overflow-hidden', !contained && 'rounded-xl border')}>
         <Table aria-busy={isLoading}>
           {caption != null && <TableCaption>{caption}</TableCaption>}
           <TableHeader>

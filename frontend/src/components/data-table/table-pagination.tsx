@@ -18,7 +18,10 @@ export function TablePagination({
       aria-label="Paginação da tabela"
       className="flex items-center justify-between gap-4"
     >
-      <p aria-live="polite" className="text-sm text-muted-foreground">
+      <p
+        aria-live="polite"
+        className="text-sm text-muted-foreground tabular-nums"
+      >
         {pageCount > 0 ? `Página ${page} de ${pageCount}` : 'Nenhuma página'}
       </p>
       <div className="flex items-center gap-2">

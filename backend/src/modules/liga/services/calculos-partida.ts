@@ -81,7 +81,7 @@ function calculateDuel(
     defensor.condicao === CondicaoJogador.Doente
   ) {
     throw new Error('Titulares inválidos para calcular o duelo');
-  }
+  } //retirar metodo daqui
 
   const [atributoAtaque, valorCadastrado] = selectAttack(atacante);
   const valorAtaque = calculateEffectiveAttribute(

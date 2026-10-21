@@ -4,7 +4,7 @@ import { Jogador, PosicaoJogador } from '../../jogadores/entities/jogador.entity
 type JogadorComPosicao = Pick<Jogador, 'posicao'>;
 
 export function isFormacaoClube(value: unknown): value is FormacaoClube {
-  return Object.values(FormacaoClube).some((formacao) => formacao === value);
+  return Object.values(FormacaoClube).some((formacao) => formacao === value); /// verificar codigo repetido
 }
 
 export function isComposicaoEscalacaoValida(

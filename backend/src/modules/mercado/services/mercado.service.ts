@@ -6,12 +6,22 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, In, IsNull, type Repository } from 'typeorm';
+import { formatarDataBrasilia } from '../../../core/date/formatar-data-brasilia.js';
+import {
+  centavosParaDecimal,
+  centavosParaNumero,
+  decimalParaCentavos,
+} from '../../../core/money/conversoes-monetarias.js';
 import { validarDataBrasilia } from '../../../core/validation/validadores-gerais.js';
 import { Clube } from '../../clubes/entities/clube.entity.js';
+import { calculateLoyaltyTerms } from '../../contratos/index.js';
 import { JogadoresService } from '../../jogadores/services/jogadores.service.js';
 import { Escalacao } from '../../liga/entities/escalacao.entity.js';
 import { ComprarJogadorDto } from '../dto/comprar-jogador.dto.js';
-import { ListarTransacoesDto, parseTiposTransacao } from '../dto/listar-transacoes.dto.js';
+import {
+  ListarTransacoesDto,
+  parseTiposTransacao,
+} from '../dto/listar-transacoes.dto.js';
 import {
   CompraResponse,
   ContratoCompraResponse,
@@ -25,14 +35,8 @@ import { Jogador } from '../../jogadores/entities/jogador.entity.js';
 import { Transacao, TipoTransacao } from '../entities/transacao.entity.js';
 import {
   calcularComissaoVenda,
-  calcularDiasRestantes,
   calcularMultaVenda,
-  calcularPercentualMulta,
   calcularTaxaCompra,
-  centavosParaDecimal,
-  centavosParaNumero,
-  decimalParaCentavos,
-  formatarDataBrasilia,
 } from './calculos-mercado.js';
 
 const LIMITE_ELENCO = 12;
@@ -56,7 +60,10 @@ export class MercadoService {
     jogadorId: number,
     dto: ComprarJogadorDto,
   ): Promise<CompraResponse> {
-    const fidelidadeAte = validarDataBrasilia(dto.loyalty_until, 'loyalty_until');
+    const fidelidadeAte = validarDataBrasilia(
+      dto.loyalty_until,
+      'loyalty_until',
+    );
 
     return this.dataSource.transaction(async (manager) => {
       const jogador = await manager
@@ -164,7 +171,8 @@ export class MercadoService {
         .getRepository(Transacao)
         .save(transacao);
 
-      return Object.assign(new CompraResponse(),
+      return Object.assign(
+        new CompraResponse(),
         this.apresentarTransacao(transacaoSalva),
         {
           contract: this.apresentarContratoCompra(contratoSalvo),
@@ -222,11 +230,8 @@ export class MercadoService {
         this.jogadoresService.calculateMarketValueInCents(jogador);
       const valorCompraEmCentavos = decimalParaCentavos(contrato.valorCompra);
       const lucroEmCentavos = valorEmCentavos - valorCompraEmCentavos;
-      const diasRestantes = calcularDiasRestantes(
-        contrato.fidelidadeAte,
-        instante,
-      );
-      const percentualMulta = calcularPercentualMulta(diasRestantes);
+      const { remainingDays: diasRestantes, penaltyRate: percentualMulta } =
+        calculateLoyaltyTerms(contrato.fidelidadeAte, instante);
       const multaEmCentavos = calcularMultaVenda(
         valorEmCentavos,
         percentualMulta,
@@ -266,7 +271,8 @@ export class MercadoService {
         .getRepository(Transacao)
         .save(transacao);
 
-      return Object.assign(new VendaResponse(),
+      return Object.assign(
+        new VendaResponse(),
         this.apresentarTransacao(transacaoSalva),
         {
           purchase_value: centavosParaNumero(valorCompraEmCentavos),

@@ -25,7 +25,7 @@ export function AttributeProgressRow({
   return (
     <div
       className={cn(
-        'grid grid-cols-[5rem_minmax(0,1fr)_1.5rem] items-center gap-2 text-xs',
+        'grid grid-cols-[5rem_minmax(0,1fr)_3.5rem] items-center gap-2 text-xs',
         className,
       )}
     >
@@ -41,23 +41,32 @@ export function AttributeProgressRow({
             ? `${displayedValue} de 99`
             : `${displayedValue} de 99; potencial ${displayedPotential} de 99`
         }
-        className="flex h-2 overflow-hidden rounded-full bg-gray-200"
+        className="flex h-2 overflow-hidden rounded-full bg-muted"
       >
         <span
           aria-hidden="true"
           data-slot="attribute-value"
-          className="h-full shrink-0 bg-blue-500"
+          className="h-full shrink-0 bg-chart-1"
           style={{ width: `${(displayedValue / 99) * 100}%` }}
         />
         <span
           aria-hidden="true"
           data-slot="attribute-potential"
-          className="h-full shrink-0 bg-blue-500/30"
+          className="h-full shrink-0 bg-chart-2"
           style={{ width: `${(potentialWidth / 99) * 100}%` }}
         />
       </div>
-      <span aria-hidden="true" className="text-right font-bold tabular-nums">
+      <span
+        aria-hidden="true"
+        className="text-right font-semibold tabular-nums"
+      >
         {displayedValue}
+        {displayedPotential !== undefined && (
+          <span className="font-normal text-muted-foreground">
+            {' / '}
+            {displayedPotential}
+          </span>
+        )}
       </span>
     </div>
   )

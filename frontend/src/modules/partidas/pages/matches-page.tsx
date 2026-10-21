@@ -15,7 +15,7 @@ export function MatchesPage() {
           // TODO: abrir o formulário de nova partida.
           <Button disabled>
             <IconPlaceholder />
-            Nova partida
+            Criar partida
           </Button>
         }
       />

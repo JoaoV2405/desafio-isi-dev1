@@ -41,7 +41,7 @@ export function createPlayerSummaryColumns<
     },
     market_value: {
       accessorKey: 'market_value',
-      header: 'Valor de Mercado',
+      header: 'Valor de mercado',
       cell: ({ row }) => formatMoney(row.original.market_value),
     },
   }

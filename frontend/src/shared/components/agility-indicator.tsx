@@ -3,9 +3,9 @@ import { cn } from '@/lib/utils'
 import { getAgilityColor } from '@/shared/lib/player-presentation'
 
 const agilityColors = {
-  red: '[&_[data-slot=progress-indicator]]:bg-red-500',
-  gray: '[&_[data-slot=progress-indicator]]:bg-gray-400',
-  green: '[&_[data-slot=progress-indicator]]:bg-green-500',
+  red: '[&_[data-slot=progress-indicator]]:bg-destructive',
+  gray: '[&_[data-slot=progress-indicator]]:bg-muted-foreground',
+  green: '[&_[data-slot=progress-indicator]]:bg-success',
 }
 
 export function AgilityIndicator({ value }: { value: number }) {

@@ -23,12 +23,14 @@ export function PlayerIdentity({
   return (
     <div className={cn('flex items-center gap-3', className)}>
       <Avatar size="lg" aria-hidden="true">
-        <AvatarFallback>{getPlayerInitials(name)}</AvatarFallback>
+        <AvatarFallback className="bg-avatar-zinc text-avatar-zinc-foreground">
+          {getPlayerInitials(name)}
+        </AvatarFallback>
       </Avatar>
       <div className="min-w-0">
         <p className="font-medium">{name}</p>
         {/* Permite compor a descrição com badges no drawer, preservando o resumo dos demais contextos. */}
-        <div className="text-xs text-muted-foreground">
+        <div className="text-xs text-muted-foreground tabular-nums">
           {description ?? (
             <>
               {age !== undefined && `${position} · `}

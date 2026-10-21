@@ -7,6 +7,7 @@ import { PlayerGeneralFields } from '../player-general-fields'
 import { PlayerFormField } from '../player-form-field'
 import { PlayerTechnicalFields } from '../player-technical-fields'
 import { Modal } from '@/components/modal/modal'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Separator } from '@/components/ui/separator'
 import type { CreatePlayerInput } from '../../types/player-input'
 
@@ -41,7 +42,7 @@ export function CreatePlayerModal({
     <Modal
       open={open}
       onOpenChange={onOpenChange}
-      title="Novo jogador"
+      title="Cadastrar jogador"
       subtitle="Informe os dados pessoais e os indicadores técnicos do jogador."
       className="max-w-5xl"
       primaryAction={{ label: 'Cadastrar jogador', formId }}
@@ -77,7 +78,7 @@ export function CreatePlayerModal({
                   id={`${formId}-technical-title`}
                   className="text-base font-semibold"
                 >
-                  Indicadores Técnicos
+                  Indicadores técnicos
                 </h2>
                 <p className="text-sm text-muted-foreground">
                   Defina os atributos e o potencial do jogador, de 1 a 99.
@@ -90,12 +91,11 @@ export function CreatePlayerModal({
             </section>
           </fieldset>
           {error && (
-            <p
-              role="alert"
-              className="whitespace-pre-line text-sm text-destructive"
-            >
-              {error}
-            </p>
+            <Alert variant="destructive">
+              <AlertDescription className="whitespace-pre-line">
+                {error}
+              </AlertDescription>
+            </Alert>
           )}
         </form>
       </FormProvider>

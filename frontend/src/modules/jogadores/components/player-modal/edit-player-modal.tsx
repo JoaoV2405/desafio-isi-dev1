@@ -9,6 +9,7 @@ import {
 import { PlayerGeneralFields } from '../player-general-fields'
 import type { Player, PlayerCondition } from '@/shared/types/player'
 import { Modal } from '@/components/modal/modal'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { PlayerConditionBadge } from '@/shared/components/player-condition-badge'
@@ -85,12 +86,11 @@ export function EditPlayerModal({
             />
           </fieldset>
           {error && (
-            <p
-              role="alert"
-              className="whitespace-pre-line text-sm text-destructive"
-            >
-              {error}
-            </p>
+            <Alert variant="destructive">
+              <AlertDescription className="whitespace-pre-line">
+                {error}
+              </AlertDescription>
+            </Alert>
           )}
         </form>
       </FormProvider>
@@ -190,7 +190,7 @@ export function EditPlayerConditionModal({
       isSubmitting={isSubmitting}
     >
       {/* O badge representa a condição atual; a seleção abaixo representa a alteração proposta. */}
-      <div className="flex items-center gap-4 rounded-lg border bg-muted/30 p-4">
+      <div className="flex items-center gap-4 rounded-xl border bg-muted/30 p-4">
         <PlayerIdentity
           name={player.name}
           position={player.position}
@@ -228,7 +228,7 @@ export function EditPlayerConditionModal({
               <label
                 key={value}
                 className={cn(
-                  'flex w-full cursor-pointer items-center gap-3 rounded-lg border p-4 transition-colors hover:bg-muted has-focus-visible:ring-3 has-focus-visible:ring-ring/50',
+                  'flex w-full cursor-pointer items-center gap-3 rounded-md border border-input p-4 transition-colors hover:bg-muted has-focus-visible:ring-3 has-focus-visible:ring-ring',
                   condition === value && 'border-primary bg-muted/50',
                   (isBlocked || isSubmitting) &&
                     'cursor-not-allowed opacity-50',
@@ -266,29 +266,33 @@ export function EditPlayerConditionModal({
         </p>
       )}
       {hasLineupError && (
-        <div role="alert" className="space-y-2 text-sm text-destructive">
-          <p>{lineup.error.message}</p>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => void lineup.refetch()}
-          >
-            Tentar novamente
-          </Button>
-        </div>
+        <Alert variant="destructive">
+          <AlertDescription className="space-y-2">
+            <p>{lineup.error.message}</p>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => void lineup.refetch()}
+            >
+              Tentar novamente
+            </Button>
+          </AlertDescription>
+        </Alert>
       )}
       {!isCheckingLineup && !hasLineupError && isStarter && (
-        <p role="status" className="rounded-lg border bg-muted/30 p-3 text-sm">
-          Ao confirmar, {player.name} será removido da escalação de {clubName}.
-        </p>
+        <Alert variant="warning" role="status">
+          <AlertDescription>
+            Ao confirmar, {player.name} será removido da escalação de {clubName}
+            .
+          </AlertDescription>
+        </Alert>
       )}
       {error && (
-        <p
-          role="alert"
-          className="whitespace-pre-line text-sm text-destructive"
-        >
-          {error}
-        </p>
+        <Alert variant="destructive">
+          <AlertDescription className="whitespace-pre-line">
+            {error}
+          </AlertDescription>
+        </Alert>
       )}
     </Modal>
   )

@@ -1,5 +1,6 @@
 import type { Player } from '@/shared/types/player'
 import { Modal } from '@/components/modal/modal'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { PlayerIdentity } from '@/shared/components/player-identity'
 
@@ -44,7 +45,7 @@ export function DeletePlayerModal({
       isSubmitting={isSubmitting}
     >
       {/* Identifica o jogador e mantém o vínculo à direita, fora do bloco de texto. */}
-      <div className="flex items-center gap-4 rounded-lg border bg-muted/30 p-4">
+      <div className="flex items-center gap-4 rounded-xl border bg-muted/30 p-4">
         <PlayerIdentity
           name={player.name}
           position={player.position}
@@ -56,17 +57,18 @@ export function DeletePlayerModal({
         </Badge>
       </div>
       {!isFree && (
-        <p role="alert" className="text-sm text-destructive">
-          Apenas jogadores livres podem ser excluídos.
-        </p>
+        <Alert variant="destructive">
+          <AlertDescription>
+            Apenas jogadores livres podem ser excluídos.
+          </AlertDescription>
+        </Alert>
       )}
       {error && (
-        <p
-          role="alert"
-          className="whitespace-pre-line text-sm text-destructive"
-        >
-          {error}
-        </p>
+        <Alert variant="destructive">
+          <AlertDescription className="whitespace-pre-line">
+            {error}
+          </AlertDescription>
+        </Alert>
       )}
     </Modal>
   )

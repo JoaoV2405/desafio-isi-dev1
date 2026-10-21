@@ -1,3 +1,4 @@
+import { useId } from 'react'
 import type { UseFormRegister } from 'react-hook-form'
 import type {
   PlayersFilterValues,
@@ -25,6 +26,7 @@ export function PlayersFilters({
   clubsLoading = false,
   clubsUnavailable = false,
 }: PlayersFiltersProps) {
+  const searchDescriptionId = useId()
   // Cada campo passa seu valor ao React Hook Form e reinicia a paginação ao mudar.
   const registerFilter = (name: keyof PlayersFilterValues) =>
     register(name, { onChange: onFilterChange })
@@ -32,17 +34,18 @@ export function PlayersFilters({
   return (
     <div
       aria-label="Filtros de jogadores"
-      className="grid grid-cols-6 items-end gap-1"
+      className="grid grid-cols-6 items-end gap-2"
     >
-      <label className="col-span-2 space-y-1 text-sm">
+      <label className="col-span-2 space-y-1 text-sm font-medium">
         <span>Buscar jogador</span>
         <Input
           {...registerFilter('search')}
-          placeholder="Buscar por nome (mínimo 2 letras)"
+          placeholder="Ex.: Carlos Silva"
+          aria-describedby={searchDescriptionId}
           maxLength={100}
         />
       </label>
-      <label className="space-y-1 text-sm">
+      <label className="space-y-1 text-sm font-medium">
         <span>Posição</span>
         <NativeSelect {...registerFilter('position')} className="w-full">
           <NativeSelectOption value="">Todas as posições</NativeSelectOption>
@@ -53,7 +56,7 @@ export function PlayersFilters({
           ))}
         </NativeSelect>
       </label>
-      <label className="space-y-1 text-sm">
+      <label className="space-y-1 text-sm font-medium">
         <span>Condição</span>
         <NativeSelect {...registerFilter('condition')} className="w-full">
           <NativeSelectOption value="">Todas as condições</NativeSelectOption>
@@ -64,7 +67,7 @@ export function PlayersFilters({
           ))}
         </NativeSelect>
       </label>
-      <label className="space-y-1 text-sm">
+      <label className="space-y-1 text-sm font-medium">
         <span>Clube</span>
         <NativeSelect
           {...registerFilter('clubId')}
@@ -108,31 +111,40 @@ export function PlayersFilters({
         </div>
       </fieldset> */}
       <fieldset className="min-w-0 space-y-1">
-        {/*
-        um fieldset só
-        */}
-        <legend className="text-sm">Valor de mercado (moedas)</legend>
+        <legend className="text-sm font-medium">
+          Valor de mercado (moedas)
+        </legend>
         <div className="flex gap-2">
-          <Input
-            {...registerFilter('minValue')}
-            aria-label="Valor de mercado mínimo"
-            type="number"
-            min={0}
-            max={550}
-            step="0.01"
-            placeholder="Mínimo"
-          />
-          <Input
-            {...registerFilter('maxValue')}
-            aria-label="Valor de mercado máximo"
-            type="number"
-            min={0}
-            max={550}
-            step="0.01"
-            placeholder="Máximo"
-          />
+          <label className="min-w-0 flex-1 space-y-1 text-sm font-medium">
+            <span>Mínimo</span>
+            <Input
+              {...registerFilter('minValue')}
+              type="number"
+              min={0}
+              max={550}
+              step="0.01"
+              placeholder="0,00"
+            />
+          </label>
+          <label className="min-w-0 flex-1 space-y-1 text-sm font-medium">
+            <span>Máximo</span>
+            <Input
+              {...registerFilter('maxValue')}
+              type="number"
+              min={0}
+              max={550}
+              step="0.01"
+              placeholder="550,00"
+            />
+          </label>
         </div>
       </fieldset>
+      <p
+        id={searchDescriptionId}
+        className="col-span-full text-xs text-muted-foreground"
+      >
+        Para buscar por nome, digite pelo menos 2 caracteres.
+      </p>
     </div>
   )
 }

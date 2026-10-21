@@ -1,6 +1,7 @@
 import { useId } from 'react'
 import type { ComponentProps } from 'react'
 import { Input } from '@/components/ui/input'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 
 interface PlayerFormFieldProps extends ComponentProps<typeof Input> {
   label: string
@@ -24,7 +25,7 @@ export function PlayerFormField({
     .join(' ')
 
   return (
-    <div className="min-w-0 space-y-1.5">
+    <div className="min-w-0 space-y-2">
       <label htmlFor={inputId} className="block text-sm font-medium">
         {label}
       </label>
@@ -40,9 +41,9 @@ export function PlayerFormField({
         </p>
       )}
       {error && (
-        <p id={errorId} role="alert" className="text-xs text-destructive">
-          {error}
-        </p>
+        <Alert id={errorId} variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
       )}
     </div>
   )

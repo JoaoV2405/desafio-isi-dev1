@@ -1,4 +1,4 @@
-import { centavosParaDecimal } from '../services/calculos-jogador.js';
+import { centavosParaDecimal } from '../../../core/money/conversoes-monetarias.js';
 import { CriarJogadorDto } from '../dto/criar-jogador.dto.js';
 import { EditarJogadorDto } from '../dto/editar-jogador.dto.js';
 import { CondicaoJogador, Jogador } from '../entities/jogador.entity.js';

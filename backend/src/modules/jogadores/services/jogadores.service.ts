@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { Clube } from '../../clubes/entities/clube.entity.js';
@@ -15,35 +15,31 @@ import {
   type ListarJogadoresDto,
   type OrdenacaoJogadores,
 } from '../dto/listar-jogadores.dto.js';
-import {
-  CondicaoJogador,
-  Jogador,
-  PosicaoJogador,
-} from '../entities/jogador.entity.js';
+import { CondicaoJogador, Jogador } from '../entities/jogador.entity.js';
 import { FiltrosJogadoresMapper } from '../mappers/filtros-jogadores.mapper.js';
 import { JogadorMapper } from '../mappers/jogador.mapper.js';
 import { JogadorPresenter } from '../presenters/jogador.presenter.js';
+import {
+  compareNameAndId,
+  comparePositions,
+  compareText,
+  normalizeForComparison,
+  sortRoster,
+} from './ordenacao-jogadores.js';
+import { projectRoster } from './project-roster.js';
 import { ValidacaoJogadoresService } from './validacao-jogadores.service.js';
 
 type JogadorCalculado = {
   jogador: Jogador;
+  // Guia do item 2, passo 1: remover response deste tipo e do retorno de calculatePlayer.
+  // Manter jogador, marketValueInCents e normalizedName para filtrar e ordenar.
   response: JogadorResponse;
   marketValueInCents: number;
   normalizedName: string;
 };
 
-const ORDEM_POSICOES: Record<PosicaoJogador, number> = {
-  [PosicaoJogador.Goleiro]: 0,
-  [PosicaoJogador.Zagueiro]: 1,
-  [PosicaoJogador.Lateral]: 2,
-  [PosicaoJogador.Meia]: 3,
-  [PosicaoJogador.Atacante]: 4,
-};
-
 @Injectable()
 export class JogadoresService {
-  private readonly logger = new Logger(JogadoresService.name);
-
   constructor(
     @InjectRepository(Jogador)
     private readonly jogadoresRepository: Repository<Jogador>,
@@ -54,7 +50,7 @@ export class JogadoresService {
   ) {}
 
   async create(dto: CriarJogadorDto): Promise<JogadorResponse> {
-    this.logger.log('create');
+    // Valida regras que dependem de mais de um campo e calcula o valor base, que fica fixo após o cadastro.
     this.validacaoJogadoresService.validateCreation(dto);
     const baseValueInCents =
       this.validacaoJogadoresService.calculateBaseValueInCents(dto);
@@ -65,9 +61,14 @@ export class JogadoresService {
   }
 
   async findAll(query: ListarJogadoresDto): Promise<ListaJogadoresResponse> {
-    this.logger.log('findAll');
     const filtros = FiltrosJogadoresMapper.fromDto(query);
     this.validacaoJogadoresService.validateFilters(filtros);
+    // Item 3, passo 1: adicionar esta variável antes de percorrer os jogadores.
+    // O DTO já ajustou os espaços; aqui preparamos caixa e acentos uma vez por pedido.
+    // const normalizedSearch =
+    //   filtros.search === undefined
+    //     ? undefined
+    //     : normalizeForComparison(filtros.search);
 
     if (
       filtros.clubId !== undefined &&
@@ -76,13 +77,23 @@ export class JogadoresService {
       throw new NotFoundException('Clube não encontrado');
     }
 
+    // O valor de mercado é derivado do estado atual, então filtros e ordenação são aplicados após calcular cada jogador.
     const jogadores = await this.jogadoresRepository.find();
     const jogadoresFiltrados = jogadores
       .map((jogador) => this.calculatePlayer(jogador))
+      // Item 3, passo 2: substituir a chamada de filter abaixo por esta versão.
+      // .filter((jogador) =>
+      //   this.matchesFilters(jogador, filtros, normalizedSearch),
+      // )
       .filter((jogador) => this.matchesFilters(jogador, filtros))
       .sort((a, b) => this.comparePlayers(a, b, filtros.sort));
     const totalItems = jogadoresFiltrados.length;
     const start = (filtros.page - 1) * filtros.limit;
+    // Guia do item 2, passo 4: preservar filtros, ordenação e totalItems antes do slice.
+    // No map após o slice, receber jogador e marketValueInCents e chamar presentPlayer
+    // com os dois argumentos (ver passo 3). Assim, overall e resposta completa serão
+    // produzidos apenas para a página; página vazia não executará esses cálculos.
+    // Na verificação, comparar data e meta e cobrir página além do fim e sem resultados.
     const data = jogadoresFiltrados
       .slice(start, start + filtros.limit)
       .map(({ response }) => response);
@@ -100,7 +111,6 @@ export class JogadoresService {
   }
 
   async findById(id: number): Promise<JogadorResponse> {
-    this.logger.log('findById');
     return this.presentPlayer(await this.findEntityById(id));
   }
 
@@ -108,13 +118,20 @@ export class JogadoresService {
     return this.validacaoJogadoresService.calculateMarketValueInCents(jogador);
   }
 
+  sortRoster(jogadores: readonly Jogador[]): Jogador[] {
+    return sortRoster(jogadores);
+  }
+
+  presentRoster(jogadores: readonly Jogador[]): JogadorResponse[] {
+    return projectRoster(jogadores).players;
+  }
+
   async update(id: number, dto: EditarJogadorDto): Promise<JogadorResponse> {
-    this.logger.log('update');
     const jogador = await this.findEntityById(id);
     // chaamar save do repository
     this.validacaoJogadoresService.validateUpdate(dto, jogador);
     const jogadorAtualizado = JogadorMapper.applyUpdate(jogador, dto);
-    
+
     return this.presentPlayer(
       await this.jogadoresRepository.save(jogadorAtualizado),
     );
@@ -124,16 +141,20 @@ export class JogadoresService {
     id: number,
     dto: AlterarCondicaoJogadorDto,
   ): Promise<JogadorResponse> {
-    this.logger.log('updateCondition');
+    // A condição e a eventual saída da escalação precisam confirmar ou reverter juntas.
     return this.dataSource.transaction(async (manager) => {
       const jogadoresRepository = manager.getRepository(Jogador);
-      const jogador = await jogadoresRepository.findOneBy({ id });
+      const jogador = await jogadoresRepository.findOne({
+        where: { id },
+        lock: { mode: 'pessimistic_write' },
+      });
 
       if (!jogador) {
         throw new NotFoundException('Jogador não encontrado');
       }
 
       if (jogador.condicao === dto.condition) {
+        // Repetir a condição é idempotente e não precisa gerar escrita nem remover novamente a escalação.
         return this.presentPlayer(jogador);
       }
 
@@ -152,7 +173,6 @@ export class JogadoresService {
   }
 
   async remove(id: number): Promise<void> {
-    this.logger.log('remove');
     const jogador = await this.findEntityById(id);
     this.validacaoJogadoresService.validateRemoval(jogador);
 
@@ -160,7 +180,6 @@ export class JogadoresService {
   }
 
   private async findEntityById(id: number): Promise<Jogador> {
-    this.logger.log('findEntityById');
     const jogador = await this.jogadoresRepository.findOneBy({ id });
 
     if (!jogador) {
@@ -171,7 +190,10 @@ export class JogadoresService {
   }
 
   private presentPlayer(jogador: Jogador): JogadorResponse {
-    this.logger.log('presentPlayer');
+    // Guia do item 2, passo 3: aceitar marketValueInCents como segundo argumento opcional.
+    // No campo marketValueInCents abaixo, usar o argumento com ?? e calcular só se ausente.
+    // Manter o cálculo de overall aqui. findAll reutilizará o valor de mercado já
+    // calculado; cadastro, consulta individual e alterações seguem com um argumento.
     return JogadorPresenter.present(jogador, {
       overall: this.validacaoJogadoresService.calculateOverall(jogador),
       marketValueInCents:
@@ -180,7 +202,10 @@ export class JogadoresService {
   }
 
   private calculatePlayer(jogador: Jogador): JogadorCalculado {
-    this.logger.log('calculatePlayer');
+    // Guia do item 2, passo 2: manter o cálculo de mercado e a normalização do nome,
+    // necessários antes de filtrar e ordenar. Remover somente o campo response abaixo,
+    // incluindo sua chamada ao presenter e ao cálculo de overall. A montagem da resposta
+    // passa para o map após o slice em findAll, usando presentPlayer conforme os passos 3 e 4.
     const marketValueInCents =
       this.validacaoJogadoresService.calculateMarketValueInCents(jogador);
 
@@ -195,15 +220,22 @@ export class JogadoresService {
     };
   }
 
-  /// criar modulo partidas e transferir essas funções
-
   private matchesFilters(
     calculado: JogadorCalculado,
     filtros: FiltrosJogadores,
+    // Item 3, passo 3: adicionar este parâmetro para receber a busca já preparada.
+    // normalizedSearch: string | undefined,
   ): boolean {
-    this.logger.log('matchesFilters');
     const { jogador, marketValueInCents, normalizedName } = calculado;
 
+    // Item 3, passo 4: substituir somente o if de busca abaixo por este bloco.
+    // Sem search, o teste é ignorado; os demais filtros continuam como estão.
+    // if (
+    //   normalizedSearch !== undefined &&
+    //   !normalizedName.includes(normalizedSearch)
+    // ) {
+    //   return false;
+    // }
     if (
       filtros.search &&
       !normalizedName.includes(normalizeForComparison(filtros.search))
@@ -233,15 +265,11 @@ export class JogadoresService {
     b: JogadorCalculado,
     ordenacoes: readonly OrdenacaoJogadores[],
   ): number {
-    this.logger.log('comparePlayers');
     for (const ordenacao of ordenacoes) {
       const resultado = this.compareBySort(a, b, ordenacao);
       if (resultado !== 0) return resultado;
     }
-    return (
-      compareText(a.normalizedName, b.normalizedName) ||
-      a.jogador.id - b.jogador.id
-    );
+    return compareNameAndId(a, b);
   }
 
   private compareBySort(
@@ -249,7 +277,6 @@ export class JogadoresService {
     b: JogadorCalculado,
     ordenacao: OrdenacaoJogadores,
   ): number {
-    this.logger.log('compareBySort');
     switch (ordenacao) {
       case 'name':
         return compareText(a.normalizedName, b.normalizedName);
@@ -262,28 +289,7 @@ export class JogadoresService {
       case 'age_desc':
         return b.jogador.idade - a.jogador.idade;
       case 'position':
-        return (
-          ORDEM_POSICOES[a.jogador.posicao] - ORDEM_POSICOES[b.jogador.posicao]
-        );
+        return comparePositions(a.jogador, b.jogador);
     }
   }
-}
-
-function normalizeForComparison(value: string): string {
-  return value
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/\p{Mn}/gu, '');
-}
-
-function compareText(a: string, b: string): number {
-  const caracteresA = Array.from(a);
-  const caracteresB = Array.from(b);
-  const tamanhoComparavel = Math.min(caracteresA.length, caracteresB.length);
-  for (let indice = 0; indice < tamanhoComparavel; indice += 1) {
-    const codigoA = caracteresA[indice].codePointAt(0) ?? 0;
-    const codigoB = caracteresB[indice].codePointAt(0) ?? 0;
-    if (codigoA !== codigoB) return codigoA - codigoB;
-  }
-  return caracteresA.length - caracteresB.length;
 }

@@ -20,10 +20,10 @@ import {
 
 @Injectable()
 export class ValidacaoJogadoresService {
-  private readonly logger = new Logger(ValidacaoJogadoresService.name);
       
 
   validateCreation(dto: CriarJogadorDto): void {
+    // Estes limites combinam atributos, potencial, idade e agilidade e por isso complementam os decorators do DTO.
     const attributes = this.getAttributes(dto);
     const highestAttribute = Math.max(...attributes);
     const attributesTotal = attributes.reduce(
@@ -53,7 +53,7 @@ export class ValidacaoJogadoresService {
   }
 
   validateUpdate(dto: EditarJogadorDto, jogador: Jogador): void {
-    this.logger.log('validateUpdate');
+    // Atualizações preservam atributos e valor base, mas ainda obedecem às regras de idade, agilidade e vínculo.
     this.validateAgilityForAge(dto.agility, dto.age);
 
     if (dto.age < jogador.idade) {
@@ -71,6 +71,7 @@ export class ValidacaoJogadoresService {
     currentCondition: CondicaoJogador,
     nextCondition: CondicaoJogador,
   ): void {
+    // A única transição proibida é sair de DOENTE diretamente para APTO.
     if (
       currentCondition === CondicaoJogador.Doente &&
       nextCondition === CondicaoJogador.Apto
@@ -90,6 +91,7 @@ export class ValidacaoJogadoresService {
   }
 
   validateFilters(filters: FiltrosJogadores): void {
+    // Rejeita combinações incoerentes que não podem ser validadas olhando cada query parameter isoladamente.
     if (filters.minAge > filters.maxAge) {
       throw new BadRequestException('min_age não pode ser maior que max_age');
     }
@@ -111,10 +113,13 @@ export class ValidacaoJogadoresService {
     }
   }
 
+  // Guia do item 2: manter a fórmula e as duas assinaturas deste método.
+  // O ajuste é no chamador: calculatePlayer deixa de chamá-lo; na listagem, presentPlayer
+  // o chama somente após o slice. No cadastro, ele continua necessário para o valor base.
+  // Não armazenar o resultado na entity nem criar cache persistente para essa otimização.
   calculateOverall(dto: CriarJogadorDto): number;
   calculateOverall(jogador: Jogador): number;
   calculateOverall(input: CriarJogadorDto | Jogador): number {
-    this.logger.log('calculateOverall');
     const position = this.getPosition(input);
     const [velocidade, finalizacao, passe, drible, defesa, fisico] =
       this.getAttributes(input);
@@ -130,6 +135,8 @@ export class ValidacaoJogadoresService {
   }
 
   calculateBaseValueInCents(dto: CriarJogadorDto): number {
+    // Guia do item 2: preservar esta chamada a calculateOverall; ela calcula o valor base
+    // uma única vez no cadastro e não participa do trabalho antecipado da paginação.
     return calcularValorBaseEmCentavos(
       this.calculateOverall(dto),
       dto.potential,
@@ -138,6 +145,9 @@ export class ValidacaoJogadoresService {
   }
 
   calculateMarketValueInCents(jogador: Jogador): number {
+    // Guia do item 2: preservar este cálculo antes dos filtros e da ordenação por valor.
+    // O resultado em centavos deve ser reaproveitado ao montar a resposta após o slice,
+    // pelo argumento opcional de presentPlayer descrito no guia de JogadoresService.
     return calcularValorMercadoEmCentavos(
       jogador.valorBase,
       jogador.condicao,

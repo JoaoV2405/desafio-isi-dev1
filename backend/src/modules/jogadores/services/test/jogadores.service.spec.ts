@@ -46,7 +46,7 @@ describe('JogadoresService', () => {
     existsBy: vi.fn(),
   };
   const repositoryTransacional = {
-    findOneBy: vi.fn(),
+    findOne: vi.fn(),
     save: vi.fn(),
   };
   const manager = {
@@ -75,6 +75,83 @@ describe('JogadoresService', () => {
       async (operacao: (entityManager: EntityManager) => unknown) =>
         operacao(manager as unknown as EntityManager),
     );
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('ordena o elenco por posição, nome normalizado e id sem alterar os registros', () => {
+    const jogadores = Object.freeze(
+      [
+        criarJogador({
+          id: 10,
+          nome: 'Ana Lima',
+          posicao: PosicaoJogador.Atacante,
+        }),
+        criarJogador({ id: 6, nome: 'Épsilon Lima' }),
+        criarJogador({ id: 4, nome: 'Ana-Maria Lima' }),
+        criarJogador({
+          id: 3,
+          nome: 'Zulu Lima',
+          posicao: PosicaoJogador.Lateral,
+        }),
+        criarJogador({ id: 9, nome: 'ÁNA Lima' }),
+        criarJogador({
+          id: 2,
+          nome: 'Zulu Lima',
+          posicao: PosicaoJogador.Zagueiro,
+        }),
+        criarJogador({ id: 5, nome: 'Delta Lima' }),
+        criarJogador({
+          id: 1,
+          nome: 'Zulu Lima',
+          posicao: PosicaoJogador.Goleiro,
+        }),
+        criarJogador({ id: 7, nome: 'ana lima' }),
+      ].map((jogador) => Object.freeze(jogador)),
+    );
+    const valorMercado = vi.spyOn(validacao, 'calculateMarketValueInCents');
+    const overall = vi.spyOn(validacao, 'calculateOverall');
+
+    const ordenados = service.sortRoster(jogadores);
+
+    expect(ordenados.map(({ id }) => id)).toEqual([1, 2, 3, 7, 9, 4, 5, 6, 10]);
+    expect(ordenados).not.toBe(jogadores);
+    for (const jogador of ordenados) {
+      expect(jogador).toBe(jogadores.find(({ id }) => id === jogador.id));
+    }
+    expect(valorMercado).not.toHaveBeenCalled();
+    expect(overall).not.toHaveBeenCalled();
+  });
+
+  it('ordena nomes por pontos Unicode, incluindo caracteres fora do plano básico', () => {
+    const jogadores = [
+      criarJogador({ id: 1, nome: '\u{10428} Lima' }),
+      criarJogador({ id: 2, nome: '\uff41 Lima' }),
+    ];
+
+    expect(service.sortRoster(jogadores).map(({ id }) => id)).toEqual([2, 1]);
+  });
+
+  it('apresenta o elenco completo na mesma ordem sem perder campos calculados', () => {
+    const jogadores = [
+      criarJogador({ id: 2, condicao: CondicaoJogador.MalCondicionado }),
+      criarJogador({ id: 1, posicao: PosicaoJogador.Goleiro }),
+    ];
+
+    const response = service.presentRoster(jogadores);
+
+    expect(response.map(({ id }) => id)).toEqual([1, 2]);
+    expect(response[1]).toMatchObject({
+      id: 2,
+      name: 'Meia Lua',
+      position: PosicaoJogador.Meia,
+      condition: CondicaoJogador.MalCondicionado,
+      base_value: 40,
+      market_value: 37,
+      overall: 75,
+    });
   });
 
   it('cria o jogador livre e APTO com valor base calculado', async () => {
@@ -203,7 +280,7 @@ describe('JogadoresService', () => {
   });
 
   it('remove a escalação na mesma transação ao marcar como DOENTE', async () => {
-    repositoryTransacional.findOneBy.mockResolvedValue(criarJogador());
+    repositoryTransacional.findOne.mockResolvedValue(criarJogador());
 
     const response = await service.updateCondition(1, {
       condition: CondicaoJogador.Doente,
@@ -217,7 +294,7 @@ describe('JogadoresService', () => {
   });
 
   it('impede a transição direta de DOENTE para APTO', async () => {
-    repositoryTransacional.findOneBy.mockResolvedValue(
+    repositoryTransacional.findOne.mockResolvedValue(
       criarJogador({ condicao: CondicaoJogador.Doente }),
     );
 
@@ -227,7 +304,7 @@ describe('JogadoresService', () => {
   });
 
   it('não grava nem altera escalação ao repetir a condição atual', async () => {
-    repositoryTransacional.findOneBy.mockResolvedValue(criarJogador());
+    repositoryTransacional.findOne.mockResolvedValue(criarJogador());
 
     const response = await service.updateCondition(1, {
       condition: CondicaoJogador.Apto,

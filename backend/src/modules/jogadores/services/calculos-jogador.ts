@@ -1,3 +1,4 @@
+import { decimalParaCentavos } from '../../../core/money/conversoes-monetarias.js';
 import { CondicaoJogador, PosicaoJogador } from '../entities/jogador.entity.js';
 
 type AtributosJogador = {
@@ -24,7 +25,7 @@ export function calcularOverall(
   posicao: PosicaoJogador,
   atributos: AtributosJogador,
 ): number {
-  
+  // O overall usa os pesos específicos da posição e arredonda o resultado inteiro com meio para cima.
   const pesos = PESOS_POR_POSICAO[posicao];
   const valores = [
     atributos.velocidade,
@@ -47,6 +48,7 @@ export function calcularValorBaseEmCentavos(
   potencial: number,
   idade: number,
 ): number {
+  // O valor base nasce uma vez do overall, com faixas progressivas, bônus jovem e piso de um real.
   const pontosPrimeiraFaixa = Math.max(0, Math.min(overall, 60) - 40);
   const pontosSegundaFaixa = Math.max(0, Math.min(overall, 75) - 60);
   const pontosTerceiraFaixa = Math.max(0, overall - 75);
@@ -69,7 +71,8 @@ export function calcularValorMercadoEmCentavos(
   agilidade: number,
   idade: number,
 ): number {
-  const valorBaseEmCentavos = dinheiroParaCentavos(valorBase);
+  // O valor de mercado é recalculado em centavos a partir da condição, agilidade e idade atuais.
+  const valorBaseEmCentavos = decimalParaCentavos(valorBase);
   let descontoEmDecimos = {
     [CondicaoJogador.Apto]: 0,
     [CondicaoJogador.MalCondicionado]: 150,
@@ -91,19 +94,4 @@ export function calcularValorMercadoEmCentavos(
   const valorMercadoEmCentavos = Math.floor((numerador + 500) / 1_000);
 
   return Math.max(100, valorMercadoEmCentavos);
-}
-
-// Funções auxiliares para conversão de valores monetários serao utilizadas em outros lugares, transfira para uma pasta shared ou utils em core
-export function centavosParaNumero(valorEmCentavos: number): number {
-  return valorEmCentavos / 100;
-}
-
-export function centavosParaDecimal(valorEmCentavos: number): string {
-  return (valorEmCentavos / 100).toFixed(2);
-}
-
-function dinheiroParaCentavos(valor: string): number {
-  const [inteiros, decimais = ''] = valor.split('.');
-
-  return Number(inteiros) * 100 + Number(decimais.padEnd(2, '0').slice(0, 2));
 }

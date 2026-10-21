@@ -1,6 +1,5 @@
 import type { JogadorResponse } from '../dto/jogador.response.js';
 import type { Jogador } from '../entities/jogador.entity.js';
-import { centavosParaNumero } from '../services/calculos-jogador.js';
 
 type ValoresDerivadosJogador = {
   overall: number;
@@ -33,3 +32,4 @@ export class JogadorPresenter {
     };
   }
 }
+import { centavosParaNumero } from '../../../core/money/conversoes-monetarias.js';

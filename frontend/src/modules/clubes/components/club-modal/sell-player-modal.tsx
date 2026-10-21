@@ -1,5 +1,5 @@
-import type { ClubPlayer } from '../types/club-details'
-import { useClubLineup } from '../hooks/use-club-lineup'
+import type { ClubPlayer } from '../../types/club-details'
+import { useClubLineup } from '../../hooks/use-club-lineup'
 import { Modal } from '@/components/modal/modal'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'

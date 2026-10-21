@@ -1,7 +1,7 @@
 import { useId } from 'react'
 import { useForm } from 'react-hook-form'
 import { Shield, Wallet } from 'lucide-react'
-import type { CreateClubInput } from '../types/club-input'
+import type { CreateClubInput } from '../../types/club-input'
 import { Modal } from '@/components/modal/modal'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Input } from '@/components/ui/input'

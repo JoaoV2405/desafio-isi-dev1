@@ -1,6 +1,6 @@
 import type { ColumnDef } from '@tanstack/react-table'
-import type { ClubPlayer } from '../types/club-details'
-import { PenaltyRateBadge } from './penalty-rate-badge'
+import type { ClubPlayer } from '../../types/club-details'
+import { PenaltyRateBadge } from '../penalty-rate-badge'
 import { Button } from '@/components/ui/button'
 import { createPlayerSummaryColumns } from '@/shared/components/player-summary-columns'
 import { formatMoney } from '@/shared/lib/format-money'

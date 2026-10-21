@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
-import { CreateClubModal } from '../components/create-club-modal'
+import { CreateClubModal } from '../components/club-modal/create-club-modal'
 import { createClub } from '../services/clubs-api'
 import type { CreateClubInput } from '../types/club-input'
 import { IconPlaceholder } from '@/components/layout/icon-placeholder'
@@ -9,7 +9,7 @@ import { PageContainer } from '@/components/page/page-container'
 import { PageHeader } from '@/components/page/page-header'
 import { PageSection } from '@/components/page/page-section'
 import { Button } from '@/components/ui/button'
-import { ClubsTable } from '../components/clubs-table'
+import { ClubsTable } from '../components/club-table/clubs-table'
 
 export function ClubsPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)

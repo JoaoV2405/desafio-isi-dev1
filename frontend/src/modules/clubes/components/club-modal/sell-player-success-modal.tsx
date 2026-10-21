@@ -1,4 +1,4 @@
-import type { PlayerSale } from '../types/player-sale'
+import type { PlayerSale } from '../../types/player-sale'
 import { OperationSuccessModal } from '@/components/modal/operation-success-modal'
 import { formatMoney } from '@/shared/lib/format-money'
 

@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import type { ClubPlayer } from '../types/club-details'
+import type { ClubPlayer } from '../../types/club-details'
 import { createClubRosterColumns } from './club-roster-columns'
 import { DataTable } from '@/components/data-table/data-table'
 

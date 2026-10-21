@@ -1,5 +1,5 @@
 import type { ClubPlayer } from '../types/club-details'
-import { ClubRosterTable } from './club-roster-table'
+import { ClubRosterTable } from './club-table/club-roster-table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export type ClubTab = 'roster' | 'lineup' | 'history'

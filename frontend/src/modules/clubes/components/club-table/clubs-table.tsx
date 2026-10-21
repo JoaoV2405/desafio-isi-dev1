@@ -1,6 +1,6 @@
-import { useClubs } from '../hooks/use-clubs'
+import { useClubs } from '../../hooks/use-clubs'
 import { clubColumns } from './club-columns'
-import { ClubsHeader } from './clubs-header'
+import { ClubsHeader } from '../clubs-header'
 import { DataTable } from '@/components/data-table/data-table'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 

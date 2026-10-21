@@ -36,7 +36,9 @@ export function PageHeader({
           </div>
         )}
         <div className="min-w-0 space-y-1">
-          <h1 className="text-2xl font-semibold">{title}</h1>
+          <h1 className="text-2xl leading-8 font-semibold tracking-[-0.025em]">
+            {title}
+          </h1>
           {description != null && (
             <div
               data-slot="page-header-description"

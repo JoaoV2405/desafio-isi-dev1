@@ -1,8 +1,16 @@
+import { useState } from 'react'
 import { Link, useLocation } from '@tanstack/react-router'
+import type { ClubPlayer } from '../types/club-details'
+import type { PlayerSale } from '../types/player-sale'
+import type { ClubTab } from '../components/club-tabs'
 import { ClubPageHeader } from '../components/club-page-header'
 import { ClubSummaryCard } from '../components/club-summary-card'
 import { ClubTabs } from '../components/club-tabs'
 import { useClub } from '../hooks/use-club'
+import { SellPlayerModal } from '../components/sell-player-modal'
+import { SellPlayerSuccessModal } from '../components/sell-player-success-modal'
+import { sellPlayer } from '../services/clubs-api'
+import { usePlayerMutation } from '@/modules/jogadores/hooks/use-player-mutation'
 import { PageContainer } from '@/components/page/page-container'
 import { PageHeader } from '@/components/page/page-header'
 import { PageSection } from '@/components/page/page-section'
@@ -16,6 +24,21 @@ export function ClubPage({ clubId }: { clubId: string }) {
     select: (location) => location.state.createdClubId,
   })
   const { data: club, isPending, isError, error } = useClub(clubId)
+  const [playerToSell, setPlayerToSell] = useState<ClubPlayer | null>(null)
+  const [saleResult, setSaleResult] = useState<PlayerSale | null>(null)
+  const [activeTab, setActiveTab] = useState<ClubTab>('roster')
+  const sale = usePlayerMutation(sellPlayer, (result) => {
+    setPlayerToSell(null)
+    setSaleResult(result)
+  })
+
+  // A seleção abre a confirmação; somente o onConfirm do modal envia a venda.
+  function handleSellPlayer(player: ClubPlayer) {
+    if (sale.isPending) return
+    sale.reset()
+    setSaleResult(null)
+    setPlayerToSell(player)
+  }
 
   if (isPending) {
     return (
@@ -99,9 +122,38 @@ export function ClubPage({ clubId }: { clubId: string }) {
             Elenco não disponível para consulta.
           </p>
         ) : (
-          <ClubTabs key={club.id} players={club.players} />
+          <ClubTabs
+            key={club.id}
+            players={club.players}
+            value={activeTab}
+            onValueChange={setActiveTab}
+            onSellPlayer={handleSellPlayer}
+            isSubmitting={sale.isPending}
+          />
         )}
       </PageSection>
+      {playerToSell && (
+        <SellPlayerModal
+          key={playerToSell.id}
+          player={playerToSell}
+          clubId={club.id}
+          onOpenChange={(open) => {
+            if (!open && !sale.isPending) setPlayerToSell(null)
+          }}
+          onConfirm={() => sale.submit(playerToSell.id)}
+          isSubmitting={sale.isPending}
+          error={sale.error}
+        />
+      )}
+      {saleResult && (
+        <SellPlayerSuccessModal
+          sale={saleResult}
+          onOpenChange={(open) => {
+            if (!open) setSaleResult(null)
+          }}
+          onViewHistory={() => setActiveTab('history')}
+        />
+      )}
     </PageContainer>
   )
 }

@@ -44,15 +44,14 @@ interface PlayerDrawerProps {
   open: boolean
   player: Player
   onOpenChange: (open: boolean) => void
-  onAction: (action: 'edit' | 'condition' |'buy', player: Player) => void
-
+  onAction: (action: 'edit' | 'condition' | 'buy', player: Player) => void
 }
 
 export function PlayerDrawer({
   open,
   player,
   onOpenChange,
-  onAction
+  onAction,
 }: PlayerDrawerProps) {
   const {
     data: details,
@@ -90,7 +89,7 @@ export function PlayerDrawer({
             position={currentPlayer.position}
             className="min-w-0 flex-1 items-start"
             description={
-              <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+              <div className="mt-2 flex flex-wrap items-center gap-2">
                 <PlayerPositionBadge position={currentPlayer.position} />
                 <PlayerConditionBadge condition={currentPlayer.condition} />
                 <Badge
@@ -148,14 +147,14 @@ export function PlayerDrawer({
                 className="grid grid-cols-2 gap-3"
               >
                 <SummaryCard
-                  title="Valor de Mercado"
+                  title="Valor de mercado"
                   value={formatMoney(details.market_value)}
                   unit="moedas"
                   description="Cotação atual no mercado"
                   icon={<Coins className="size-4" />}
                 />
                 <SummaryCard
-                  title="Valor Base"
+                  title="Valor base"
                   value={formatMoney(details.base_value)}
                   unit="moedas"
                   description="Calculado no cadastro"
@@ -177,9 +176,11 @@ export function PlayerDrawer({
 
               <section
                 aria-label="Indicadores técnicos"
-                className="space-y-4 rounded-xl border bg-white p-4"
+                className="space-y-4 rounded-xl border bg-card p-4"
               >
-                <h2 className="text-sm font-semibold">Indicadores técnicos</h2>
+                <h2 className="text-base leading-6 font-semibold">
+                  Indicadores técnicos
+                </h2>
                 <div className="space-y-4">
                   {PLAYER_ATTRIBUTE_FIELDS.map(({ key, label }) => (
                     <AttributeProgressRow
@@ -195,17 +196,17 @@ export function PlayerDrawer({
                   aria-label="Legenda dos indicadores"
                   className="flex flex-wrap gap-4 text-xs text-muted-foreground"
                 >
-                  <span className="inline-flex items-center gap-1.5">
+                  <span className="inline-flex items-center gap-2">
                     <span
                       aria-hidden="true"
-                      className="size-2.5 rounded-sm bg-blue-500"
+                      className="size-2.5 rounded-sm bg-chart-1"
                     />
                     Atributo atual
                   </span>
-                  <span className="inline-flex items-center gap-1.5">
+                  <span className="inline-flex items-center gap-2">
                     <span
                       aria-hidden="true"
-                      className="size-2.5 rounded-sm bg-blue-500/30"
+                      className="size-2.5 rounded-sm bg-chart-2"
                     />
                     Potencial
                   </span>
@@ -213,7 +214,7 @@ export function PlayerDrawer({
               </section>
 
               {/* Tabela simples de apresentação, sem controles de ordenação ou paginação. */}
-              <div className="overflow-hidden rounded-lg border">
+              <div className="overflow-hidden rounded-xl border">
                 <Table>
                   <caption className="sr-only">Informações do jogador</caption>
                   <TableBody>
@@ -258,25 +259,37 @@ export function PlayerDrawer({
                 </Table>
               </div>
               {details.club_id !== null && clubsError && (
-                <p role="alert" className="text-sm text-destructive">
-                  {clubsError.message}
-                </p>
+                <Alert variant="destructive">
+                  <AlertDescription>{clubsError.message}</AlertDescription>
+                </Alert>
               )}
             </>
           )}
         </div>
 
-        {/* Ações reservadas para uma próxima etapa; este drawer oferece apenas visualização. */}
+        {/* A página substitui os detalhes pelo modal correspondente à ação selecionada. */}
         <DrawerFooter className="grid grid-cols-1 gap-2 border-t px-6 py-4 min-[480px]:grid-cols-3">
-          <Button type="button" variant="outline" onClick={() => onAction('edit',currentPlayer )}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onAction('edit', currentPlayer)}
+          >
             <Pencil aria-hidden="true" />
             Editar
           </Button>
-          <Button type="button" variant="outline" onClick={() => onAction('condition', currentPlayer)} >
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onAction('condition', currentPlayer)}
+          >
             <HeartPulse aria-hidden="true" />
             Alterar condição
           </Button>
-          <Button type="button" disabled>
+          <Button
+            type="button"
+            disabled={currentPlayer.club_id !== null}
+            onClick={() => onAction('buy', currentPlayer)}
+          >
             <ShoppingCart aria-hidden="true" />
             Comprar
           </Button>

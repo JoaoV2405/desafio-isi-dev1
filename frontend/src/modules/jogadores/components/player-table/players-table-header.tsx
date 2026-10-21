@@ -16,7 +16,7 @@ export function PlayersTableHeader({
           [
             ['all', 'Todos'],
             ['free', 'Livres'],
-            ['clubs', 'Em Clubes'],
+            ['clubs', 'Em clubes'],
           ] satisfies [PlayersScope, string][]
         ).map(([value, label]) => (
           <TabsTrigger key={value} value={value}>

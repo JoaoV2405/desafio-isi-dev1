@@ -5,6 +5,9 @@ import {
   EditPlayerConditionModal,
 } from '../components/player-modal/edit-player-modal'
 import { DeletePlayerModal } from '../components/player-modal/delete-player-modal'
+import { BuyPlayerModal } from '../components/player-modal/buy-player-modal'
+import { BuyPlayerSuccessModal } from '../components/player-modal/buy-player-success-modal'
+import type { PlayerPurchase } from '../types/player-purchase'
 import type { Player } from '@/shared/types/player'
 import { IconPlaceholder } from '@/components/layout/icon-placeholder'
 import { PageContainer } from '@/components/page/page-container'
@@ -18,6 +21,7 @@ import {
   createPlayer,
   updatePlayer,
   updatePlayerCondition,
+  buyPlayer,
 } from '../services/player-mutations'
 import { deletePlayer } from '../services/delete-player'
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
@@ -27,6 +31,9 @@ import { PLAYER_CONDITIONS } from '@/shared/types/player'
 export type PlayerAction = 'details' | 'edit' | 'condition' | 'delete' | 'buy'
 
 export function PlayersPage() {
+  const [purchaseResult, setPurchaseResult] = useState<PlayerPurchase | null>(
+    null,
+  )
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [selectedAction, setSelectedAction] = useState<{
     type: PlayerAction
@@ -61,23 +68,30 @@ export function PlayersPage() {
   const deletion = usePlayerMutation(deletePlayer, () =>
     finishAction('Jogador excluído com sucesso.'),
   )
+  const purchase = usePlayerMutation(buyPlayer, (result) => {
+    finishAction(`${result.player_name} contratado com sucesso.`)
+    setPurchaseResult(result)
+  })
   const isSubmitting =
     create.isPending ||
     edit.isPending ||
     condition.isPending ||
-    deletion.isPending
+    deletion.isPending ||
+    purchase.isPending
 
   function resetErrors() {
     create.reset()
     edit.reset()
     condition.reset()
     deletion.reset()
+    purchase.reset()
   }
 
   function handlePlayerAction(type: PlayerAction, player: Player) {
     if (isSubmitting) return
     resetErrors()
     setFeedback(null)
+    setPurchaseResult(null)
     setIsCreateModalOpen(false)
     setSelectedAction({ type, player })
   }
@@ -87,6 +101,7 @@ export function PlayersPage() {
     if (open) {
       resetErrors()
       setFeedback(null)
+      setPurchaseResult(null)
     }
     if (open && selectedAction !== null) {
       setSelectedAction(null)
@@ -111,12 +126,12 @@ export function PlayersPage() {
             onClick={() => changeCreateModalOpen(true)}
           >
             <IconPlaceholder />
-            Novo jogador
+            Cadastrar jogador
           </Button>
         }
       />
       {feedback && (
-        <Alert role="status">
+        <Alert variant="success" role="status">
           <AlertTitle>{feedback.title}</AlertTitle>
           {feedback.description && (
             <AlertDescription>{feedback.description}</AlertDescription>
@@ -182,6 +197,27 @@ export function PlayersPage() {
           onConfirm={(player) => deletion.submit(player.id)}
           isSubmitting={deletion.isPending}
           error={deletion.error}
+        />
+      )}
+      {selectedAction?.type === 'buy' && (
+        <BuyPlayerModal
+          key={selectedAction.player.id}
+          open
+          player={selectedAction.player}
+          onOpenChange={changeActionModalOpen}
+          onConfirm={(input) =>
+            purchase.submit({ playerId: selectedAction.player.id, input })
+          }
+          isSubmitting={purchase.isPending}
+          error={purchase.error}
+        />
+      )}
+      {purchaseResult && (
+        <BuyPlayerSuccessModal
+          purchase={purchaseResult}
+          onOpenChange={(open) => {
+            if (!open) setPurchaseResult(null)
+          }}
         />
       )}
     </PageContainer>

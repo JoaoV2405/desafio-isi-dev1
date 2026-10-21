@@ -23,7 +23,9 @@ export function PlayerAttributesPreview() {
       aria-label="Prévia dos atributos"
       className="min-w-0 self-start space-y-5 rounded-xl border bg-muted/50 p-4"
     >
-      <h3 className="text-sm font-semibold">Prévia dos atributos</h3>
+      <h3 className="text-base leading-6 font-semibold">
+        Prévia dos atributos
+      </h3>
       <div className="space-y-4">
         {PLAYER_ATTRIBUTE_FIELDS.map(({ key, label }, index) => (
           <AttributeProgressRow

@@ -45,7 +45,14 @@ export function PlayersTable({ onPlayerAction }: PlayersTableProps) {
     error: clubsError,
   } = useClubs()
   const columns = useMemo(
-    () => createPlayerColumns({ clubs, onPlayerAction }),
+    () =>
+      createPlayerColumns({
+        clubs,
+        onPlayerAction,
+        onBuyPlayer: onPlayerAction
+          ? (player) => onPlayerAction('buy', player)
+          : undefined,
+      }),
     [clubs, onPlayerAction],
   )
   const search = filters.search.trim()
@@ -145,7 +152,7 @@ export function PlayersTable({ onPlayerAction }: PlayersTableProps) {
             {activeFilters.map(([key, label]) => (
               <span
                 key={key}
-                className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-muted py-1 pr-1 pl-3 text-sm"
+                className="inline-flex shrink-0 items-center gap-1 rounded-md bg-muted py-1 pr-1 pl-3 text-sm"
               >
                 {label}
                 <Button
@@ -160,7 +167,7 @@ export function PlayersTable({ onPlayerAction }: PlayersTableProps) {
               </span>
             ))}
             {scope !== 'all' && (
-              <span className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-muted py-1 pr-1 pl-3 text-sm">
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-muted py-1 pr-1 pl-3 text-sm">
                 Vínculo: {scope === 'free' ? 'Livres' : 'Em clubes'}
                 <Button
                   type="button"
@@ -193,7 +200,7 @@ export function PlayersTable({ onPlayerAction }: PlayersTableProps) {
         <Tabs
           value={scope}
           onValueChange={(value) => changeScope(value as PlayersScope)}
-          className="gap-0 overflow-hidden rounded-lg border"
+          className="gap-0 overflow-hidden rounded-xl border"
         >
           <div className="border-b p-4">
             <PlayersTableHeader sort={sort} onSortChange={changeSort} />
@@ -210,7 +217,7 @@ export function PlayersTable({ onPlayerAction }: PlayersTableProps) {
               caption={<span className="sr-only">Jogadores da liga</span>}
               footer={
                 <div className="flex items-center justify-between gap-4">
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-muted-foreground tabular-nums">
                     {data?.meta.total_items ?? 0} jogadores encontrados ·{' '}
                     {PAGE_SIZE} por página
                   </p>

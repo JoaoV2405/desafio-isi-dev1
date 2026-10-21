@@ -11,7 +11,6 @@ import {
 } from '@/components/ui/dropdown-menu'
 import type { PlayerAction } from '../pages/players-page'
 
-
 export interface PlayerActionsMenuProps {
   player: Player
   onAction: (action: PlayerAction, player: Player) => void
@@ -32,14 +31,14 @@ export function PlayerActionsMenu({
     <DropdownMenu open={open} onOpenChange={setOpen} modal={false}>
       <DropdownMenuTrigger
         aria-label={`Ações de ${player.name}`}
-        render={<Button type="button" variant="default" size="icon-sm" />}
+        render={<Button type="button" variant="ghost" size="icon-sm" />}
       >
         <Ellipsis aria-hidden="true" />
       </DropdownMenuTrigger>
       <DropdownMenuContent
         side="bottom"
         align="start"
-        sideOffset={6}
+        sideOffset={8}
         alignOffset={4}
         className="w-48"
         aria-label={`Ações de ${player.name}`}

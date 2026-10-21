@@ -1,5 +1,6 @@
 import type { ClubDetails } from '../types/club-details'
 import type { CreateClubInput } from '../types/club-input'
+import type { PlayerSale } from '../types/player-sale'
 import type { Club } from '@/shared/types/club'
 import type { Player } from '@/shared/types/player'
 import { apiJson } from '@/shared/lib/api-client'
@@ -32,4 +33,10 @@ export function getClubLineup(
   signal?: AbortSignal,
 ): Promise<{ club_id: number; players: Player[] }> {
   return apiJson(`/clubs/${clubId}/lineup`, { signal })
+}
+
+export function sellPlayer(playerId: number): Promise<PlayerSale> {
+  return apiJson<PlayerSale>(`/players/${playerId}/sell`, {
+    method: 'POST',
+  })
 }

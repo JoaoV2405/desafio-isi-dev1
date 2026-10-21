@@ -1,3 +1,16 @@
+const PLAYER_AVATAR_CLASSES = [
+  'bg-avatar-violet text-avatar-violet-foreground',
+  'bg-avatar-pink text-avatar-pink-foreground',
+  'bg-avatar-cyan text-avatar-cyan-foreground',
+  'bg-avatar-teal text-avatar-teal-foreground',
+  'bg-avatar-zinc text-avatar-zinc-foreground',
+] as const
+
+export function getPlayerAvatarClassName(playerId: number) {
+  // O ID mantém a cor consistente entre telas, ordenações e edições do nome.
+  return PLAYER_AVATAR_CLASSES[playerId % PLAYER_AVATAR_CLASSES.length]
+}
+
 export function getPlayerInitials(name: string) {
   const words = name.trim().split(/\s+/).filter(Boolean)
   const firstName = words.at(0) ?? ''

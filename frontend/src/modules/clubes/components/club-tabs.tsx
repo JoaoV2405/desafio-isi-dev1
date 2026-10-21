@@ -2,10 +2,27 @@ import type { ClubPlayer } from '../types/club-details'
 import { ClubRosterTable } from './club-roster-table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
-export function ClubTabs({ players }: { players: ClubPlayer[] }) {
+export type ClubTab = 'roster' | 'lineup' | 'history'
+
+interface ClubTabsProps {
+  players: ClubPlayer[]
+  value: ClubTab
+  onValueChange: (tab: ClubTab) => void
+  onSellPlayer: (player: ClubPlayer) => void
+  isSubmitting: boolean
+}
+
+export function ClubTabs({
+  players,
+  value,
+  onValueChange,
+  onSellPlayer,
+  isSubmitting,
+}: ClubTabsProps) {
   return (
     <Tabs
-      defaultValue="roster"
+      value={value}
+      onValueChange={(nextValue) => onValueChange(nextValue as ClubTab)}
       className="gap-0 overflow-hidden rounded-xl border"
     >
       <div className="border-b p-4">
@@ -16,7 +33,11 @@ export function ClubTabs({ players }: { players: ClubPlayer[] }) {
         </TabsList>
       </div>
       <TabsContent value="roster">
-        <ClubRosterTable players={players} />
+        <ClubRosterTable
+          players={players}
+          onSellPlayer={onSellPlayer}
+          isSubmitting={isSubmitting}
+        />
       </TabsContent>
       <TabsContent value="lineup" className="p-6 text-muted-foreground">
         Escalação em breve.

@@ -68,7 +68,7 @@ export function Modal({
       <Dialog.Portal>
         <Dialog.Backdrop
           data-slot="modal-backdrop"
-          className="fixed inset-0 z-50 bg-black/50"
+          className="fixed inset-0 z-50 bg-overlay"
         />
         <Dialog.Popup
           ref={popupRef}
@@ -77,7 +77,7 @@ export function Modal({
           finalFocus={finalFocus}
           aria-busy={isSubmitting}
           className={cn(
-            'fixed top-1/2 left-1/2 z-50 flex max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-xl border bg-background text-foreground shadow-lg outline-none',
+            'fixed top-1/2 left-1/2 z-50 flex max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-lg border bg-popover text-popover-foreground shadow-lg outline-none',
             className,
           )}
         >
@@ -86,7 +86,7 @@ export function Modal({
             className="flex shrink-0 items-start justify-between gap-4 border-b p-6"
           >
             <div className="min-w-0 space-y-1">
-              <Dialog.Title className="text-lg font-semibold">
+              <Dialog.Title className="text-lg leading-6 font-semibold">
                 {title}
               </Dialog.Title>
               {subtitle != null && (

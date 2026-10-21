@@ -8,7 +8,7 @@ export function ClubsHeader({ total }: { total: number | undefined }) {
           {total === undefined ? 'Carregando clubes...' : `${total} clubes`}
         </p>
         {total !== undefined && (
-          <Badge variant="secondary" className="rounded-md">
+          <Badge variant="secondary" className="rounded-md tabular-nums">
             {total} clubes de 20
           </Badge>
         )}

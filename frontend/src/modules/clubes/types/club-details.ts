@@ -16,3 +16,4 @@ export interface ClubDetails extends Club {
   // Ausência significa elenco não informado; um array vazio significa elenco sem jogadores.
   players?: ClubPlayer[]
 }
+

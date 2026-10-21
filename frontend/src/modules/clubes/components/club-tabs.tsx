@@ -6,7 +6,7 @@ export function ClubTabs({ players }: { players: ClubPlayer[] }) {
   return (
     <Tabs
       defaultValue="roster"
-      className="gap-0 overflow-hidden rounded-lg border"
+      className="gap-0 overflow-hidden rounded-xl border"
     >
       <div className="border-b p-4">
         <TabsList variant="line" aria-label="Seções do clube">

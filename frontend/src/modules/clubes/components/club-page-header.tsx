@@ -13,7 +13,9 @@ export function ClubPageHeader({ club }: { club: ClubDetails }) {
       icon={
         <span className="relative flex size-10 items-center justify-center">
           <Shield className="size-10 text-muted-foreground" strokeWidth={1.5} />
-          <span className="absolute text-[9px] font-bold">{club.acronym}</span>
+          <span className="absolute text-[9px] font-semibold">
+            {club.acronym}
+          </span>
         </span>
       }
       title={club.name}
@@ -21,7 +23,7 @@ export function ClubPageHeader({ club }: { club: ClubDetails }) {
         <div className="flex flex-wrap items-center gap-2 pt-1">
           <Badge
             variant="outline"
-            className="h-auto rounded-md bg-white px-2.5 py-1 font-normal text-gray-600"
+            className="h-auto rounded-md bg-card px-3 py-1 font-medium text-muted-foreground"
           >
             Sigla {club.acronym}
           </Badge>
@@ -29,10 +31,10 @@ export function ClubPageHeader({ club }: { club: ClubDetails }) {
           {club.players !== undefined && (
             <Badge
               variant="outline"
-              className="h-auto gap-1.5 rounded-md bg-white px-2.5 py-1 font-normal text-gray-600"
+              className="h-auto gap-2 rounded-md tabular-nums bg-card px-3 py-1 font-medium text-muted-foreground"
             >
               <Shirt aria-hidden="true" />
-              {club.players.length} de 12 Jogadores
+              {club.players.length} de 12 jogadores
             </Badge>
           )}
         </div>

@@ -35,14 +35,14 @@ export function OperationSuccessModal({
       cancelLabel="Fechar"
       primaryAction={{ ...primaryAction, onClick: continueAfterSuccess }}
     >
-      <dl className="divide-y rounded-lg border px-4">
+      <dl className="divide-y rounded-xl border px-4">
         {details.map(({ label, value }) => (
           <div
             key={label}
             className="grid grid-cols-1 gap-1 py-3 text-sm sm:grid-cols-2 sm:gap-4"
           >
             <dt className="text-muted-foreground">{label}</dt>
-            <dd className="min-w-0 font-medium wrap-break-word sm:text-right">
+            <dd className="min-w-0 font-semibold tabular-nums wrap-break-word sm:text-right">
               {value}
             </dd>
           </div>

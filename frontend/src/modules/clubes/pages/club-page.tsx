@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router'
+import { Link, useLocation } from '@tanstack/react-router'
 import { ClubPageHeader } from '../components/club-page-header'
 import { ClubSummaryCard } from '../components/club-summary-card'
 import { ClubTabs } from '../components/club-tabs'
@@ -12,6 +12,9 @@ import { RoutePaths } from '@/router/route-paths'
 import { formatMoney } from '@/shared/lib/format-money'
 
 export function ClubPage({ clubId }: { clubId: string }) {
+  const createdClubId = useLocation({
+    select: (location) => location.state.createdClubId,
+  })
   const { data: club, isPending, isError, error } = useClub(clubId)
 
   if (isPending) {
@@ -25,19 +28,13 @@ export function ClubPage({ clubId }: { clubId: string }) {
     )
   }
 
-  if (isError || !club) {
+  if (isError) {
     return (
       <PageContainer>
         <PageHeader title="Clube" />
-        <Alert variant={isError ? 'destructive' : 'default'}>
-          <AlertTitle>
-            {isError
-              ? 'Não foi possível carregar o clube'
-              : 'Clube não encontrado'}
-          </AlertTitle>
-          <AlertDescription>
-            {isError ? error.message : 'O clube informado não foi encontrado.'}
-          </AlertDescription>
+        <Alert variant="destructive">
+          <AlertTitle>Não foi possível carregar o clube</AlertTitle>
+          <AlertDescription>{error.message}</AlertDescription>
         </Alert>
         <div>
           <Button
@@ -55,6 +52,14 @@ export function ClubPage({ clubId }: { clubId: string }) {
   return (
     <PageContainer>
       <ClubPageHeader club={club} />
+      {createdClubId === club.id && (
+        <Alert variant="success" role="status">
+          <AlertTitle>{club.name} criado com sucesso.</AlertTitle>
+          <AlertDescription>
+            O clube está pronto para receber jogadores.
+          </AlertDescription>
+        </Alert>
+      )}
       <PageSection
         aria-label="Indicadores do clube"
         className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
@@ -66,7 +71,7 @@ export function ClubPage({ clubId }: { clubId: string }) {
           description="Disponível para contratações"
         />
         <ClubSummaryCard
-          title="Valor do Elenco"
+          title="Valor do elenco"
           value={
             club.squad_value === undefined ? '—' : formatMoney(club.squad_value)
           }

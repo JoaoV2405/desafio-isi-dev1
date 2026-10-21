@@ -2,10 +2,14 @@ import type { ReactNode } from 'react'
 import type { PlayerPosition } from '@/shared/types/player'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { cn } from '@/lib/utils'
-import { getPlayerInitials } from '@/shared/lib/player-presentation'
+import {
+  getPlayerAvatarClassName,
+  getPlayerInitials,
+} from '@/shared/lib/player-presentation'
 import { PLAYER_POSITIONS } from '@/shared/types/player'
 
 export interface PlayerIdentityProps {
+  playerId: number
   name: string
   position: PlayerPosition
   age?: number
@@ -14,6 +18,7 @@ export interface PlayerIdentityProps {
 }
 
 export function PlayerIdentity({
+  playerId,
   name,
   position,
   age,
@@ -23,7 +28,7 @@ export function PlayerIdentity({
   return (
     <div className={cn('flex items-center gap-3', className)}>
       <Avatar size="lg" aria-hidden="true">
-        <AvatarFallback className="bg-avatar-zinc text-avatar-zinc-foreground">
+        <AvatarFallback className={getPlayerAvatarClassName(playerId)}>
           {getPlayerInitials(name)}
         </AvatarFallback>
       </Avatar>

@@ -11,7 +11,7 @@ type PlayerSummary = Pick<
 >
 
 export function createPlayerSummaryColumns<
-  TPlayer extends PlayerSummary,
+  TPlayer extends PlayerSummary & Pick<Player, 'id'>,
 >(): Record<keyof PlayerSummary, ColumnDef<TPlayer>> {
   return {
     name: {
@@ -19,6 +19,7 @@ export function createPlayerSummaryColumns<
       header: 'Jogador',
       cell: ({ row }) => (
         <PlayerIdentity
+          playerId={row.original.id}
           name={row.original.name}
           position={row.original.position}
         />

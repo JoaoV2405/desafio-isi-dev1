@@ -47,6 +47,7 @@ export function DeletePlayerModal({
       {/* Identifica o jogador e mantém o vínculo à direita, fora do bloco de texto. */}
       <div className="flex items-center gap-4 rounded-xl border bg-muted/30 p-4">
         <PlayerIdentity
+          playerId={player.id}
           name={player.name}
           position={player.position}
           age={player.age}

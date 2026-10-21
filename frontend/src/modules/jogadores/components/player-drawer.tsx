@@ -85,6 +85,7 @@ export function PlayerDrawer({
             Valores, atributos técnicos e dados pessoais do jogador.
           </DrawerDescription>
           <PlayerIdentity
+            playerId={currentPlayer.id}
             name={currentPlayer.name}
             position={currentPlayer.position}
             className="min-w-0 flex-1 items-start"

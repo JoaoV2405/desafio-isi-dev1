@@ -192,6 +192,7 @@ export function EditPlayerConditionModal({
       {/* O badge representa a condição atual; a seleção abaixo representa a alteração proposta. */}
       <div className="flex items-center gap-4 rounded-xl border bg-muted/30 p-4">
         <PlayerIdentity
+          playerId={player.id}
           name={player.name}
           position={player.position}
           age={player.age}

@@ -99,6 +99,7 @@ export function BuyPlayerModal({
     >
       <div className="flex w-full items-start justify-between gap-4 rounded-xl border bg-muted/30 p-4">
         <PlayerIdentity
+          playerId={player.id}
           name={player.name}
           position={player.position}
           age={player.age}

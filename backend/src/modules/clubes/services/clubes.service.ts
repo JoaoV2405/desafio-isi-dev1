@@ -1,14 +1,25 @@
 import {
   ConflictException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, type Repository } from 'typeorm';
 import { isUniqueConstraintViolation } from '../../../core/validation/is-unique-constraint-violation.js';
+import { decimalParaCentavos } from '../../../core/money/conversoes-monetarias.js';
+import { calculateLoyaltyTerms } from '../../contratos/index.js';
+import { projectRoster } from '../../jogadores/index.js';
 import { CriarClubeDto } from '../dto/criar-clube.dto.js';
-import { ClubeResponse } from '../dto/clube-response.js';
+import { ClubeDetailResponse, ClubeResponse } from '../dto/clube-response.js';
 import { Clube } from '../entities/clube.entity.js';
+import { ListarClubesDto, OrdenacaoClubes } from '../dto/listar-clubes.dto.js';
+import {
+  ClubePresenter,
+  type TotaisClube,
+} from '../presenters/clube.presenter.js';
+import { DetalhesClubeQuery } from '../queries/detalhes-clube.query.js';
+import type { ContratoAtivoLeitura } from '../queries/detalhes-clube.types.js';
 import { validateClubCreation } from '../validators/clube.validators.js';
 
 const CLUB_LIMIT = 20;
@@ -49,6 +60,7 @@ export class ClubesService {
     @InjectRepository(Clube)
     private readonly clubsRepository: Repository<Clube>,
     private readonly dataSource: DataSource,
+    private readonly detalhesClubeQuery: DetalhesClubeQuery,
   ) {}
 
   async create(input: CriarClubeDto): Promise<ClubeResponse> {
@@ -73,7 +85,7 @@ export class ClubesService {
         return clubsRepository.save(newClub);
       });
 
-      return this.present(club);
+      return ClubePresenter.present(club, this.calculateTotals(club, 0));
     } catch (error) {
       if (error instanceof ConflictException) {
         throw error;
@@ -87,32 +99,90 @@ export class ClubesService {
     }
   }
 
-  async findAll(): Promise<ClubeResponse[]> {
-    const clubs = await this.clubsRepository.find();
-    clubs.sort(
-      (first, second) =>
-        compareNames(first.nome, second.nome) || first.id - second.id,
-    );
+  async findAll(query: ListarClubesDto = {}): Promise<ClubeResponse[]> {
+    const clubs = await this.clubsRepository
+      .createQueryBuilder('clube')
+      .leftJoinAndSelect(
+        'clube.jogadores',
+        'jogador',
+        'jogador.excluidoEm IS NULL',
+      )
+      .getMany();
+    const calculados = clubs.map((clube) => {
+      const { squadValueInCents } = projectRoster(clube.jogadores);
+      return { clube, totais: this.calculateTotals(clube, squadValueInCents) };
+    });
+    const sort = query.sort ?? OrdenacaoClubes.Nome;
 
-    return clubs.map((club) => this.present(club));
+    calculados.sort((first, second) => {
+      const diferencaPatrimonio =
+        sort === OrdenacaoClubes.Nome
+          ? 0
+          : (first.totais.netWorthInCents - second.totais.netWorthInCents) *
+            (sort === OrdenacaoClubes.PatrimonioDecrescente ? -1 : 1);
+
+      return (
+        diferencaPatrimonio ||
+        compareNames(first.clube.nome, second.clube.nome) ||
+        first.clube.id - second.clube.id
+      );
+    });
+
+    return calculados.map(({ clube, totais }) =>
+      ClubePresenter.present(clube, totais),
+    );
   }
 
-  async findById(id: number): Promise<ClubeResponse> {
-    const club = await this.clubsRepository.findOneBy({ id });
+  async findById(id: number): Promise<ClubeDetailResponse> {
+    const leitura = await this.detalhesClubeQuery.findById(id);
 
-    if (!club) {
+    if (!leitura) {
       throw new NotFoundException('Clube não encontrado');
     }
 
-    return this.present(club);
+    const instante = new Date();
+    const contratosPorJogador = new Map<number, ContratoAtivoLeitura | null>(
+      leitura.elenco.map(({ jogador, contrato }) => [jogador.id, contrato]),
+    );
+    const { players, squadValueInCents } = projectRoster(
+      leitura.elenco.map(({ jogador }) => jogador),
+    );
+    const elenco = players.map((jogador) => {
+      const contrato = contratosPorJogador.get(jogador.id);
+
+      if (!contrato) {
+        throw new InternalServerErrorException(
+          'Não foi possível consultar o elenco do clube',
+        );
+      }
+
+      return {
+        jogador,
+        contrato: {
+          purchaseValueInCents: decimalParaCentavos(contrato.valorCompra),
+          loyaltyUntil: contrato.fidelidadeAte,
+          ...calculateLoyaltyTerms(contrato.fidelidadeAte, instante),
+        },
+      };
+    });
+
+    return ClubePresenter.presentDetails(
+      leitura.clube,
+      this.calculateTotals(leitura.clube, squadValueInCents),
+      elenco,
+    );
   }
 
-  private present(club: Clube): ClubeResponse {
+  private calculateTotals(
+    clube: Pick<Clube, 'caixa'>,
+    squadValueInCents: number,
+  ): TotaisClube {
+    const cashInCents = decimalParaCentavos(clube.caixa);
+
     return {
-      id: club.id,
-      name: club.nome,
-      acronym: club.sigla.trimEnd(),
-      cash: Number(club.caixa),
+      cashInCents,
+      squadValueInCents,
+      netWorthInCents: cashInCents + squadValueInCents,
     };
   }
 }

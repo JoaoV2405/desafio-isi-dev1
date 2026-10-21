@@ -33,6 +33,7 @@ import {
 import { Contrato, SituacaoContrato } from '../entities/contrato.entity.js';
 import { Jogador } from '../../jogadores/entities/jogador.entity.js';
 import { Transacao, TipoTransacao } from '../entities/transacao.entity.js';
+import { presentTransactionsCsv } from '../presenters/transacoes-csv.presenter.js';
 import {
   calcularComissaoVenda,
   calcularMultaVenda,
@@ -289,6 +290,27 @@ export class MercadoService {
     clubeId: number,
     filtros: ListarTransacoesDto,
   ): Promise<HistoricoTransacoesResponse> {
+    const transacoes = await this.findTransactions(clubeId, filtros);
+
+    return {
+      data: transacoes.map((transacao) => this.apresentarTransacao(transacao)),
+      summary: this.somarTransacoes(transacoes),
+    };
+  }
+
+  async exportTransactionsCsv(
+    clubeId: number,
+    filtros: ListarTransacoesDto,
+  ): Promise<string> {
+    return presentTransactionsCsv(
+      await this.findTransactions(clubeId, filtros),
+    );
+  }
+
+  private async findTransactions(
+    clubeId: number,
+    filtros: ListarTransacoesDto,
+  ): Promise<Transacao[]> {
     if (!(await this.clubesRepository.existsBy({ id: clubeId }))) {
       throw new NotFoundException('Clube não encontrado');
     }
@@ -304,7 +326,7 @@ export class MercadoService {
     }
 
     const tipos = parseTiposTransacao(filtros.type);
-    const transacoes = await this.transacoesRepository.find({
+    return this.transacoesRepository.find({
       where: {
         clubeId,
         ...(jogadorId === undefined ? {} : { jogadorId }),
@@ -312,13 +334,6 @@ export class MercadoService {
       },
       order: { criadoEm: 'DESC', id: 'DESC' },
     });
-
-    const resumo = this.somarTransacoes(transacoes);
-
-    return {
-      data: transacoes.map((transacao) => this.apresentarTransacao(transacao)),
-      summary: resumo,
-    };
   }
 
   private somarTransacoes(

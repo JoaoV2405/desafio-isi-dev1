@@ -1,6 +1,7 @@
 import type { ClubPlayer } from '../types/club-details'
 import { ClubRosterTable } from './club-table/club-roster-table'
 import { ClubHistory } from './club-history/club-history'
+import { ClubLineup } from './club-lineup/club-lineup'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export type ClubTab = 'roster' | 'lineup' | 'history'
@@ -42,8 +43,8 @@ export function ClubTabs({
           isSubmitting={isSubmitting}
         />
       </TabsContent>
-      <TabsContent value="lineup" className="p-6 text-muted-foreground">
-        Escalação em breve.
+      <TabsContent value="lineup">
+        <ClubLineup key={clubId} clubId={clubId} players={players} />
       </TabsContent>
       <TabsContent value="history">
         <ClubHistory clubId={clubId} />

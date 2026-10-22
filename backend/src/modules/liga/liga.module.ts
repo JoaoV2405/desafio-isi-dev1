@@ -10,6 +10,9 @@ import { Escalacao } from './entities/escalacao.entity.js';
 import { Partida } from './entities/partida.entity.js';
 import { EscalacoesService } from './services/escalacao.service.js';
 import { PartidasService } from './services/partidas.service.js';
+import { ClassificacaoQuery } from './services/classificacao.query.js';
+import { ClassificacaoController } from './controllers/classificacao.controller.js';
+import { ClassificacaoService } from './services/classificacao.service.js';
 
 @Module({
   imports: [
@@ -22,7 +25,17 @@ import { PartidasService } from './services/partidas.service.js';
     ]),
     JogadoresModule,
   ],
-  controllers: [EscalacaoController, PartidasController],
-  providers: [EscalacoesService, PartidasService],
+  controllers: [
+    EscalacaoController,
+    PartidasController,
+    ClassificacaoController,
+  ],
+  providers: [
+    EscalacoesService,
+    PartidasService,
+    ClassificacaoQuery,
+    ClassificacaoService,
+  ],
+  exports: [ClassificacaoService],
 })
 export class LigaModule {}

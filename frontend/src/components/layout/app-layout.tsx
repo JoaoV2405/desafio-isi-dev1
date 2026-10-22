@@ -7,6 +7,7 @@ import { useClubs } from '@/modules/clubes/hooks/use-clubs'
 export function AppLayout({ children }: { children: ReactNode }) {
   // Reutiliza a consulta de clubes para preencher navegação e nomes dos breadcrumbs.
   const { data: clubs = [], isPending, error } = useClubs()
+  //const {general_data} = useInfoData 
 
   return (
     <SidebarProvider>

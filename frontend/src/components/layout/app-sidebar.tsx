@@ -1,9 +1,9 @@
 import { Link, useRouterState } from '@tanstack/react-router'
-import { Plus } from 'lucide-react'
+import { Plus, Shield, Swords, Trophy } from 'lucide-react'
 import type { SidebarClub } from './navigation'
 import { navigationGroups } from './navigation'
-import { IconPlaceholder } from './icon-placeholder'
 import logo from '@/assets/image.png'
+import mark from '@/assets/Marca.png'
 import { Button } from '@/components/ui/button'
 import {
   Sidebar,
@@ -16,6 +16,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from '@/components/ui/sidebar'
 import { RoutePaths } from '@/router/route-paths'
 
@@ -31,31 +32,49 @@ export function AppSidebar({
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   })
+  const { state } = useSidebar()
+  const isCollapsed = state === 'collapsed'
 
   return (
-    <Sidebar collapsible="offcanvas">
-      <SidebarHeader>
-        <Link to={RoutePaths.home} aria-label="Passe. Início">
-          <img src={logo} alt="Passe" className="h-auto w-40 p-2" />
+    <Sidebar collapsible="icon">
+      <SidebarHeader className="h-14 justify-center">
+        <Link
+          to={RoutePaths.home}
+          aria-label="Passe. Início"
+          className="flex h-10 items-center px-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0"
+        >
+          <img
+            src={isCollapsed ? mark : logo}
+            alt="Passe"
+            className={
+              isCollapsed
+                ? 'size-7 object-contain'
+                : 'h-8 w-auto max-w-full object-contain'
+            }
+          />
         </Link>
       </SidebarHeader>
       <SidebarContent>
         {navigationGroups.map((group) => (
           <SidebarGroup key={group.label}>
-            <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
+            <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden">
+              {group.label}
+            </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {group.items.map((item) => (
                   <SidebarMenuItem key={item.to}>
                     <SidebarMenuButton
+                      aria-label={item.label}
+                      title={item.label}
                       isActive={
                         pathname === item.to ||
                         pathname.startsWith(`${item.to}/`)
                       }
                       render={<Link to={item.to} />}
                     >
-                      <IconPlaceholder />
-                      <span>{item.label}</span>
+                      <item.icon aria-hidden="true" />
+                      {!isCollapsed && <span>{item.label}</span>}
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
@@ -64,7 +83,7 @@ export function AppSidebar({
           </SidebarGroup>
         ))}
         <SidebarGroup>
-          <SidebarGroupLabel className="justify-around">
+          <SidebarGroupLabel className="justify-around group-data-[collapsible=icon]:hidden">
             <span>Clubes</span>
             <Button
               variant="ghost"
@@ -82,6 +101,8 @@ export function AppSidebar({
               {clubs.map((club) => (
                 <SidebarMenuItem key={club.id}>
                   <SidebarMenuButton
+                    aria-label={club.name}
+                    title={club.name}
                     isActive={pathname === `/mercado/clubes/${club.id}`}
                     render={
                       <Link
@@ -90,8 +111,8 @@ export function AppSidebar({
                       />
                     }
                   >
-                    <IconPlaceholder />
-                    <span>{club.name}</span>
+                    <Shield aria-hidden="true" />
+                    {!isCollapsed && <span>{club.name}</span>}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -99,43 +120,62 @@ export function AppSidebar({
             {isLoading ? (
               <p
                 role="status"
-                className="px-2 py-1 text-xs text-muted-foreground"
+                className="px-2 py-1 text-xs text-muted-foreground group-data-[collapsible=icon]:hidden"
               >
                 Carregando clubes...
               </p>
             ) : error ? (
-              <p role="alert" className="px-2 py-1 text-xs text-destructive">
+              <p
+                role="alert"
+                className="px-2 py-1 text-xs text-destructive group-data-[collapsible=icon]:hidden"
+              >
                 {error}
               </p>
             ) : (
               clubs.length === 0 && (
-                <p className="px-2 py-1 text-xs text-muted-foreground">
+                <p className="px-2 py-1 text-xs text-muted-foreground group-data-[collapsible=icon]:hidden">
                   Nenhum clube cadastrado.
                 </p>
               )
             )}
           </SidebarGroupContent>
         </SidebarGroup>
-        {/* novo grupo, no fim da sidebar, 3 itens seguindo o mesmo formato, mas nao são clicaveis  */}
       </SidebarContent>
-      <SidebarFooter className="m-2 rounded-xl border bg-card p-3">
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {['Liga fictícia', 'Último jogo'].map((label) => (
-                <SidebarMenuItem key={label}>
-                  <SidebarMenuButton
-                    render={<div />}
-                    className="hover:bg-transparent hover:text-inherit"
-                  >
-                    <IconPlaceholder />
-                    <span>{label}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+      <SidebarFooter
+        className={isCollapsed ? 'p-2' : 'm-2 rounded-xl border bg-card p-3'}
+      >
+        {isCollapsed ? (
+          <div
+            role="img"
+            aria-label="Liga fictícia e último jogo"
+            title="Liga fictícia e último jogo"
+            className="flex size-8 items-center justify-center text-muted-foreground"
+          >
+            <Swords aria-hidden="true" className="size-4" />
+          </div>
+        ) : (
+          <SidebarGroup>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {['Liga fictícia', 'Último jogo'].map((label) => (
+                  <SidebarMenuItem key={label}>
+                    <SidebarMenuButton
+                      render={<div />}
+                      className="hover:bg-transparent hover:text-inherit"
+                    >
+                      {label === 'Último jogo' ? (
+                        <Swords aria-hidden="true" />
+                      ) : (
+                        <Trophy aria-hidden="true" />
+                      )}
+                      <span>{label}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarFooter>
     </Sidebar>
   )

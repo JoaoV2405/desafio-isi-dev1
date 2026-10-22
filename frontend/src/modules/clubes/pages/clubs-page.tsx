@@ -1,6 +1,6 @@
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useNavigate } from '@tanstack/react-router'
+import { useNavigate, useSearch } from '@tanstack/react-router'
 import { CreateClubModal } from '../components/club-modal/create-club-modal'
 import { createClub } from '../services/clubs-api'
 import type { CreateClubInput } from '../types/club-input'
@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button'
 import { ClubsTable } from '../components/club-table/clubs-table'
 
 export function ClubsPage() {
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const { create: isCreateModalOpen } = useSearch({ from: '/mercado/clubes' })
   const inFlight = useRef(false)
   const queryClient = useQueryClient()
   const navigate = useNavigate()
@@ -21,7 +21,8 @@ export function ClubsPage() {
     retry: false,
     onSuccess: async (club) => {
       await queryClient.invalidateQueries({ queryKey: ['clubs'] })
-      setIsCreateModalOpen(false)
+      // Remove a intenção de criação antes de abrir o detalhe: Voltar não reabre o modal.
+      await navigate({ to: '/mercado/clubes', search: {}, replace: true })
       await navigate({
         to: '/mercado/clubes/$clubeId',
         params: { clubeId: String(club.id) },
@@ -35,8 +36,12 @@ export function ClubsPage() {
 
   function changeCreateModalOpen(open: boolean) {
     if (inFlight.current) return
-    if (open) creation.reset()
-    setIsCreateModalOpen(open)
+    creation.reset()
+    void navigate({
+      to: '/mercado/clubes',
+      search: open ? { create: true } : {},
+      replace: true,
+    })
   }
 
   function submitClub(input: CreateClubInput) {
@@ -63,7 +68,7 @@ export function ClubsPage() {
         }
       />
       <PageSection aria-label="Clubes">
-        <ClubsTable />
+        <ClubsTable onCreateClub={() => changeCreateModalOpen(true)} />
       </PageSection>
       {isCreateModalOpen && (
         <CreateClubModal

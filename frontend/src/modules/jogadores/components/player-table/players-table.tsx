@@ -21,15 +21,21 @@ import { formatMoney } from '@/shared/lib/format-money'
 import { PLAYER_CONDITIONS, PLAYER_POSITIONS } from '@/shared/types/player'
 import type { Club } from '@/shared/types/club'
 import { useClubs } from '@/modules/clubes/hooks/use-clubs'
+import { ContentState } from '@/components/custom/content-state'
+import { ContentErrorState } from '@/components/custom/content-error-state'
 
 const PAGE_SIZE = 10
 const EMPTY_CLUBS: Club[] = []
 
 interface PlayersTableProps {
   onPlayerAction?: PlayerActionsMenuProps['onAction']
+  onCreatePlayer: () => void
 }
 
-export function PlayersTable({ onPlayerAction }: PlayersTableProps) {
+export function PlayersTable({
+  onPlayerAction,
+  onCreatePlayer,
+}: PlayersTableProps) {
   // Centraliza os filtros e observa alterações para manter consulta e indicadores sincronizados.
   const { register, control, setValue, reset } = useForm<PlayersFilterValues>({
     defaultValues: DEFAULT_PLAYER_FILTERS,
@@ -192,10 +198,10 @@ export function PlayersTable({ onPlayerAction }: PlayersTableProps) {
         </div>
       )}
       {isError ? (
-        <Alert variant="destructive">
-          <AlertTitle>Não foi possível carregar os jogadores</AlertTitle>
-          <AlertDescription>{error.message}</AlertDescription>
-        </Alert>
+        <ContentErrorState
+          title="Não foi possível carregar os jogadores"
+          error={error}
+        />
       ) : (
         <Tabs
           value={scope}
@@ -213,7 +219,36 @@ export function PlayersTable({ onPlayerAction }: PlayersTableProps) {
               columns={columns}
               getRowId={(player) => String(player.id)}
               isLoading={isPending}
-              emptyMessage="Nenhum jogador encontrado."
+              emptyContent={
+                hasActiveFilters ? (
+                  <ContentState
+                    variant="not-found"
+                    title="Nenhum jogador encontrado"
+                    description="Ajuste a busca ou limpe os filtros para consultar os jogadores."
+                    action={{ label: 'Limpar filtros', onClick: clearFilters }}
+                  />
+                ) : (data?.meta.total_items ?? 0) > 0 ? (
+                  <ContentState
+                    variant="not-found"
+                    title="Nenhum jogador nesta página"
+                    description="Volte à primeira página para consultar os jogadores cadastrados."
+                    action={{
+                      label: 'Ir para a primeira página',
+                      onClick: () => setPage(1),
+                    }}
+                  />
+                ) : (
+                  <ContentState
+                    variant="empty"
+                    title="Nenhum jogador cadastrado"
+                    description="Cadastre o primeiro jogador para começar a montar os elencos."
+                    action={{
+                      label: 'Cadastrar jogador',
+                      onClick: onCreatePlayer,
+                    }}
+                  />
+                )
+              }
               caption={<span className="sr-only">Jogadores da liga</span>}
               footer={
                 <div className="flex items-center justify-between gap-4">

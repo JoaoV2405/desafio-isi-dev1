@@ -8,5 +8,5 @@ export const Route = createFileRoute('/mercado/clubes_/$clubeId')({
 function ClubRoute() {
   const { clubeId } = Route.useParams()
 
-  return <ClubPage clubId={clubeId} />
+  return <ClubPage key={clubeId} clubId={clubeId} />
 }

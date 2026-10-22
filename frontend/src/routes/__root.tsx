@@ -2,6 +2,7 @@ import { createRootRoute, Outlet, useRouterState } from '@tanstack/react-router'
 
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import { AppLayout } from '@/components/layout/app-layout'
+import { Toaster } from '@/components/ui/toast'
 import { RoutePaths } from '@/router/route-paths'
 
 export function RootLayout() {
@@ -10,7 +11,7 @@ export function RootLayout() {
   })
 
   return (
-    <>
+    <Toaster>
       {isHome ? (
         <Outlet />
       ) : (
@@ -21,7 +22,7 @@ export function RootLayout() {
       {import.meta.env.DEV && (
         <TanStackRouterDevtools position="bottom-right" />
       )}
-    </>
+    </Toaster>
   )
 }
 export const Route = createRootRoute({ component: RootLayout })

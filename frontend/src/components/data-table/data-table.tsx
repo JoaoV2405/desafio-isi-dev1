@@ -25,6 +25,7 @@ export interface DataTableProps<TData, TValue = unknown> {
   isLoading?: boolean
   loadingMessage?: string
   emptyMessage?: string
+  emptyContent?: ReactNode
   getRowId?: TableOptions<TData>['getRowId']
   className?: string
   contained?: boolean
@@ -39,6 +40,7 @@ export function DataTable<TData, TValue = unknown>({
   isLoading = false,
   loadingMessage = 'Carregando...',
   emptyMessage = 'Nenhum resultado encontrado.',
+  emptyContent,
   getRowId,
   className,
   contained = false,
@@ -114,7 +116,7 @@ export function DataTable<TData, TValue = unknown>({
             ) : (
               <TableRow>
                 <TableCell colSpan={columnCount} className="h-24 text-center">
-                  <span role="status">{emptyMessage}</span>
+                  {emptyContent ?? <span role="status">{emptyMessage}</span>}
                 </TableCell>
               </TableRow>
             )}

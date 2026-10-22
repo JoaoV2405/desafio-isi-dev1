@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useLocation } from '@tanstack/react-router'
+import { useLocation } from '@tanstack/react-router'
 import type { ClubPlayer } from '../types/club-details'
 import type { PlayerSale } from '../types/player-sale'
 import type { ClubTab } from '../components/club-tabs'
@@ -15,8 +15,8 @@ import { PageContainer } from '@/components/page/page-container'
 import { PageHeader } from '@/components/page/page-header'
 import { PageSection } from '@/components/page/page-section'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
-import { RoutePaths } from '@/router/route-paths'
+import { ContentErrorState } from '@/components/custom/content-error-state'
+import { ApiError } from '@/shared/lib/api-error'
 import { formatMoney } from '@/shared/lib/format-money'
 
 export function ClubPage({ clubId }: { clubId: string }) {
@@ -55,19 +55,14 @@ export function ClubPage({ clubId }: { clubId: string }) {
     return (
       <PageContainer>
         <PageHeader title="Clube" />
-        <Alert variant="destructive">
-          <AlertTitle>Não foi possível carregar o clube</AlertTitle>
-          <AlertDescription>{error.message}</AlertDescription>
-        </Alert>
-        <div>
-          <Button
-            variant="outline"
-            nativeButton={false}
-            render={<Link to={RoutePaths.clubs} />}
-          >
-            Voltar para clubes
-          </Button>
-        </div>
+        <ContentErrorState
+          title={
+            error instanceof ApiError && error.status === 404
+              ? 'Clube não encontrado'
+              : 'Não foi possível carregar o clube'
+          }
+          error={error}
+        />
       </PageContainer>
     )
   }
@@ -124,6 +119,7 @@ export function ClubPage({ clubId }: { clubId: string }) {
         ) : (
           <ClubTabs
             key={club.id}
+            clubId={club.id}
             players={club.players}
             value={activeTab}
             onValueChange={setActiveTab}

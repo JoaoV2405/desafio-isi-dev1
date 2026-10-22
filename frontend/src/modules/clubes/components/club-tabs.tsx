@@ -1,10 +1,12 @@
 import type { ClubPlayer } from '../types/club-details'
 import { ClubRosterTable } from './club-table/club-roster-table'
+import { ClubHistory } from './club-history/club-history'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export type ClubTab = 'roster' | 'lineup' | 'history'
 
 interface ClubTabsProps {
+  clubId: number
   players: ClubPlayer[]
   value: ClubTab
   onValueChange: (tab: ClubTab) => void
@@ -13,6 +15,7 @@ interface ClubTabsProps {
 }
 
 export function ClubTabs({
+  clubId,
   players,
   value,
   onValueChange,
@@ -42,8 +45,8 @@ export function ClubTabs({
       <TabsContent value="lineup" className="p-6 text-muted-foreground">
         Escalação em breve.
       </TabsContent>
-      <TabsContent value="history" className="p-6 text-muted-foreground">
-        Histórico em breve.
+      <TabsContent value="history">
+        <ClubHistory clubId={clubId} />
       </TabsContent>
     </Tabs>
   )

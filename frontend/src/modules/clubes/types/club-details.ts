@@ -1,5 +1,5 @@
 import type { Club } from '@/shared/types/club'
-import type { Player } from '@/shared/types/player'
+import type { Player, PlayerDetails } from '@/shared/types/player'
 
 export interface ClubPlayerContract {
   purchase_value: number
@@ -8,7 +8,8 @@ export interface ClubPlayerContract {
   penalty_rate: number
 }
 
-export interface ClubPlayer extends Player {
+export interface ClubPlayer
+  extends Player, Partial<Omit<PlayerDetails, keyof Player>> {
   contract: ClubPlayerContract
 }
 
@@ -16,4 +17,3 @@ export interface ClubDetails extends Club {
   // Ausência significa elenco não informado; um array vazio significa elenco sem jogadores.
   players?: ClubPlayer[]
 }
-

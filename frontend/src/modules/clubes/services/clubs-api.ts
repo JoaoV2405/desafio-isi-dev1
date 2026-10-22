@@ -1,8 +1,8 @@
 import type { ClubDetails } from '../types/club-details'
 import type { CreateClubInput } from '../types/club-input'
+import type { ClubLineup, SaveClubLineupInput } from '../types/club-lineup'
 import type { PlayerSale } from '../types/player-sale'
 import type { Club } from '@/shared/types/club'
-import type { Player } from '@/shared/types/player'
 import { apiJson } from '@/shared/lib/api-client'
 
 export function createClub(input: CreateClubInput): Promise<Club> {
@@ -27,12 +27,23 @@ export function getClub(
   })
 }
 
-// Consulta os titulares para avisar sobre a remoção de um jogador ao alterar sua condição.
+// Consulta a formação, os titulares e o estado de conclusão da escalação salva.
 export function getClubLineup(
   clubId: number,
   signal?: AbortSignal,
-): Promise<{ club_id: number; players: Player[] }> {
-  return apiJson(`/clubs/${clubId}/lineup`, { signal })
+): Promise<ClubLineup> {
+  return apiJson<ClubLineup>(`/clubs/${clubId}/lineup`, { signal })
+}
+
+export function saveClubLineup(
+  clubId: number,
+  input: SaveClubLineupInput,
+): Promise<ClubLineup> {
+  return apiJson<ClubLineup>(`/clubs/${clubId}/lineup`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(input),
+  })
 }
 
 export function sellPlayer(playerId: number): Promise<PlayerSale> {

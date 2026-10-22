@@ -1,0 +1,80 @@
+.soccer-field {
+  position: relative;
+  width: 100%;
+  container-type: inline-size;
+}
+
+.soccer-field[data-presentation='lineup'] {
+  --marker-size: clamp(18px, 12cqw, 44px);
+  --marker-font: clamp(8px, 3.6cqw, 13px);
+  --marker-label-width: 26cqw;
+  --marker-label-font: clamp(8px, 3cqw, 12px);
+}
+
+.soccer-field[data-presentation='match'] {
+  --marker-size: clamp(14px, 4.5cqw, 40px);
+  --marker-font: clamp(7px, 1.5cqw, 13px);
+  /* The keeper and central defender can share a row, 8.46% apart. */
+  --marker-label-width: 8cqw;
+  --marker-label-font: clamp(7px, 1.3cqw, 12px);
+}
+
+.soccer-field-players {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  pointer-events: none;
+}
+
+.soccer-field-marker {
+  position: absolute;
+  width: var(--marker-size);
+  height: var(--marker-size);
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+}
+
+.soccer-field-marker-circle {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  border-width: 2px;
+  border-radius: 50%;
+  font-size: var(--marker-font);
+  font-weight: 600;
+  line-height: 1;
+}
+
+.soccer-field-marker-condition {
+  width: clamp(12px, 6cqw, 18px);
+  height: clamp(12px, 6cqw, 18px);
+  transform: translate(-15%, -15%);
+}
+
+.soccer-field-marker-condition > svg {
+  width: 75%;
+  height: 75%;
+}
+
+/* Keep the circle centered on the coordinates, regardless of label height. */
+.soccer-field-marker-name {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 50%;
+  width: var(--marker-label-width);
+  overflow: hidden;
+  border-radius: 4px;
+  padding: 1px 3px;
+  transform: translateX(-50%);
+  background: rgb(0 0 0 / 45%);
+  color: white;
+  font-size: var(--marker-label-font);
+  line-height: 1.35;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

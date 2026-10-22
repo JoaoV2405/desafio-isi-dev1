@@ -1,3 +1,7 @@
+import {
+  compareText,
+  normalizeForComparison,
+} from '../../../core/text/ordenacao-texto.js';
 import { type Jogador, PosicaoJogador } from '../entities/jogador.entity.js';
 
 type JogadorOrdenavel = {
@@ -38,25 +42,4 @@ export function compareNameAndId(
     compareText(a.normalizedName, b.normalizedName) ||
     a.jogador.id - b.jogador.id
   );
-}
-
-export function normalizeForComparison(value: string): string {
-  return value
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/\p{Mn}/gu, '');
-}
-
-export function compareText(a: string, b: string): number {
-  const caracteresA = Array.from(a);
-  const caracteresB = Array.from(b);
-  const tamanhoComparavel = Math.min(caracteresA.length, caracteresB.length);
-
-  for (let indice = 0; indice < tamanhoComparavel; indice += 1) {
-    const codigoA = caracteresA[indice].codePointAt(0) ?? 0;
-    const codigoB = caracteresB[indice].codePointAt(0) ?? 0;
-    if (codigoA !== codigoB) return codigoA - codigoB;
-  }
-
-  return caracteresA.length - caracteresB.length;
 }

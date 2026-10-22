@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, type Repository } from 'typeorm';
+import { compareNames } from '../../../core/text/ordenacao-texto.js';
 import { isUniqueConstraintViolation } from '../../../core/validation/is-unique-constraint-violation.js';
 import { decimalParaCentavos } from '../../../core/money/conversoes-monetarias.js';
 import { calculateLoyaltyTerms } from '../../contratos/index.js';
@@ -23,36 +24,6 @@ import type { ContratoAtivoLeitura } from '../queries/detalhes-clube.types.js';
 import { validateClubCreation } from '../validators/clube.validators.js';
 
 const CLUB_LIMIT = 20;
-
-function normalizeNameForSorting(name: string): string[] {
-  return Array.from(
-    name
-      .normalize('NFD')
-      .toLowerCase()
-      .replace(/\p{Mn}/gu, ''),
-  );
-}
-
-function compareNames(firstName: string, secondName: string): number {
-  const firstCharacters = normalizeNameForSorting(firstName);
-  const secondCharacters = normalizeNameForSorting(secondName);
-  const sharedLength = Math.min(
-    firstCharacters.length,
-    secondCharacters.length,
-  );
-
-  for (let index = 0; index < sharedLength; index += 1) {
-    const difference =
-      firstCharacters[index].codePointAt(0)! -
-      secondCharacters[index].codePointAt(0)!;
-
-    if (difference !== 0) {
-      return difference;
-    }
-  }
-
-  return firstCharacters.length - secondCharacters.length;
-}
 
 @Injectable()
 export class ClubesService {

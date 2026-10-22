@@ -1,6 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
+import {
+  compareText,
+  normalizeForComparison,
+} from '../../../core/text/ordenacao-texto.js';
 import { Clube } from '../../clubes/entities/clube.entity.js';
 import { Escalacao } from '../../liga/entities/escalacao.entity.js';
 import { AlterarCondicaoJogadorDto } from '../dto/alterar-condicao-jogador.dto.js';
@@ -22,8 +26,6 @@ import { JogadorPresenter } from '../presenters/jogador.presenter.js';
 import {
   compareNameAndId,
   comparePositions,
-  compareText,
-  normalizeForComparison,
   sortRoster,
 } from './ordenacao-jogadores.js';
 import { projectRoster } from './project-roster.js';

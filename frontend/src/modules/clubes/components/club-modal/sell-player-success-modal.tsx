@@ -1,6 +1,7 @@
 import type { PlayerSale } from '../../types/player-sale'
 import { OperationSuccessModal } from '@/components/modal/operation-success-modal'
 import { formatMoney } from '@/shared/lib/format-money'
+import { ContractStatusBadge } from '@/shared/components/contract-status-badge'
 
 interface SellPlayerSuccessModalProps {
   sale: PlayerSale
@@ -31,17 +32,18 @@ export function SellPlayerSuccessModal({
         { label: 'Lucro', value: `${formatMoney(sale.profit)} moedas` },
         { label: 'Comissão', value: `${formatMoney(sale.fee)} moedas` },
         {
-          label: 'Crédito recebido',
+          label: 'Crédito no caixa',
           value: `${formatMoney(sale.cash_change)} moedas`,
+          emphasized: true,
         },
         {
           label: 'Situação do contrato',
-          value:
-            sale.contract_status === 'RESCINDIDO' ? 'Rescindido' : 'Encerrado',
+          value: <ContractStatusBadge status={sale.contract_status} />,
         },
         {
           label: 'Novo caixa do clube',
           value: `${formatMoney(sale.club_cash)} moedas`,
+          emphasized: true,
         },
       ]}
       primaryAction={{ label: 'Ver histórico', onClick: onViewHistory }}

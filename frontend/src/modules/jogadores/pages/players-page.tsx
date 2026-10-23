@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { CreatePlayerModal } from '../components/player-modal/create-player-modal'
+import { CreatePlayerSuccessModal } from '../components/player-modal/create-player-success-modal'
 import {
   EditPlayerModal,
   EditPlayerConditionModal,
@@ -26,12 +27,14 @@ import {
 } from '../services/player-mutations'
 import { deletePlayer } from '../services/delete-player'
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
+import { toast } from '@/components/ui/toast'
 import { formatMoney } from '@/shared/lib/format-money'
 import { PLAYER_CONDITIONS } from '@/shared/types/player'
 
 export type PlayerAction = 'details' | 'edit' | 'condition' | 'delete' | 'buy'
 
 export function PlayersPage() {
+  const [createdPlayer, setCreatedPlayer] = useState<Player | null>(null)
   const [purchaseResult, setPurchaseResult] = useState<PlayerPurchase | null>(
     null,
   )
@@ -47,32 +50,54 @@ export function PlayersPage() {
     description?: string
   } | null>(null)
 
-  function finishAction(title: string, description?: string) {
-    setFeedback({ title, description })
+  function finishAction() {
+    setFeedback(null)
+    setCreatedPlayer(null)
     setIsCreateModalOpen(false)
     setSelectedAction(null)
   }
 
   // Cada operação mantém seu próprio erro e só fecha o modal após sucesso e atualização dos dados.
-  const create = usePlayerMutation(createPlayer, (player) =>
-    finishAction(
-      `${player.name} cadastrado com sucesso.`,
-      `Overall: ${player.overall} · Valor base: ${formatMoney(player.base_value)} moedas.`,
-    ),
-  )
-  const edit = usePlayerMutation(updatePlayer, (player) =>
-    finishAction(`${player.name} atualizado com sucesso.`),
-  )
-  const condition = usePlayerMutation(updatePlayerCondition, (player) =>
-    finishAction(
-      `Condição de ${player.name} atualizada para ${PLAYER_CONDITIONS[player.condition]}.`,
-    ),
-  )
-  const deletion = usePlayerMutation(deletePlayer, () =>
-    finishAction('Jogador excluído com sucesso.'),
+  const create = usePlayerMutation(createPlayer, (player) => {
+    finishAction()
+    setCreatedPlayer(player)
+  })
+  const edit = usePlayerMutation(updatePlayer, (player) => {
+    finishAction()
+    toast.add({
+      type: 'success',
+      title: 'Jogador editado',
+      description: `${player.name} teve os dados atualizados. Condição: ${PLAYER_CONDITIONS[player.condition]}. Valor de mercado: ${formatMoney(player.market_value)}.`,
+      timeout: 5000,
+    })
+  })
+  const condition = usePlayerMutation(updatePlayerCondition, (player) => {
+    finishAction()
+    toast.add({
+      type: 'success',
+      title: 'Condição alterada',
+      description: `${player.name} agora está ${PLAYER_CONDITIONS[player.condition]}. Valor de mercado: ${formatMoney(player.market_value)}.`,
+      timeout: 5000,
+    })
+  })
+  const deletion = usePlayerMutation(
+    async (player: Player) => {
+      await deletePlayer(player.id)
+      return player
+    },
+    (player) => {
+      finishAction()
+      toast.add({
+        type: 'success',
+        title: 'Jogador excluído',
+        description: `${player.name} saiu da lista. Transações e partidas antigas dele continuam gravadas.`,
+        timeout: 5000,
+      })
+    },
   )
   const purchase = usePlayerMutation(buyPlayer, (result) => {
-    finishAction(`${result.player_name} contratado com sucesso.`)
+    finishAction()
+    setFeedback({ title: `${result.player_name} contratado com sucesso.` })
     setPurchaseResult(result)
   })
   const isSubmitting =
@@ -96,6 +121,7 @@ export function PlayersPage() {
     if (isSubmitting) return
     resetErrors()
     setFeedback(null)
+    setCreatedPlayer(null)
     setPurchaseResult(null)
     setIsCreateModalOpen(false)
     setSelectedAction({ type, player })
@@ -106,6 +132,7 @@ export function PlayersPage() {
     if (open) {
       resetErrors()
       setFeedback(null)
+      setCreatedPlayer(null)
       setPurchaseResult(null)
     }
     if (open && selectedAction !== null) {
@@ -159,6 +186,15 @@ export function PlayersPage() {
           error={create.error}
         />
       )}
+      {createdPlayer && (
+        <CreatePlayerSuccessModal
+          player={createdPlayer}
+          onOpenChange={(open) => {
+            if (!open) setCreatedPlayer(null)
+          }}
+          onViewDetails={() => handlePlayerAction('details', createdPlayer)}
+        />
+      )}
       {/* A ação selecionada fornece os dados atuais e desmonta o formulário ao fechar. */}
       {selectedAction?.type === 'edit' && (
         <EditPlayerModal
@@ -203,7 +239,7 @@ export function PlayersPage() {
           open
           player={selectedAction.player}
           onOpenChange={changeActionModalOpen}
-          onConfirm={(player) => deletion.submit(player.id)}
+          onConfirm={deletion.submit}
           isSubmitting={deletion.isPending}
           error={deletion.error}
         />

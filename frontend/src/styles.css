@@ -125,7 +125,7 @@ body {
   --destructive-soft-foreground: #bf000f;
   --destructive-soft-border: #ffcaca;
   --border: #e4e4e7;
-  --input: #91919b;
+  --input: #d4d4d8;
   --ring: #155dfc;
   --overlay: rgb(0 0 0 / 50%);
   --chart-1: #155dfc;
@@ -196,6 +196,11 @@ body {
 @layer base {
   * {
     @apply border-border outline-ring/50;
+  }
+  :is(button, [role='button']):not(:disabled):not([aria-disabled='true']):not(
+      [data-disabled]
+    ) {
+    cursor: pointer;
   }
   body {
     @apply bg-background text-foreground;

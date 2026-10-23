@@ -45,7 +45,7 @@ export function LineupPlayerSelect({
           onValueChange={(player) => onValueChange(player?.id ?? null)}
           itemToStringLabel={(player) => player.name}
           isItemEqualToValue={(player, selected) => player.id === selected.id}
-          disabled={disabled}
+          disabled={disabled || players.length === 0}
         >
           <ComboboxTrigger
             ref={inputRef}
@@ -58,7 +58,10 @@ export function LineupPlayerSelect({
             aria-describedby={error ? errorId : undefined}
           >
             <span className="truncate">
-              {value?.name ?? 'Selecionar jogador'}
+              {value?.name ??
+                (players.length === 0
+                  ? 'Nenhum jogador disponível'
+                  : 'Selecionar jogador')}
             </span>
           </ComboboxTrigger>
           <ComboboxContent className="min-w-64">

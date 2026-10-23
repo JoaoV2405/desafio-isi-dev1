@@ -2,6 +2,7 @@ import { useId, useRef, useState } from 'react'
 import type { SubmitEvent } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
+import { Shield } from 'lucide-react'
 import { matchDetailKey } from '../hooks/use-match'
 import { createMatch } from '../services/matches-api'
 import type { CreateMatchInput } from '../services/matches-api'
@@ -115,6 +116,7 @@ export function CreateMatchModal({
               </label>
               <NativeSelect
                 id={`${formId}-home`}
+                icon={<Shield />}
                 className="w-full"
                 value={homeId}
                 onChange={(event) => setHomeId(event.target.value)}
@@ -140,6 +142,7 @@ export function CreateMatchModal({
               </label>
               <NativeSelect
                 id={`${formId}-away`}
+                icon={<Shield />}
                 className="w-full"
                 value={awayId}
                 onChange={(event) => setAwayId(event.target.value)}

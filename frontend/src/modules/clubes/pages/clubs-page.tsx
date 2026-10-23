@@ -10,8 +10,10 @@ import { PageContainer } from '@/components/page/page-container'
 import { PageHeader } from '@/components/page/page-header'
 import { PageSection } from '@/components/page/page-section'
 import { Button } from '@/components/ui/button'
+import { toast } from '@/components/ui/toast'
 import { ClubsTable } from '../components/club-table/clubs-table'
 import { dashboardQueryOptions } from '@/modules/inicio/hooks/use-dashboard'
+import { formatMoney } from '@/shared/lib/format-money'
 
 export function ClubsPage() {
   const { create: isCreateModalOpen } = useSearch({ from: '/mercado/clubes' })
@@ -34,7 +36,12 @@ export function ClubsPage() {
       await navigate({
         to: '/mercado/clubes/$clubeId',
         params: { clubeId: String(club.id) },
-        state: { createdClubId: club.id },
+      })
+      toast.add({
+        type: 'success',
+        title: 'Clube criado',
+        description: `${club.name} (${club.acronym}) começa com ${formatMoney(club.cash)} em caixa.`,
+        timeout: 5000,
       })
     },
     onSettled: () => {

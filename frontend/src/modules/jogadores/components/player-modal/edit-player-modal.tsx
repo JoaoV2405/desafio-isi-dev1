@@ -261,7 +261,7 @@ export function EditPlayerConditionModal({
               <label
                 key={value}
                 className={cn(
-                  'flex w-full cursor-pointer items-center gap-3 rounded-md border border-input p-4 transition-colors hover:bg-muted has-focus-visible:ring-3 has-focus-visible:ring-ring',
+                  'flex w-full cursor-pointer items-center gap-3 rounded-md border border-input p-4 transition-colors hover:bg-muted has-focus-visible:ring-1 has-focus-visible:ring-ring/30',
                   condition === value && 'border-primary bg-muted/50',
                   (isBlocked || isSubmitting) &&
                     'cursor-not-allowed opacity-50',

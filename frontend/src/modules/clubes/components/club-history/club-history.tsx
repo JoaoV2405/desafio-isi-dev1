@@ -95,6 +95,7 @@ export function ClubHistory({ clubId }: { clubId: number }) {
   }
 
   const noTransactions = transactions.data?.data.length === 0
+  const noPlayerTransactions = noTransactions && playerId !== null
 
   return (
     <section
@@ -184,17 +185,17 @@ export function ClubHistory({ clubId }: { clubId: number }) {
           </ErrorAlert>
         ) : noTransactions ? (
           <Alert
-            variant={playerId !== null ? 'destructive' : 'default'}
+            variant={noPlayerTransactions ? 'destructive' : 'default'}
             className="rounded-none border-0"
           >
             <CircleAlert aria-hidden="true" />
             <AlertTitle>
-              {playerId !== null
+              {noPlayerTransactions
                 ? 'Nenhuma transação encontrada para este jogador'
                 : 'Nenhuma transação registrada neste clube'}
             </AlertTitle>
             <AlertDescription>
-              {playerId !== null
+              {noPlayerTransactions
                 ? 'O jogador selecionado não possui transações neste histórico com os filtros atuais. Selecione outro jogador ou altere os tipos de operação.'
                 : 'As compras e vendas do clube aparecerão aqui. Os totais são zero enquanto não houver transações.'}
             </AlertDescription>
@@ -216,9 +217,11 @@ export function ClubHistory({ clubId }: { clubId: number }) {
             }
           />
         )}
-        {!transactions.isError && transactions.data && (
-          <TransactionSummary summary={transactions.data.summary} />
-        )}
+        {!transactions.isError &&
+          !noPlayerTransactions &&
+          transactions.data && (
+            <TransactionSummary summary={transactions.data.summary} />
+          )}
       </div>
     </section>
   )

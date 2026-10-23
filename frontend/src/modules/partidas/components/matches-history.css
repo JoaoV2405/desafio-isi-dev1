@@ -61,6 +61,11 @@
 }
 
 /* Carregamento e conteúdo vazio ocupam a tabela inteira, fora das regras de coluna. */
+.matches-history-table th[colspan]:not([colspan='1']) {
+  grid-column: 1 / -1;
+  padding-inline: 1.25rem;
+}
+
 .matches-history-table td[colspan] {
   display: grid;
   grid-column: 1 / -1;

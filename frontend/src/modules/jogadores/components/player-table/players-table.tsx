@@ -230,6 +230,7 @@ export function PlayersTable({
               columns={columns}
               getRowId={(player) => String(player.id)}
               isLoading={isPending}
+              loadingMessage="Carregando jogadores..."
               emptyContent={
                 hasActiveFilters ? (
                   <ContentState

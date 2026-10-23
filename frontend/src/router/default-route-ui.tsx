@@ -3,9 +3,15 @@ import { useRouter } from '@tanstack/react-router'
 
 import { RoutePaths } from './route-paths'
 import { ContentState } from '@/components/custom/content-state'
+import { PageContainer } from '@/components/page/page-container'
+import { PageSkeleton } from '@/components/page/page-skeleton'
 
 export function RouterPendingComponent() {
-  return <p className="p-8">Carregando...</p>
+  return (
+    <PageContainer>
+      <PageSkeleton />
+    </PageContainer>
+  )
 }
 
 export function RouterErrorComponent({ error, reset }: ErrorComponentProps) {

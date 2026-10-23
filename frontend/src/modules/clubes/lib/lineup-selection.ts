@@ -5,7 +5,10 @@ import type {
   SoccerFormation,
 } from '@/shared/components/soccer-field/types'
 import type { Player } from '@/shared/types/player'
-import { FORMATION_LAYOUTS } from '../../../shared/components/soccer-field/formations.ts'
+import {
+  FORMATION_LAYOUTS,
+  SOCCER_FORMATIONS,
+} from '../../../shared/components/soccer-field/formations.ts'
 import {
   canOccupyFieldSlot,
   FIELD_POSITION_SECTORS,
@@ -45,6 +48,18 @@ export function reconcileLineupSelection(
   return Object.fromEntries(
     Object.entries(reconcileFieldOccupants(formation, occupants)).map(
       ([slotId, player]) => [slotId, player?.id ?? null],
+    ),
+  )
+}
+
+export function hasPlayersForFormation(
+  formation: SoccerFormation | null,
+  players: Player[],
+): boolean {
+  const formations = formation ? [formation] : SOCCER_FORMATIONS
+  return formations.some((candidate) =>
+    Object.values(createLineupSelection(candidate, players)).every(
+      (id) => id != null,
     ),
   )
 }

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useLocation, useNavigate } from '@tanstack/react-router'
+import { useNavigate } from '@tanstack/react-router'
 import type { ClubPlayer } from '../types/club-details'
 import type { PlayerSale } from '../types/player-sale'
 import type { ClubTab } from '../components/club-tabs'
@@ -14,7 +14,7 @@ import { usePlayerMutation } from '@/modules/jogadores/hooks/use-player-mutation
 import { PageContainer } from '@/components/page/page-container'
 import { PageHeader } from '@/components/page/page-header'
 import { PageSection } from '@/components/page/page-section'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { PageSkeleton } from '@/components/page/page-skeleton'
 import { ContentErrorState } from '@/components/custom/content-error-state'
 import { ContentState } from '@/components/custom/content-state'
 import { RoutePaths } from '@/router/route-paths'
@@ -24,9 +24,6 @@ import { Coins, Landmark, Shirt, WalletMinimal } from 'lucide-react'
 
 export function ClubPage({ clubId }: { clubId: string }) {
   const navigate = useNavigate()
-  const createdClubId = useLocation({
-    select: (location) => location.state.createdClubId,
-  })
   const { data: club, isPending, isError, error } = useClub(clubId)
   const [playerToSell, setPlayerToSell] = useState<ClubPlayer | null>(null)
   const [saleResult, setSaleResult] = useState<PlayerSale | null>(null)
@@ -47,10 +44,7 @@ export function ClubPage({ clubId }: { clubId: string }) {
   if (isPending) {
     return (
       <PageContainer>
-        <PageHeader title="Clube" />
-        <p role="status" className="text-sm text-muted-foreground">
-          Carregando clube...
-        </p>
+        <PageSkeleton />
       </PageContainer>
     )
   }
@@ -84,14 +78,6 @@ export function ClubPage({ clubId }: { clubId: string }) {
   return (
     <PageContainer>
       <ClubPageHeader club={club} />
-      {createdClubId === club.id && (
-        <Alert variant="success" role="status">
-          <AlertTitle>{club.name} criado com sucesso.</AlertTitle>
-          <AlertDescription>
-            O clube está pronto para receber jogadores.
-          </AlertDescription>
-        </Alert>
-      )}
       <PageSection
         aria-label="Indicadores do clube"
         className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
@@ -101,7 +87,7 @@ export function ClubPage({ clubId }: { clubId: string }) {
           value={formatMoney(club.cash)}
           unit="moedas"
           description="Disponível para contratações"
-          icon={<WalletMinimal/>}
+          icon={<WalletMinimal />}
         />
         <ClubSummaryCard
           title="Valor do elenco"
@@ -110,7 +96,7 @@ export function ClubPage({ clubId }: { clubId: string }) {
           }
           unit={club.squad_value === undefined ? undefined : 'moedas'}
           description="Valor de mercado dos jogadores"
-          icon={<Coins/>}
+          icon={<Coins />}
         />
         <ClubSummaryCard
           title="Patrimônio"
@@ -119,13 +105,13 @@ export function ClubPage({ clubId }: { clubId: string }) {
           }
           unit={club.net_worth === undefined ? undefined : 'moedas'}
           description="Caixa e valor do elenco"
-          icon={<Landmark/>}
+          icon={<Landmark />}
         />
         <ClubSummaryCard
           title="Elenco"
           value={club.players?.length ?? '—'}
           description="Jogadores vinculados ao clube"
-          icon={<Shirt/>}
+          icon={<Shirt />}
         />
       </PageSection>
       <PageSection aria-label="Elenco, escalação e histórico">
@@ -138,6 +124,7 @@ export function ClubPage({ clubId }: { clubId: string }) {
           <ClubTabs
             key={club.id}
             clubId={club.id}
+            clubName={club.name}
             players={club.players}
             value={activeTab}
             onValueChange={setActiveTab}

@@ -5,6 +5,7 @@ import {
 } from '@tanstack/react-table'
 import type { ColumnDef, TableOptions } from '@tanstack/react-table'
 import type { ReactNode } from 'react'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
   Table,
   TableBody,
@@ -78,28 +79,40 @@ export function DataTable<TData, TValue = unknown>({
         <Table aria-busy={isLoading}>
           {caption != null && <TableCaption>{caption}</TableCaption>}
           <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} colSpan={header.colSpan}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                  </TableHead>
-                ))}
+            {isLoading ? (
+              <TableRow>
+                <TableHead colSpan={columnCount}>
+                  <span role="status">{loadingMessage}</span>
+                </TableHead>
               </TableRow>
-            ))}
+            ) : (
+              table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id} colSpan={header.colSpan}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                    </TableHead>
+                  ))}
+                </TableRow>
+              ))
+            )}
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={columnCount} className="h-24 text-center">
-                  <span role="status">{loadingMessage}</span>
-                </TableCell>
-              </TableRow>
+              Array.from({ length: 5 }, (_, index) => (
+                <TableRow key={index} aria-hidden="true">
+                  {table.getVisibleLeafColumns().map((column) => (
+                    <TableCell key={column.id} className="h-12">
+                      <Skeleton className="h-4 w-24 max-w-full motion-reduce:animate-none" />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
             ) : rows.length > 0 ? (
               rows.map((row) => (
                 <TableRow key={row.id}>

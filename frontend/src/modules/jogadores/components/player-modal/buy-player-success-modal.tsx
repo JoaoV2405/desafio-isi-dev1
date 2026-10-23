@@ -3,6 +3,7 @@ import type { PlayerPurchase } from '../../types/player-purchase'
 import { OperationSuccessModal } from '@/components/modal/operation-success-modal'
 import { formatMoney } from '@/shared/lib/format-money'
 import { formatDateTime } from '@/shared/lib/format-date-time'
+import { ContractStatusBadge } from '@/shared/components/contract-status-badge'
 
 interface BuyPlayerSuccessModalProps {
   purchase: PlayerPurchase
@@ -29,14 +30,20 @@ export function BuyPlayerSuccessModal({
         {
           label: 'Custo total',
           value: `${formatMoney(purchase.value + purchase.fee)} moedas`,
+          emphasized: true,
         },
         {
           label: 'Fim da fidelidade',
           value: formatDateTime(purchase.contract.loyalty_until),
         },
         {
+          label: 'Situação do contrato',
+          value: <ContractStatusBadge status={purchase.contract.status} />,
+        },
+        {
           label: 'Novo caixa do clube',
           value: `${formatMoney(purchase.club_cash)} moedas`,
+          emphasized: true,
         },
       ]}
       primaryAction={{

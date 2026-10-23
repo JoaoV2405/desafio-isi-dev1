@@ -2,6 +2,8 @@ import { Controller, FormProvider, useWatch } from 'react-hook-form'
 import { LoaderCircle, Save } from 'lucide-react'
 import { useClubLineupForm } from '../../hooks/use-club-lineup-form'
 import type { ClubPlayer } from '../../types/club-details'
+import { hasPlayersForFormation } from '../../lib/lineup-selection'
+import { validateLineup } from '../../lib/lineup-validation'
 import { FormationSelector } from './formation-selector'
 import { LineupStartersTable } from './lineup-starters-table'
 import { LineupPreview } from './lineup-preview'
@@ -19,9 +21,11 @@ import { Button } from '@/components/ui/button'
 
 export function ClubLineup({
   clubId,
+  clubName,
   players,
 }: {
   clubId: number
+  clubName: string
   players: ClubPlayer[]
 }) {
   const {
@@ -33,7 +37,12 @@ export function ClubLineup({
     changePlayer,
     submit,
   } = useClubLineupForm(clubId, players)
-  const selection = useWatch({ control: form.control, name: 'selection' })
+  const [formation, selection] = useWatch({
+    control: form.control,
+    name: ['formation', 'selection'],
+  })
+  const hasEnoughPlayers = hasPlayersForFormation(formation, players)
+  const canSave = validateLineup(formation, selection, players).valid
   const selectedIds = new Set(Object.values(selection))
   const savedIds = new Set(lineup.data?.players.map(({ id }) => id))
 
@@ -86,22 +95,22 @@ export function ClubLineup({
               </Button>
             </ErrorAlert>
           )}
-          {lineup.data && !lineup.data.complete && !lineup.isError && (
-            <Alert
-              variant={lineup.data.formation ? 'warning' : 'default'}
-              role="status"
-              className="rounded-none border-0 border-b"
-            >
-              <AlertTitle>
-                {lineup.data.formation
-                  ? 'Escalação incompleta'
-                  : 'Nenhuma escalação salva'}
-              </AlertTitle>
-              <AlertDescription>
-                O clube não pode jogar. Escolha uma formação e salve cinco
-                titulares válidos.
-              </AlertDescription>
-            </Alert>
+          {lineup.data && !hasEnoughPlayers && !lineup.isError && (
+            <div className="px-4 pt-4">
+              <Alert variant="warning" role="status">
+                <AlertTitle>
+                  Escalação incompleta: o {clubName} não pode jogar partidas
+                </AlertTitle>
+                <AlertDescription>
+                  O elenco tem {players.length}{' '}
+                  {players.length === 1 ? 'jogador' : 'jogadores'}, e a
+                  escalação precisa de 5: 1 goleiro e 4 jogadores de linha.
+                  {players.length >= 5 &&
+                    ' Faltam jogadores disponíveis e compatíveis com as posições da formação.'}{' '}
+                  Compre jogadores e salve a escalação com os 5 titulares.
+                </AlertDescription>
+              </Alert>
+            </div>
           )}
           <Controller
             control={form.control}
@@ -117,11 +126,6 @@ export function ClubLineup({
               />
             )}
           />
-          {players.length === 0 && !disabled && (
-            <p className="border-b p-4 text-sm text-muted-foreground">
-              O elenco está vazio. Contrate jogadores para montar a escalação.
-            </p>
-          )}
           <LineupStartersTable
             players={players}
             onPlayerChange={changePlayer}
@@ -149,7 +153,7 @@ export function ClubLineup({
             />
             <div className="flex flex-wrap items-center justify-between gap-3">
               <LineupSelectionCount players={players} />
-              <Button type="submit" disabled={disabled}>
+              <Button type="submit" disabled={disabled || !canSave}>
                 {save.isPending ? (
                   <LoaderCircle
                     aria-hidden="true"

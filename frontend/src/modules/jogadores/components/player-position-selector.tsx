@@ -43,7 +43,7 @@ export function PlayerPositionSelector({
             <label
               key={position}
               className={cn(
-                'flex min-w-0 cursor-pointer flex-col items-center gap-1 rounded-md border border-input bg-background px-1 py-3 text-center transition-colors hover:bg-muted has-focus-visible:ring-3 has-focus-visible:ring-ring',
+                'flex min-w-0 cursor-pointer flex-col items-center gap-1 rounded-md border border-input bg-background px-1 py-3 text-center transition-colors hover:bg-muted has-focus-visible:ring-1 has-focus-visible:ring-ring/30',
                 value === position &&
                   'border-primary bg-primary-soft text-primary-soft-foreground hover:bg-primary-soft',
                 error && 'border-destructive',

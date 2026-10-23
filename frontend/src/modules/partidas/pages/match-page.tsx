@@ -7,6 +7,7 @@ import { MatchScoreCard } from '../components/match-score-card'
 import { MatchFieldSection } from '../components/match-field-section'
 import { MatchDuelsTable } from '../components/match-duels-table'
 import { PageContainer } from '@/components/page/page-container'
+import { PageSkeleton } from '@/components/page/page-skeleton'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { ContentErrorState } from '@/components/custom/content-error-state'
@@ -51,12 +52,7 @@ export function MatchPage({ matchId }: { matchId: string }) {
         </Button>
       </header>
       {isPending ? (
-        <p
-          role="status"
-          className="py-6 text-center text-sm text-muted-foreground"
-        >
-          Carregando partida e duelos...
-        </p>
+        <PageSkeleton showHeader={false} />
       ) : isError && error instanceof ApiError && error.status === 404 ? (
         <ContentState
           variant="not-found"

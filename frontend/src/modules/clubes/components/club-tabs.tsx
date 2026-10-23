@@ -8,6 +8,7 @@ export type ClubTab = 'roster' | 'lineup' | 'history'
 
 interface ClubTabsProps {
   clubId: number
+  clubName: string
   players: ClubPlayer[]
   value: ClubTab
   onValueChange: (tab: ClubTab) => void
@@ -17,6 +18,7 @@ interface ClubTabsProps {
 
 export function ClubTabs({
   clubId,
+  clubName,
   players,
   value,
   onValueChange,
@@ -44,7 +46,12 @@ export function ClubTabs({
         />
       </TabsContent>
       <TabsContent value="lineup">
-        <ClubLineup key={clubId} clubId={clubId} players={players} />
+        <ClubLineup
+          key={clubId}
+          clubId={clubId}
+          clubName={clubName}
+          players={players}
+        />
       </TabsContent>
       <TabsContent value="history">
         <ClubHistory clubId={clubId} />

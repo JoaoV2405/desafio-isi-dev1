@@ -1,10 +1,21 @@
 import {
   type ArgumentMetadata,
+  BadRequestException,
   type INestApplication,
+  type ValidationError,
   ValidationPipe,
 } from '@nestjs/common';
 
 class ApiValidationPipe extends ValidationPipe {
+  override createExceptionFactory(): (
+    validationErrors?: ValidationError[],
+  ) => BadRequestException {
+    return (validationErrors = []) => {
+      const message = this.flattenValidationErrors(validationErrors).join('; ');
+      return new BadRequestException(message || 'Dados inválidos');
+    };
+  }
+
   protected override transformPrimitive(
     value: unknown,
     metadata: ArgumentMetadata,

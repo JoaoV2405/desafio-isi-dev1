@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { cva } from 'class-variance-authority'
+import { CircleAlert } from 'lucide-react'
 import type { VariantProps } from 'class-variance-authority'
 import { cn } from 'cn'
 
@@ -77,4 +78,30 @@ function AlertAction({ className, ...props }: React.ComponentProps<'div'>) {
   )
 }
 
-export { Alert, AlertTitle, AlertDescription, AlertAction }
+type ErrorAlertProps = Omit<
+  React.ComponentProps<'div'>,
+  'title' | 'children'
+> & {
+  title: React.ReactNode
+  children: React.ReactNode
+  descriptionClassName?: string
+}
+
+function ErrorAlert({
+  title,
+  children,
+  descriptionClassName,
+  ...props
+}: ErrorAlertProps) {
+  return (
+    <Alert {...props} variant="destructive">
+      <CircleAlert aria-hidden="true" />
+      <AlertTitle>{title}</AlertTitle>
+      <AlertDescription className={descriptionClassName}>
+        {children}
+      </AlertDescription>
+    </Alert>
+  )
+}
+
+export { Alert, AlertTitle, AlertDescription, AlertAction, ErrorAlert }

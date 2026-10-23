@@ -2,8 +2,8 @@ import { StandingsTable } from '../components/classificacao-table'
 import { RecentMatchesCard } from '../components/recent-matches-card'
 import { StandingsOrderCard } from '../components/standings-order-card'
 import { useState } from 'react'
-import { Plus } from 'lucide-react'
-import { IconPlaceholder } from '@/components/layout/icon-placeholder'
+import { ListOrdered, Plus } from 'lucide-react'
+import { PageIcon } from '@/components/page/page-icon'
 import { PageContainer } from '@/components/page/page-container'
 import { PageHeader } from '@/components/page/page-header'
 import { PageSection } from '@/components/page/page-section'
@@ -16,7 +16,7 @@ export function StandingsPage() {
   return (
     <PageContainer>
       <PageHeader
-        icon={<IconPlaceholder />}
+        icon={<PageIcon icon={ListOrdered} />}
         title="Classificação"
         description="Acompanhe a posição dos clubes e os resultados da liga."
         actions={

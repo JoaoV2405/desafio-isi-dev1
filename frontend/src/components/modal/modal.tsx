@@ -23,6 +23,7 @@ export interface ModalProps {
   onOpenChange: (open: boolean) => void
   title: ReactNode
   subtitle?: ReactNode
+  feedback?: ReactNode
   children: ReactNode
   primaryAction: ModalPrimaryAction
   cancelLabel?: string
@@ -37,6 +38,7 @@ export function Modal({
   onOpenChange,
   title,
   subtitle,
+  feedback,
   children,
   primaryAction,
   cancelLabel = 'Cancelar',
@@ -110,6 +112,7 @@ export function Modal({
             data-slot="modal-body"
             className="min-h-0 flex-1 space-y-4 overflow-y-auto p-6"
           >
+            {feedback}
             {children}
           </div>
           <footer

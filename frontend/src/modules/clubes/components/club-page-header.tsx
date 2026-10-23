@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { Shield, Shirt, ShoppingCart } from 'lucide-react'
+import { Shirt, ShoppingCart } from 'lucide-react'
 import type { ClubDetails } from '../types/club-details'
 import { PageHeader } from '@/components/page/page-header'
 import { Badge } from '@/components/ui/badge'
@@ -11,12 +11,12 @@ export function ClubPageHeader({ club }: { club: ClubDetails }) {
     <PageHeader
       className="flex-col sm:flex-row"
       icon={
-        <span className="relative flex size-10 items-center justify-center">
-          <Shield className="size-10 text-muted-foreground" strokeWidth={1.5} />
-          <span className="absolute text-[9px] font-semibold">
-            {club.acronym}
-          </span>
-        </span>
+        <Badge
+          variant="secondary"
+          className="size-10 rounded-lg p-0 text-xs font-semibold"
+        >
+          {club.acronym}
+        </Badge>
       }
       title={club.name}
       description={

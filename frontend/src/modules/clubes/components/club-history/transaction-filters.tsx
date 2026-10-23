@@ -1,4 +1,10 @@
-import { HandCoins, ShoppingCart, UserRound } from 'lucide-react'
+import {
+  HandCoins,
+  ShoppingCart,
+  Square,
+  SquareCheck,
+  UserRound,
+} from 'lucide-react'
 import type {
   TransactionPlayerOption,
   TransactionType,
@@ -46,13 +52,18 @@ export function TransactionFilters({
         <span className="mr-1 text-sm font-medium">Tipo</span>
         {transactionTypes.map(({ value, label, icon: Icon }) => {
           const selected = types.includes(value)
+          const SelectionIcon = selected ? SquareCheck : Square
           return (
             <Button
               key={value}
               type="button"
               variant="outline"
               aria-pressed={selected}
-              className={selected ? 'border-foreground/30 bg-muted' : ''}
+              className={
+                selected
+                  ? 'border-primary bg-primary-soft text-primary-soft-foreground hover:bg-primary-soft hover:text-primary-soft-foreground disabled:opacity-100'
+                  : ''
+              }
               disabled={disabled || (selected && types.length === 1)}
               title={
                 selected && types.length === 1
@@ -67,6 +78,7 @@ export function TransactionFilters({
                 )
               }
             >
+              <SelectionIcon aria-hidden="true" />
               <Icon aria-hidden="true" />
               {label}
             </Button>

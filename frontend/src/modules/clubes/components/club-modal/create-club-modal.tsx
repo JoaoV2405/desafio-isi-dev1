@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form'
 import { Shield, Wallet } from 'lucide-react'
 import type { CreateClubInput } from '../../types/club-input'
 import { Modal } from '@/components/modal/modal'
-import { Alert, AlertDescription } from '@/components/ui/alert'
+import { ErrorAlert } from '@/components/ui/alert'
 import { Input } from '@/components/ui/input'
 import {
   InputGroup,
@@ -54,6 +54,18 @@ export function CreateClubModal({
         formId,
       }}
       isSubmitting={isSubmitting || isFormSubmitting}
+      feedback={
+        <>
+          {error && (
+            <ErrorAlert
+              title="Não foi possível criar o clube"
+              descriptionClassName="whitespace-pre-line"
+            >
+              {error}
+            </ErrorAlert>
+          )}
+        </>
+      }
     >
       <form id={formId} noValidate onSubmit={submitForm} className="space-y-6">
         <fieldset disabled={isSubmitting} className="min-w-0 space-y-6">
@@ -95,9 +107,9 @@ export function CreateClubModal({
               espaços, hífen ou ponto. O nome deve ser único na liga.
             </p>
             {errors.name && (
-              <Alert id={`${nameId}-error`} variant="destructive">
-                <AlertDescription>{errors.name.message}</AlertDescription>
-              </Alert>
+              <ErrorAlert id={`${nameId}-error`} title="Nome inválido">
+                {errors.name.message}
+              </ErrorAlert>
             )}
           </div>
           <div className="space-y-2">
@@ -133,9 +145,9 @@ export function CreateClubModal({
               ser única na liga.
             </p>
             {errors.acronym && (
-              <Alert id={`${acronymId}-error`} variant="destructive">
-                <AlertDescription>{errors.acronym.message}</AlertDescription>
-              </Alert>
+              <ErrorAlert id={`${acronymId}-error`} title="Sigla inválida">
+                {errors.acronym.message}
+              </ErrorAlert>
             )}
           </div>
           <div className="flex items-center gap-3 rounded-xl border bg-muted/30 p-4">
@@ -152,13 +164,6 @@ export function CreateClubModal({
             </p>
           </div>
         </fieldset>
-        {error && (
-          <Alert variant="destructive">
-            <AlertDescription className="whitespace-pre-line">
-              {error}
-            </AlertDescription>
-          </Alert>
-        )}
       </form>
     </Modal>
   )

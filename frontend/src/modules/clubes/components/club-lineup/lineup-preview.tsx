@@ -1,7 +1,6 @@
 import { useFormContext, useWatch } from 'react-hook-form'
 import type { LineupFormValues } from '../../lib/lineup-form'
 import type { ClubPlayer } from '../../types/club-details'
-import { LineupConditionAlert } from './lineup-condition-alert'
 import { SoccerFieldBackground } from '@/shared/components/soccer-field/soccer-field-background'
 import { LineupField } from '@/shared/components/soccer-field/lineup-field'
 
@@ -11,8 +10,6 @@ export function LineupPreview({ players }: { players: ClubPlayer[] }) {
     control,
     name: ['formation', 'selection'],
   })
-  const selectedIds = new Set(Object.values(selection))
-  const selectedPlayers = players.filter(({ id }) => selectedIds.has(id))
 
   return (
     <section
@@ -46,7 +43,6 @@ export function LineupPreview({ players }: { players: ClubPlayer[] }) {
             </p>
           </>
         )}
-        <LineupConditionAlert players={selectedPlayers} />
       </div>
     </section>
   )

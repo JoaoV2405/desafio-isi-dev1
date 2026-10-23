@@ -14,7 +14,12 @@ import { transactionColumns } from './transaction-columns'
 import { TransactionFilters } from './transaction-filters'
 import { TransactionSummary } from './transaction-summary'
 import { DataTable } from '@/components/data-table/data-table'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  ErrorAlert,
+} from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { toast } from '@/components/ui/toast'
 
@@ -139,46 +144,44 @@ export function ClubHistory({ clubId }: { clubId: number }) {
         disabled={exportPending}
       />
       {availablePlayers.isError && (
-        <Alert variant="destructive">
-          <CircleAlert aria-hidden="true" />
-          <AlertTitle>Não foi possível carregar todos os jogadores</AlertTitle>
-          <AlertDescription className="space-y-2">
-            <p>{availablePlayers.error.message}</p>
-            <Button
-              variant="outline"
-              disabled={availablePlayers.isFetching}
-              onClick={() => void availablePlayers.refetch()}
-            >
-              Tentar novamente
-            </Button>
-          </AlertDescription>
-        </Alert>
+        <ErrorAlert
+          title="Não foi possível carregar todos os jogadores"
+          descriptionClassName="space-y-2"
+        >
+          <p>{availablePlayers.error.message}</p>
+          <Button
+            variant="outline"
+            disabled={availablePlayers.isFetching}
+            onClick={() => void availablePlayers.refetch()}
+          >
+            Tentar novamente
+          </Button>
+        </ErrorAlert>
       )}
       {exportError && (
-        <Alert variant="destructive">
-          <CircleAlert aria-hidden="true" />
-          <AlertTitle>Não foi possível exportar o CSV</AlertTitle>
-          <AlertDescription className="whitespace-pre-line">
-            {exportError}
-          </AlertDescription>
-        </Alert>
+        <ErrorAlert
+          title="Não foi possível exportar o CSV"
+          descriptionClassName="whitespace-pre-line"
+        >
+          {exportError}
+        </ErrorAlert>
       )}
       <div className="w-full overflow-hidden rounded-xl border">
         {transactions.isError ? (
-          <Alert variant="destructive" className="rounded-none border-0">
-            <CircleAlert aria-hidden="true" />
-            <AlertTitle>Não foi possível carregar o histórico</AlertTitle>
-            <AlertDescription className="space-y-2 whitespace-pre-line">
-              <p>{transactions.error.message}</p>
-              <Button
-                variant="outline"
-                disabled={transactions.isFetching}
-                onClick={() => void transactions.refetch()}
-              >
-                Tentar novamente
-              </Button>
-            </AlertDescription>
-          </Alert>
+          <ErrorAlert
+            className="rounded-none border-0"
+            title="Não foi possível carregar o histórico"
+            descriptionClassName="space-y-2 whitespace-pre-line"
+          >
+            <p>{transactions.error.message}</p>
+            <Button
+              variant="outline"
+              disabled={transactions.isFetching}
+              onClick={() => void transactions.refetch()}
+            >
+              Tentar novamente
+            </Button>
+          </ErrorAlert>
         ) : noTransactions ? (
           <Alert
             variant={playerId !== null ? 'destructive' : 'default'}

@@ -1,4 +1,4 @@
-import { Controller, FormProvider } from 'react-hook-form'
+import { Controller, FormProvider, useWatch } from 'react-hook-form'
 import { LoaderCircle, Save } from 'lucide-react'
 import { useClubLineupForm } from '../../hooks/use-club-lineup-form'
 import type { ClubPlayer } from '../../types/club-details'
@@ -7,7 +7,13 @@ import { LineupStartersTable } from './lineup-starters-table'
 import { LineupPreview } from './lineup-preview'
 import { LineupSelectionCount } from './lineup-selection-count'
 import { LineupReserves } from './lineup-reserves'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { LineupConditionAlert } from './lineup-condition-alert'
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  ErrorAlert,
+} from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 
@@ -27,6 +33,8 @@ export function ClubLineup({
     changePlayer,
     submit,
   } = useClubLineupForm(clubId, players)
+  const selection = useWatch({ control: form.control, name: 'selection' })
+  const selectedIds = new Set(Object.values(selection))
   const savedIds = new Set(lineup.data?.players.map(({ id }) => id))
 
   return (
@@ -62,23 +70,21 @@ export function ClubLineup({
             </div>
           </header>
           {lineup.isError && (
-            <Alert
-              variant="destructive"
+            <ErrorAlert
               className="rounded-none border-0 border-b"
+              title="Não foi possível carregar a escalação"
+              descriptionClassName="space-y-2"
             >
-              <AlertTitle>Não foi possível carregar a escalação</AlertTitle>
-              <AlertDescription className="space-y-2">
-                <p className="whitespace-pre-line">{lineup.error.message}</p>
-                <Button
-                  type="button"
-                  variant="outline"
-                  disabled={lineup.isFetching || save.isPending}
-                  onClick={() => void lineup.refetch()}
-                >
-                  Tentar novamente
-                </Button>
-              </AlertDescription>
-            </Alert>
+              <p className="whitespace-pre-line">{lineup.error.message}</p>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={lineup.isFetching || save.isPending}
+                onClick={() => void lineup.refetch()}
+              >
+                Tentar novamente
+              </Button>
+            </ErrorAlert>
           )}
           {lineup.data && !lineup.data.complete && !lineup.isError && (
             <Alert
@@ -129,29 +135,32 @@ export function ClubLineup({
             }
           />
           {save.error && (
-            <Alert
-              variant="destructive"
+            <ErrorAlert
               className="rounded-none border-0 border-t"
+              title="Não foi possível salvar a escalação"
+              descriptionClassName="whitespace-pre-line"
             >
-              <AlertTitle>Não foi possível salvar a escalação</AlertTitle>
-              <AlertDescription className="whitespace-pre-line">
-                {save.error}
-              </AlertDescription>
-            </Alert>
+              {save.error}
+            </ErrorAlert>
           )}
-          <footer className="flex flex-wrap items-center justify-between gap-3 border-t p-4">
-            <LineupSelectionCount players={players} />
-            <Button type="submit" disabled={disabled}>
-              {save.isPending ? (
-                <LoaderCircle
-                  aria-hidden="true"
-                  className="animate-spin motion-reduce:animate-none"
-                />
-              ) : (
-                <Save aria-hidden="true" />
-              )}
-              {save.isPending ? 'Salvando...' : 'Salvar escalação'}
-            </Button>
+          <footer className="space-y-4 border-t p-4">
+            <LineupConditionAlert
+              players={players.filter(({ id }) => selectedIds.has(id))}
+            />
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <LineupSelectionCount players={players} />
+              <Button type="submit" disabled={disabled}>
+                {save.isPending ? (
+                  <LoaderCircle
+                    aria-hidden="true"
+                    className="animate-spin motion-reduce:animate-none"
+                  />
+                ) : (
+                  <Save aria-hidden="true" />
+                )}
+                {save.isPending ? 'Salvando...' : 'Salvar escalação'}
+              </Button>
+            </div>
           </footer>
         </form>
 

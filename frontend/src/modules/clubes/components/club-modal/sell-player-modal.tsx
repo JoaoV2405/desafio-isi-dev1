@@ -1,7 +1,7 @@
 import type { ClubPlayer } from '../../types/club-details'
 import { useClubLineup } from '../../hooks/use-club-lineup'
 import { Modal } from '@/components/modal/modal'
-import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Alert, AlertDescription, ErrorAlert } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { PlayerIdentity } from '@/shared/components/player-identity'
 import { formatDateTime } from '@/shared/lib/format-date-time'
@@ -46,6 +46,34 @@ export function SellPlayerModal({
         },
       }}
       isSubmitting={isSubmitting}
+      feedback={
+        <>
+          {lineup.isError && (
+            <ErrorAlert
+              title="Não foi possível verificar a escalação"
+              descriptionClassName="space-y-2"
+            >
+              <p className="whitespace-pre-line">{lineup.error.message}</p>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={isCheckingLineup || isSubmitting}
+                onClick={() => void lineup.refetch()}
+              >
+                Tentar novamente
+              </Button>
+            </ErrorAlert>
+          )}
+          {error && (
+            <ErrorAlert
+              title="Não foi possível vender o jogador"
+              descriptionClassName="whitespace-pre-line"
+            >
+              {error}
+            </ErrorAlert>
+          )}
+        </>
+      }
     >
       <div className="rounded-xl border bg-muted/30 p-4">
         <PlayerIdentity
@@ -90,33 +118,12 @@ export function SellPlayerModal({
           Verificando a escalação do clube...
         </p>
       )}
-      {lineup.isError && (
-        <Alert variant="destructive">
-          <AlertDescription className="space-y-2">
-            <p className="whitespace-pre-line">{lineup.error.message}</p>
-            <Button
-              type="button"
-              variant="outline"
-              disabled={isCheckingLineup || isSubmitting}
-              onClick={() => void lineup.refetch()}
-            >
-              Tentar novamente
-            </Button>
-          </AlertDescription>
-        </Alert>
-      )}
+
       {!isCheckingLineup && !lineup.isError && isStarter && (
         <Alert variant="warning" role="status">
           <AlertDescription>
             {player.name} é titular. A venda o removerá da escalação e deixará a
             equipe incompleta.
-          </AlertDescription>
-        </Alert>
-      )}
-      {error && (
-        <Alert variant="destructive">
-          <AlertDescription className="whitespace-pre-line">
-            {error}
           </AlertDescription>
         </Alert>
       )}

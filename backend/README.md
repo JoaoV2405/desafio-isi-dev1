@@ -1,124 +1,157 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Passe — backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API REST de uma liga fictícia de futebol, implementada com NestJS 12, TypeScript 6, TypeORM e PostgreSQL 17. Os módulos cobrem jogadores, clubes, contratos, mercado, escalações, partidas, classificação e indicadores da tela inicial.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Para a avaliação, siga primeiro o [procedimento com Docker na raiz](../README.md#instalar-e-executar). Ele prepara as duas aplicações e o banco a partir do `.env` distribuído, sem edição de configuração.
 
-## Description
+## Pré-requisitos para execução local
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- Node.js **22 LTS, 22.22.3 ou superior da série 22.x**, com npm 10. O `.nvmrc` da raiz seleciona a série 22.
+- PostgreSQL **17**, que pode ser iniciado pelo Compose da raiz com Docker Engine e Compose v2.
+- Portas `3003` para a API e `5432` para o banco disponíveis.
 
-## Project setup
+O Dockerfile utiliza `node:22-alpine` para build, instalação de dependências de produção e execução. A versão mínima de Node.js também atende às ferramentas de build declaradas no lock.
+
+## Instalar e executar localmente
+
+Este é um caminho alternativo ao Docker completo. A partir da raiz, inicie somente o banco:
 
 ```bash
-$ npm install
+docker compose up -d --wait database
 ```
 
-## Compile and run the project
+Em seguida, entre em `backend/`, copie o ambiente local, instale as dependências travadas e aplique as migrations:
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+cd backend
+cp .env.example .env
+npm ci
+npm run migration:run
+npm run start:dev
 ```
 
-## Run tests
+A origem da API é **http://localhost:3003**, sem o prefixo `/api/v1`. Swagger: **http://localhost:3003/docs**; OpenAPI: **http://localhost:3003/docs-json**. O frontend local usa **http://localhost:3000**.
+
+`migration:run` executa um build prévio e aplica apenas migrations pendentes. O comando funciona neste caminho porque `npm ci` instala também as dependências de desenvolvimento. Na imagem final Docker, use a CLI TypeORM indicada no README da raiz.
+
+Para executar o build sem observação, na pasta `backend`, substitua `start:dev` por:
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm run build
+npm run start:prod
 ```
 
-## Deployment
+## Variáveis de ambiente
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+O arquivo [.env.example](.env.example) contém valores prontos para a API local e o banco criado pelo Compose. O NestJS e a CLI de migrations carregam `.env.local` antes de `.env`; variáveis já exportadas no terminal têm precedência. O fluxo de avaliação em Docker recebe as variáveis diretamente do Compose e não lê esses arquivos locais.
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+| Variável          | Exemplo local              | Uso                                                                                                 |
+| ----------------- | -------------------------- | --------------------------------------------------------------------------------------------------- |
+| `DB_HOST`         | `127.0.0.1`                | Host do PostgreSQL; em Docker, `database`.                                                          |
+| `DB_PORT`         | `5432`                     | Porta do PostgreSQL, validada como inteiro de 1 a 65535.                                            |
+| `DB_USER`         | `postgres`                 | Usuário do banco.                                                                                   |
+| `DB_PASSWORD`     | `postgres`                 | Senha de exemplo do banco local.                                                                    |
+| `DB_NAME`         | `dev-junior-project`       | Nome do banco, criado pelo Compose.                                                                 |
+| `PORT`            | `3003`                     | Porta HTTP local; o código usa `3000` se ausente. No container, o Compose fixa `3000`.              |
+| `FRONTEND_DOMAIN` | `http://localhost:3000`    | Única origem autorizada pelo CORS, sem caminho ou barra final.                                      |
+| `NODE_ENV`        | `production` no Dockerfile | Indica execução de produção ao runtime NestJS; não é necessário defini-la no desenvolvimento local. |
+
+As cinco variáveis `DB_*` são obrigatórias para o banco. `SERVER_URL` não é utilizada pelo código. Sem `FRONTEND_DOMAIN`, o código usa `http://localhost:5173`; os arquivos de exemplo e o Compose configuram explicitamente `http://localhost:3000`.
+
+CORS não autoriza outras origens do navegador. Requisições sem `Origin`, como curl, continuam disponíveis. O cabeçalho `Content-Disposition` é exposto para o download CSV. Reinicie a API após mudar a configuração.
+
+## Banco, migrations e recriação
+
+O schema é mantido em `src/infrastructure/db/migrations/`, com `synchronize: false`. A criação inicial deixa o banco sem registros de domínio. A recriação completa, incluindo a remoção do volume, está no [README da raiz](../README.md#criar-e-recriar-o-banco-do-zero).
+
+Para consultar ou reverter a última migration em desenvolvimento, na pasta `backend`, com o banco em execução:
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npm run migration:show
+npm run migration:revert
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Observability
-
-In production applications, observability is essential for understanding how your system behaves, detecting issues early, and maintaining reliable performance.
-
-[NestJS Observe](https://observe.nestjs.com) automatically instruments your NestJS application, giving you deep visibility into your system with minimal setup:
-
-- **Distributed tracing:** Follow requests across services and understand how they flow through your system.
-- **Waterfall analysis:** Visualize request execution and identify slow operations, bottlenecks, and unexpected delays.
-- **Performance analysis:** Analyze application performance in real time and quickly pinpoint areas that need optimization.
-- **Metrics:** Track key application and infrastructure metrics to understand system health and performance trends.
-- **Logging:** Centralize and correlate logs with traces and other telemetry to make debugging easier.
-- **Error tracking:** Detect errors quickly and investigate their root causes with the surrounding context.
-- **SLA monitoring:** Track service-level objectives and identify when your application is approaching or exceeding defined thresholds.
-- **Alarms and alerts:** Set up alerts for critical errors, performance degradation, SLA violations, and other anomalies so your team can react quickly.
-
-To add it to this project:
+Cada reversão desfaz uma migration; migrations que removem tabelas também removem os dados dessas tabelas. Para reaplicar as pendentes:
 
 ```bash
-$ npm install @nestjs/observe
+npm run migration:run
 ```
 
-Then follow the [setup guide](https://docs.nestjs.com/observability/overview) - it takes a single import and an app key.
+## Contrato HTTP e Swagger
 
-The free plan needs no payment details and covers 300,000 events a month. You can also browse the [live demo](https://www.observe-demo.nestjs.com/dashboard) first - the whole dashboard over a busy service's data, with nothing to install.
+A API usa prefixo `/api/v1`, nomes em inglês e `snake_case` no JSON. Recusas retornam `message` como texto. O Swagger em `/docs` descreve DTOs, respostas e erros; `/docs-json` disponibiliza o documento OpenAPI.
 
-## Resources
+| Área                 | Operações                                                                                                                           |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Jogadores            | `GET /players`, `GET /players/{id}`, `POST /players`, `PUT /players/{id}`, `PATCH /players/{id}/condition`, `DELETE /players/{id}`. |
+| Clubes               | `POST /clubs`, `GET /clubs`, `GET /clubs/{id}`.                                                                                     |
+| Mercado              | `POST /players/{id}/buy`, `POST /players/{id}/sell`.                                                                                |
+| Histórico financeiro | `GET /clubs/{id}/transactions`, `GET /clubs/{id}/transactions/export`.                                                              |
+| Escalação            | `GET /clubs/{id}/lineup`, `PUT /clubs/{id}/lineup`.                                                                                 |
+| Partidas             | `POST /matches`, `GET /matches`, `GET /matches/{id}`.                                                                               |
+| Classificação        | `GET /standings`.                                                                                                                   |
+| Tela inicial         | `GET /dashboard`.                                                                                                                   |
 
-Check out a few resources that may come in handy when working with NestJS:
+A listagem de jogadores é paginada. Clubes aceitam `sort=name`, `net_worth_asc` e `net_worth_desc`. O detalhe do clube inclui indicadores financeiros, elenco e contratos ativos. Compras, vendas e substituições de escalação preservam a atomicidade das operações.
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Auto-instrument your application with [NestJS Observe](https://observe.nestjs.com). Distributed tracing, metrics, and logging made easy. Error tracking and performance monitoring for your NestJS applications.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+O histórico aceita `type=COMPRA`, `type=VENDA` ou `type=COMPRA,VENDA` e `player_id`. A exportação aplica os mesmos filtros, usa UTF-8 sem BOM, separador `;`, linhas LF e `Content-Disposition` com `historico-clube-{id}.csv`.
 
-## Support
+A partida recebe apenas os dois clubes; o backend calcula placar e seis duelos e persiste snapshots. O histórico é ordenado por data e id decrescentes. A classificação inclui todos os clubes e devolve posições, pontos, saldo e demais estatísticas já calculados e ordenados.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## Validação
 
-## Stay in touch
+Na pasta `backend`, após `npm ci`:
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```bash
+npm run lint
+npm run test
+npm run build
+```
 
-## License
+`npm run test` usa `vitest run`: termina sozinho, sem modo de observação. Os testes unitários em `src/**/*.spec.ts` incluem cálculos de valor de mercado, regras de compra/venda, contratos, validação, escalação, duelos, classificação e contratos HTTP em isolamento. Não dependem de um PostgreSQL em execução. O arquivo `test/fixtures/partida.fixture.ts` fornece dados auxiliares para os unitários de partidas e precisa acompanhá-los no repositório.
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Prettier está configurado, mas a verificação global ainda aponta pendências em arquivos existentes. O diferencial de lint e formatação não é declarado como concluído. O script `format` modifica arquivos.
+
+## Estrutura de pastas
+
+| Caminho                            | Responsabilidade                                                           |
+| ---------------------------------- | -------------------------------------------------------------------------- |
+| `src/main.ts`                      | Inicialização, prefixo, validação, CORS, Swagger e porta HTTP.             |
+| `src/core/`                        | Infraestrutura HTTP compartilhada e utilitários de dinheiro, data e texto. |
+| `src/modules/`                     | Domínios e casos de uso, com controllers, DTOs, services e entidades.      |
+| `src/infrastructure/db/`           | Conexão TypeORM/PostgreSQL e migrations.                                   |
+| `src/**/*.spec.ts`                 | Testes unitários.                                                          |
+| `test/fixtures/partida.fixture.ts` | Dados auxiliares compartilhados pelos testes unitários de partidas.        |
+| `vitest.config.ts`                 | Configuração da suíte unitária.                                            |
+
+## Bibliotecas utilizadas
+
+A tabela cobre as dependências diretas declaradas no `package.json`, incluindo ferramentas de desenvolvimento.
+
+| Pacote                                                       | Motivo de uso                                                                                          |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| `@nestjs/common`, `@nestjs/core`, `@nestjs/platform-express` | Estrutura NestJS, injeção de dependências, decorators e servidor HTTP Express.                         |
+| `@nestjs/config`                                             | Carregamento dos arquivos de ambiente e consulta da configuração.                                      |
+| `@nestjs/swagger`                                            | Geração do documento OpenAPI e interface Swagger.                                                      |
+| `@nestjs/typeorm`                                            | Integração do TypeORM com módulos e injeção do NestJS.                                                 |
+| `typeorm`                                                    | Entidades, consultas, transações e migrations do schema.                                               |
+| `pg`                                                         | Driver de conexão PostgreSQL.                                                                          |
+| `class-validator`                                            | Validação declarativa dos DTOs.                                                                        |
+| `class-transformer`                                          | Conversão de objetos e apoio à transformação dos DTOs.                                                 |
+| `reflect-metadata`                                           | Metadados utilizados pelos decorators do NestJS e TypeORM.                                             |
+| `rxjs`                                                       | Primitivas reativas utilizadas pela infraestrutura do NestJS.                                          |
+| `@nestjs/cli`, `@nestjs/schematics`                          | Build, desenvolvimento e geração de estruturas NestJS.                                                 |
+| `@nestjs/testing`                                            | Criação dos módulos de teste e substituição de dependências.                                           |
+| `vitest`, `@vitest/coverage-v8`                              | Testes unitários e coleta opcional de cobertura com V8.                                                |
+| `vite-tsconfig-paths`                                        | Resolução dos aliases TypeScript durante os testes.                                                    |
+| `supertest`, `@types/supertest`                              | Requisições HTTP simuladas e seus tipos, inclusive nos testes unitários de configuração global.        |
+| `oxlint`, `oxlint-tsgolint`                                  | Lint e análise de regras com informação de tipos.                                                      |
+| `prettier`                                                   | Padronização e verificação de formatação.                                                              |
+| `typescript`                                                 | Tipagem e compilação do código.                                                                        |
+| `@types/express`, `@types/node`                              | Tipos das APIs HTTP e do runtime Node.js.                                                              |
+| `source-map-support`                                         | Suporte a stack traces com source maps no ambiente de desenvolvimento.                                 |
+| `@nestjs/mau`                                                | Dependência de deploy herdada do template; não é utilizada na execução nem na avaliação desta entrega. |
+
+## Decisões, limitações e uso de IA
+
+As seções [Decisões e premissas](../README.md#decisões-e-premissas), [Funcionalidades não implementadas](../README.md#funcionalidades-não-implementadas) e [Uso de inteligência artificial](../README.md#uso-de-inteligência-artificial) são compartilhadas pelo repositório e estão no README da raiz.

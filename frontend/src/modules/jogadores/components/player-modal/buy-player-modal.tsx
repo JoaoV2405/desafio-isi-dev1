@@ -225,12 +225,21 @@ export function BuyPlayerModal({
                   control={form.control}
                   rules={{ required: 'Selecione a data do fim da fidelidade.' }}
                   render={({ field }) => (
-                    <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+                    <Popover
+                      open={calendarOpen}
+                      onOpenChange={(nextOpen) => {
+                        setCalendarOpen(nextOpen)
+                        if (!nextOpen) field.onBlur()
+                      }}
+                    >
                       <PopoverTrigger
                         render={<Button type="button" variant="outline" />}
                         id={dateId}
                         ref={field.ref}
-                        onBlur={field.onBlur}
+                        onBlur={() => {
+                          // O foco passa para o calendário antes de uma data ser escolhida.
+                          if (!calendarOpen) field.onBlur()
+                        }}
                         disabled={isSubmitting}
                         className="w-full justify-start font-normal tabular-nums"
                         aria-label="Data do fim de fidelidade"
@@ -258,7 +267,10 @@ export function BuyPlayerModal({
                           defaultMonth={field.value}
                           onSelect={(date) => {
                             field.onChange(date)
-                            if (date) setCalendarOpen(false)
+                            if (date) {
+                              setCalendarOpen(false)
+                              field.onBlur()
+                            }
                           }}
                         />
                       </PopoverContent>

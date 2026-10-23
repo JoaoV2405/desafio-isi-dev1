@@ -1,5 +1,6 @@
 import { useRef } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { dashboardQueryOptions } from '@/modules/inicio/hooks/use-dashboard'
 
 export function usePlayerMutation<TInput, TResult>(
   mutationFn: (input: TInput) => Promise<TResult>,
@@ -16,6 +17,9 @@ export function usePlayerMutation<TInput, TResult>(
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['players'] }),
         queryClient.invalidateQueries({ queryKey: ['clubs'] }),
+        queryClient.invalidateQueries({
+          queryKey: dashboardQueryOptions.queryKey,
+        }),
       ])
       onSuccess(result)
     },

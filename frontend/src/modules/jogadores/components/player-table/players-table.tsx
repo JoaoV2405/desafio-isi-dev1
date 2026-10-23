@@ -3,18 +3,20 @@ import { useForm, useWatch } from 'react-hook-form'
 import { X } from 'lucide-react'
 import type {
   PlayersFilterValues,
+  PlayersQuery,
   PlayersScope,
   PlayersSort,
 } from '../../types/players-query'
 import { DEFAULT_PLAYER_FILTERS } from '../../types/players-query'
 import { usePlayers } from '../../hooks/use-players'
+import { usePlayersScopeCounts } from '../../hooks/use-players-scope-counts'
 import { createPlayerColumns } from './player-columns'
 import type { PlayerActionsMenuProps } from '../player-actions-menu'
 import { PlayersFilters } from './players-filters'
 import { PlayersTableHeader } from './players-table-header'
 import { DataTable } from '@/components/data-table/data-table'
 import { TablePagination } from '@/components/data-table/table-pagination'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { ErrorAlert } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent } from '@/components/ui/tabs'
 import { formatMoney } from '@/shared/lib/format-money'
@@ -86,12 +88,8 @@ export function PlayersTable({
     Object.entries(filterLabels) as [keyof PlayersFilterValues, string][]
   ).filter(([, label]) => label)
   const hasActiveFilters = activeFilters.length > 0 || scope !== 'all'
-  const { data, isPending, isError, error } = usePlayers({
-    page,
-    limit: PAGE_SIZE,
-    sort,
+  const queryFilters: PlayersQuery = {
     search: search.length >= 2 ? search : undefined,
-    free: scope === 'all' ? undefined : scope === 'free',
     position: filters.position || undefined,
     condition: filters.condition || undefined,
     club_id: filters.clubId ? Number(filters.clubId) : undefined,
@@ -99,6 +97,14 @@ export function PlayersTable({
     max_age: filters.maxAge ? Number(filters.maxAge) : undefined,
     min_value: filters.minValue ? Number(filters.minValue) : undefined,
     max_value: filters.maxValue ? Number(filters.maxValue) : undefined,
+  }
+  const counts = usePlayersScopeCounts(queryFilters)
+  const { data, isPending, isError, error } = usePlayers({
+    ...queryFilters,
+    page,
+    limit: PAGE_SIZE,
+    sort,
+    free: scope === 'all' ? undefined : scope === 'free',
   })
 
   // A exclusão do último item de uma página pode reduzir a quantidade de páginas da consulta.
@@ -142,12 +148,13 @@ export function PlayersTable({
         clubs={clubs}
         clubsLoading={clubsPending}
         clubsUnavailable={Boolean(clubsError)}
+        minValue={filters.minValue}
+        maxValue={filters.maxValue}
       />
       {clubsError && (
-        <Alert variant="destructive">
-          <AlertTitle>Não foi possível carregar os clubes</AlertTitle>
-          <AlertDescription>{clubsError.message}</AlertDescription>
-        </Alert>
+        <ErrorAlert title="Não foi possível carregar os clubes">
+          {clubsError.message}
+        </ErrorAlert>
       )}
       {hasActiveFilters && (
         <div
@@ -209,7 +216,11 @@ export function PlayersTable({
           className="gap-0 overflow-hidden rounded-xl border"
         >
           <div className="border-b p-4">
-            <PlayersTableHeader sort={sort} onSortChange={changeSort} />
+            <PlayersTableHeader
+              sort={sort}
+              onSortChange={changeSort}
+              counts={counts}
+            />
           </div>
           <TabsContent value={scope}>
             <DataTable

@@ -24,7 +24,7 @@ import {
 } from '@/components/ui/drawer'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { ErrorAlert } from '@/components/ui/alert'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   Table,
@@ -126,20 +126,20 @@ export function PlayerDrawer({
               <Skeleton aria-hidden="true" className="h-64" />
             </div>
           ) : error ? (
-            <Alert variant="destructive">
-              <AlertTitle>Não foi possível carregar o jogador</AlertTitle>
-              <AlertDescription className="space-y-3">
-                <p>{error.message}</p>
-                <Button
-                  type="button"
-                  variant="outline"
-                  disabled={isFetching}
-                  onClick={() => void refetch()}
-                >
-                  Tentar novamente
-                </Button>
-              </AlertDescription>
-            </Alert>
+            <ErrorAlert
+              title="Não foi possível carregar o jogador"
+              descriptionClassName="space-y-3"
+            >
+              <p>{error.message}</p>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={isFetching}
+                onClick={() => void refetch()}
+              >
+                Tentar novamente
+              </Button>
+            </ErrorAlert>
           ) : (
             <>
               {/* Os quatro indicadores são apresentados na ordem solicitada, usando valores da API. */}
@@ -260,9 +260,9 @@ export function PlayerDrawer({
                 </Table>
               </div>
               {details.club_id !== null && clubsError && (
-                <Alert variant="destructive">
-                  <AlertDescription>{clubsError.message}</AlertDescription>
-                </Alert>
+                <ErrorAlert title="Não foi possível carregar os clubes">
+                  {clubsError.message}
+                </ErrorAlert>
               )}
             </>
           )}

@@ -9,7 +9,7 @@ import {
 import { PlayerGeneralFields } from '../player-general-fields'
 import type { Player, PlayerCondition } from '@/shared/types/player'
 import { Modal } from '@/components/modal/modal'
-import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Alert, AlertDescription, ErrorAlert } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { PlayerConditionBadge } from '@/shared/components/player-condition-badge'
@@ -67,6 +67,18 @@ export function EditPlayerModal({
       primaryAction={{ label: 'Salvar alterações', formId }}
       // Usa o estado de envio do formulário para bloquear ações do modal durante o envio.
       isSubmitting={isSubmitting || form.formState.isSubmitting}
+      feedback={
+        <>
+          {error && (
+            <ErrorAlert
+              title="Não foi possível salvar as alterações"
+              descriptionClassName="whitespace-pre-line"
+            >
+              {error}
+            </ErrorAlert>
+          )}
+        </>
+      }
     >
       {/* Compartilha o formulário e aplica as restrições da edição aos quatro campos editáveis. */}
       <FormProvider {...form}>
@@ -85,13 +97,6 @@ export function EditPlayerModal({
               }
             />
           </fieldset>
-          {error && (
-            <Alert variant="destructive">
-              <AlertDescription className="whitespace-pre-line">
-                {error}
-              </AlertDescription>
-            </Alert>
-          )}
         </form>
       </FormProvider>
     </Modal>
@@ -188,6 +193,33 @@ export function EditPlayerConditionModal({
           hasLineupError,
       }}
       isSubmitting={isSubmitting}
+      feedback={
+        <>
+          {hasLineupError && (
+            <ErrorAlert
+              title="Não foi possível verificar a escalação"
+              descriptionClassName="space-y-2"
+            >
+              <p>{lineup.error.message}</p>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => void lineup.refetch()}
+              >
+                Tentar novamente
+              </Button>
+            </ErrorAlert>
+          )}
+          {error && (
+            <ErrorAlert
+              title="Não foi possível alterar a condição física"
+              descriptionClassName="whitespace-pre-line"
+            >
+              {error}
+            </ErrorAlert>
+          )}
+        </>
+      }
     >
       {/* O badge representa a condição atual; a seleção abaixo representa a alteração proposta. */}
       <div className="flex items-center gap-4 rounded-xl border bg-muted/30 p-4">
@@ -266,32 +298,12 @@ export function EditPlayerConditionModal({
           Verificando a escalação do clube...
         </p>
       )}
-      {hasLineupError && (
-        <Alert variant="destructive">
-          <AlertDescription className="space-y-2">
-            <p>{lineup.error.message}</p>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => void lineup.refetch()}
-            >
-              Tentar novamente
-            </Button>
-          </AlertDescription>
-        </Alert>
-      )}
+
       {!isCheckingLineup && !hasLineupError && isStarter && (
         <Alert variant="warning" role="status">
           <AlertDescription>
             Ao confirmar, {player.name} será removido da escalação de {clubName}
             .
-          </AlertDescription>
-        </Alert>
-      )}
-      {error && (
-        <Alert variant="destructive">
-          <AlertDescription className="whitespace-pre-line">
-            {error}
           </AlertDescription>
         </Alert>
       )}

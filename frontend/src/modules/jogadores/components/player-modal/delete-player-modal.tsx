@@ -1,6 +1,6 @@
 import type { Player } from '@/shared/types/player'
 import { Modal } from '@/components/modal/modal'
-import { Alert, AlertDescription } from '@/components/ui/alert'
+import { ErrorAlert } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { PlayerIdentity } from '@/shared/components/player-identity'
 
@@ -43,6 +43,23 @@ export function DeletePlayerModal({
         disabled: !isFree,
       }}
       isSubmitting={isSubmitting}
+      feedback={
+        <>
+          {!isFree && (
+            <ErrorAlert title="Jogador indisponível para exclusão">
+              Apenas jogadores livres podem ser excluídos.
+            </ErrorAlert>
+          )}
+          {error && (
+            <ErrorAlert
+              title="Não foi possível excluir o jogador"
+              descriptionClassName="whitespace-pre-line"
+            >
+              {error}
+            </ErrorAlert>
+          )}
+        </>
+      }
     >
       {/* Identifica o jogador e mantém o vínculo à direita, fora do bloco de texto. */}
       <div className="flex items-center gap-4 rounded-xl border bg-muted/30 p-4">
@@ -57,20 +74,6 @@ export function DeletePlayerModal({
           {isFree ? 'Livre' : 'Vinculado'}
         </Badge>
       </div>
-      {!isFree && (
-        <Alert variant="destructive">
-          <AlertDescription>
-            Apenas jogadores livres podem ser excluídos.
-          </AlertDescription>
-        </Alert>
-      )}
-      {error && (
-        <Alert variant="destructive">
-          <AlertDescription className="whitespace-pre-line">
-            {error}
-          </AlertDescription>
-        </Alert>
-      )}
     </Modal>
   )
 }

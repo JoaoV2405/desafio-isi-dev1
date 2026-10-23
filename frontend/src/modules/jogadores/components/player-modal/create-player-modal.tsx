@@ -7,7 +7,7 @@ import { PlayerGeneralFields } from '../player-general-fields'
 import { PlayerFormField } from '../player-form-field'
 import { PlayerTechnicalFields } from '../player-technical-fields'
 import { Modal } from '@/components/modal/modal'
-import { Alert, AlertDescription } from '@/components/ui/alert'
+import { ErrorAlert } from '@/components/ui/alert'
 import { Separator } from '@/components/ui/separator'
 import type { CreatePlayerInput } from '../../types/player-input'
 
@@ -48,6 +48,18 @@ export function CreatePlayerModal({
       primaryAction={{ label: 'Cadastrar jogador', formId }}
       // Usa o estado de envio do formulário para bloquear ações do modal durante o envio.
       isSubmitting={isSubmitting || form.formState.isSubmitting}
+      feedback={
+        <>
+          {error && (
+            <ErrorAlert
+              title="Não foi possível cadastrar o jogador"
+              descriptionClassName="whitespace-pre-line"
+            >
+              {error}
+            </ErrorAlert>
+          )}
+        </>
+      }
     >
       {/* Distribui os métodos aos campos e à prévia sem repassar valores e eventos por props. */}
       <FormProvider {...form}>
@@ -90,13 +102,6 @@ export function CreatePlayerModal({
               </div>
             </section>
           </fieldset>
-          {error && (
-            <Alert variant="destructive">
-              <AlertDescription className="whitespace-pre-line">
-                {error}
-              </AlertDescription>
-            </Alert>
-          )}
         </form>
       </FormProvider>
     </Modal>

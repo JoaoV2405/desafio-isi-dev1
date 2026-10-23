@@ -1,7 +1,7 @@
 import { useId } from 'react'
 import type { ComponentProps } from 'react'
 import { Input } from '@/components/ui/input'
-import { Alert, AlertDescription } from '@/components/ui/alert'
+import { ErrorAlert } from '@/components/ui/alert'
 
 interface PlayerFormFieldProps extends ComponentProps<typeof Input> {
   label: string
@@ -41,9 +41,9 @@ export function PlayerFormField({
         </p>
       )}
       {error && (
-        <Alert id={errorId} variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
+        <ErrorAlert id={errorId} title={`${label}: valor inválido`}>
+          {error}
+        </ErrorAlert>
       )}
     </div>
   )

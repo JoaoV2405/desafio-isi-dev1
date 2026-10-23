@@ -5,7 +5,7 @@ import { PLAYER_FORM_RULES } from '../lib/player-form'
 import type { PlayerPosition } from '@/shared/types/player'
 import { cn } from '@/lib/utils'
 import { PLAYER_POSITIONS } from '@/shared/types/player'
-import { Alert, AlertDescription } from '@/components/ui/alert'
+import { ErrorAlert } from '@/components/ui/alert'
 
 interface PlayerPositionSelectorProps {
   rules?: PlayerFormRules['position']
@@ -80,9 +80,9 @@ export function PlayerPositionSelector({
         </p>
       )}
       {error && (
-        <Alert id={errorId} variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
+        <ErrorAlert id={errorId} title="Posição inválida">
+          {error}
+        </ErrorAlert>
       )}
     </fieldset>
   )

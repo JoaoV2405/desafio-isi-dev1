@@ -2,7 +2,7 @@ import { useId, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { CalendarDays, Clock3 } from 'lucide-react'
+import { CalendarDays } from 'lucide-react'
 import type { BuyPlayerInput } from '../../types/player-purchase'
 import type { Player } from '@/shared/types/player'
 import type { Club } from '@/shared/types/club'
@@ -25,12 +25,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from '@/components/ui/input-group'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { InputGroup, InputGroupInput } from '@/components/ui/input-group'
+import { ErrorAlert } from '@/components/ui/alert'
 
 interface BuyPlayerModalProps {
   open: boolean
@@ -96,6 +92,39 @@ export function BuyPlayerModal({
         disabled: blocked,
       }}
       isSubmitting={isSubmitting || form.formState.isSubmitting}
+      feedback={
+        <>
+          {clubs.error && (
+            <ErrorAlert
+              title="Não foi possível carregar os clubes"
+              descriptionClassName="space-y-2"
+            >
+              <p>{clubs.error.message}</p>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={clubs.isFetching}
+                onClick={() => void clubs.refetch()}
+              >
+                Tentar novamente
+              </Button>
+            </ErrorAlert>
+          )}
+          {!isFree && (
+            <ErrorAlert title="Jogador indisponível para compra">
+              Apenas jogadores livres podem ser comprados.
+            </ErrorAlert>
+          )}
+          {error && (
+            <ErrorAlert
+              title="Não foi possível comprar o jogador"
+              descriptionClassName="whitespace-pre-line"
+            >
+              {error}
+            </ErrorAlert>
+          )}
+        </>
+      }
     >
       <div className="flex w-full items-start justify-between gap-4 rounded-xl border bg-muted/30 p-4">
         <PlayerIdentity
@@ -170,9 +199,12 @@ export function BuyPlayerModal({
               atual.
             </p>
             {errors.clubId && (
-              <Alert id={`${clubId}-error`} variant="destructive">
-                <AlertDescription>{errors.clubId.message}</AlertDescription>
-              </Alert>
+              <ErrorAlert
+                id={`${clubId}-error`}
+                title="Clube comprador inválido"
+              >
+                {errors.clubId.message}
+              </ErrorAlert>
             )}
             {!clubs.isPending && !clubs.isError && !clubs.data.length && (
               <p role="status" className="text-sm text-muted-foreground">
@@ -213,7 +245,12 @@ export function BuyPlayerModal({
                           ? format(field.value, 'dd/MM/yyyy')
                           : 'Selecione uma data'}
                       </PopoverTrigger>
-                      <PopoverContent align="start" className="w-auto p-0">
+                      <PopoverContent
+                        align="start"
+                        side="top"
+                        collisionAvoidance={{ side: 'none', align: 'shift' }}
+                        className="w-auto p-0"
+                      >
                         <Calendar
                           mode="single"
                           locale={ptBR}
@@ -234,9 +271,6 @@ export function BuyPlayerModal({
                   Horário
                 </label>
                 <InputGroup>
-                  <InputGroupAddon>
-                    <Clock3 aria-hidden="true" />
-                  </InputGroupAddon>
                   <InputGroupInput
                     {...form.register('time', {
                       required: 'Informe o horário do fim da fidelidade.',
@@ -248,6 +282,7 @@ export function BuyPlayerModal({
                     id={timeId}
                     type="time"
                     step={60}
+                    onClick={(event) => event.currentTarget.showPicker()}
                     aria-required="true"
                     aria-invalid={Boolean(errors.time)}
                     aria-describedby={`${formId}-loyalty-description${errors.time ? ` ${timeId}-error` : ''}`}
@@ -264,47 +299,17 @@ export function BuyPlayerModal({
               futuro, em até 1.095 dias.
             </p>
             {errors.date && (
-              <Alert id={`${dateId}-error`} variant="destructive">
-                <AlertDescription>{errors.date.message}</AlertDescription>
-              </Alert>
+              <ErrorAlert id={`${dateId}-error`} title="Data inválida">
+                {errors.date.message}
+              </ErrorAlert>
             )}
             {errors.time && (
-              <Alert id={`${timeId}-error`} variant="destructive">
-                <AlertDescription>{errors.time.message}</AlertDescription>
-              </Alert>
+              <ErrorAlert id={`${timeId}-error`} title="Horário inválido">
+                {errors.time.message}
+              </ErrorAlert>
             )}
           </fieldset>
         </fieldset>
-        {clubs.error && (
-          <Alert variant="destructive">
-            <AlertTitle>Não foi possível carregar os clubes</AlertTitle>
-            <AlertDescription className="space-y-2">
-              <p>{clubs.error.message}</p>
-              <Button
-                type="button"
-                variant="outline"
-                disabled={clubs.isFetching}
-                onClick={() => void clubs.refetch()}
-              >
-                Tentar novamente
-              </Button>
-            </AlertDescription>
-          </Alert>
-        )}
-        {!isFree && (
-          <Alert variant="destructive">
-            <AlertDescription>
-              Apenas jogadores livres podem ser comprados.
-            </AlertDescription>
-          </Alert>
-        )}
-        {error && (
-          <Alert variant="destructive">
-            <AlertDescription className="whitespace-pre-line">
-              {error}
-            </AlertDescription>
-          </Alert>
-        )}
       </form>
     </Modal>
   )

@@ -54,6 +54,7 @@ export function createPlayerColumns({
         return (
           <ClubIdentity
             club={club}
+            linkToClub
             onBuy={onBuyPlayer ? () => onBuyPlayer(player) : undefined}
           />
         )

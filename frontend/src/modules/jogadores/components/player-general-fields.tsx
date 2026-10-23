@@ -24,6 +24,7 @@ export function PlayerGeneralFields({
     register,
     formState: { errors },
   } = useFormContext<PlayerFormValues>()
+  const hasReachedMaxAge = minAge >= 45
   return (
     <section aria-label="Dados gerais do jogador" className="space-y-5">
       <PlayerFormField
@@ -56,7 +57,12 @@ export function PlayerGeneralFields({
           max={45}
           step={1}
           required
-          description={`Entre ${minAge} e 45 anos.`}
+          disabled={hasReachedMaxAge}
+          description={
+            hasReachedMaxAge
+              ? 'Idade máxima de 45 anos atingida.'
+              : `Entre ${minAge} e 45 anos.`
+          }
           error={errors.age?.message}
         />
         <PlayerFormField

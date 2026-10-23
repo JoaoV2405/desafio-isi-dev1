@@ -3,7 +3,7 @@ import type {
   TransactionPlayerOption,
   TransactionsQuery,
 } from '../types/club-transactions'
-import { getPlayers } from '@/modules/jogadores/services/get-players'
+import { getPlayers } from '@/modules/jogadores/services/players-api'
 import { apiFetch, apiJson } from '@/shared/lib/api-client'
 
 function transactionsPath(

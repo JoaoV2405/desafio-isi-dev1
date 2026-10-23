@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import type { PlayersQuery } from '../types/players-query'
-import { getPlayers } from '../services/get-players'
+import { getPlayers } from '../services/players-api'
 
 export function usePlayers(query: PlayersQuery = {}) {
   return useQuery({

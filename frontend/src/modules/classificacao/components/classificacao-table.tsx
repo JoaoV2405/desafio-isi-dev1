@@ -1,7 +1,7 @@
 import { DataTable } from '@/components/data-table/data-table'
 import { ContentErrorState } from '@/components/custom/content-error-state'
-import { useStandings } from '../use-classificacao'
-import type { Standings } from '../use-classificacao'
+import { useStandings } from '../hooks/use-standings'
+import type { Standings } from '../hooks/use-standings'
 import type { ColumnDef } from '@tanstack/react-table'
 import { useClubs } from '@/modules/clubes/hooks/use-clubs'
 import type { ClubSummary } from '@/shared/types/club'
@@ -12,8 +12,6 @@ import { cn } from '@/lib/utils'
 
 export interface Standing extends Standings {
   club: ClubSummary
-  goal_difference: number
-  points: number
 }
 
 export const standingColumns: ColumnDef<Standing>[] = [
@@ -74,9 +72,6 @@ export function StandingsTable() {
   const { data: clubs } = useClubs()
   const standingsWithClubs: Standing[] = (data ?? []).map((standing) => ({
     ...standing,
-    goal_difference:
-      standing.goal_difference ?? standing.goals_for - standing.goals_against,
-    points: standing.points,
     club: {
       id: standing.club_id,
       name: standing.club_name,

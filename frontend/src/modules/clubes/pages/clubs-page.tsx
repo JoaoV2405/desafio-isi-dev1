@@ -12,7 +12,7 @@ import { PageSection } from '@/components/page/page-section'
 import { Button } from '@/components/ui/button'
 import { toast } from '@/components/ui/toast'
 import { ClubsTable } from '../components/club-table/clubs-table'
-import { dashboardQueryOptions } from '@/modules/inicio/hooks/use-dashboard'
+import { dashboardQueryOptions } from '@/shared/hooks/use-dashboard'
 import { formatMoney } from '@/shared/lib/format-money'
 
 export function ClubsPage() {

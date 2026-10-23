@@ -10,6 +10,7 @@ import type { FieldSlotId } from '@/shared/components/soccer-field/types'
 import { FORMATION_LAYOUTS } from '@/shared/components/soccer-field/formations'
 import { getFieldSlotLabel } from '@/shared/components/soccer-field/lineup-occupants'
 import { PlayerConditionBadge } from '@/shared/components/player-condition-badge'
+import { PLAYER_ATTRIBUTE_LABELS } from '@/shared/lib/player-presentation'
 import {
   Table,
   TableBody,
@@ -24,13 +25,6 @@ const sectorAbbreviations = {
   defense: 'ZAG / LAT',
   midfield: 'MEI',
   attack: 'ATA',
-} as const
-
-const attributeLabels = {
-  defending: 'Defesa',
-  shooting: 'Finalização',
-  passing: 'Passe',
-  dribbling: 'Drible',
 } as const
 
 interface LineupStartersTableProps {
@@ -124,7 +118,7 @@ export function LineupStartersTable({
                         player,
                       ).map((attribute) => (
                         <span key={attribute} className="text-muted-foreground">
-                          {attributeLabels[attribute]}{' '}
+                          {PLAYER_ATTRIBUTE_LABELS[attribute]}{' '}
                           <span className="font-medium text-foreground tabular-nums">
                             {player[attribute] ?? '—'}
                           </span>

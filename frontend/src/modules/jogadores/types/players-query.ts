@@ -38,8 +38,6 @@ export interface PlayersFilterValues {
   position: PlayerPosition | ''
   condition: PlayerCondition | ''
   clubId: string
-  minAge: string
-  maxAge: string
   minValue: string
   maxValue: string
 }
@@ -49,8 +47,6 @@ export const DEFAULT_PLAYER_FILTERS: PlayersFilterValues = {
   position: '',
   condition: '',
   clubId: '',
-  minAge: '',
-  maxAge: '',
   minValue: '',
   maxValue: '',
 }

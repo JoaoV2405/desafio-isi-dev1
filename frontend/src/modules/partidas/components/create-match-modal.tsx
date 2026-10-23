@@ -11,7 +11,7 @@ import { Modal } from '@/components/modal/modal'
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select'
 import { ErrorAlert } from '@/components/ui/alert'
 import { RoutePaths } from '@/router/route-paths'
-import { dashboardQueryOptions } from '@/modules/inicio/hooks/use-dashboard'
+import { dashboardQueryOptions } from '@/shared/hooks/use-dashboard'
 
 export function CreateMatchModal({
   onOpenChange,

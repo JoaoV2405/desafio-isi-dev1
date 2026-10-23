@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 import { getClubs } from '../services/clubs-api'
+import type { ClubsSort } from '../types/clubs-query'
 
-export function useClubs() {
+export function useClubs(sort: ClubsSort = 'name') {
   return useQuery({
-    queryKey: ['clubs', 'list'],
-    // A mesma consulta abastece listagem, filtros e sidebar, compartilhando o cache.
-    queryFn: ({ signal }) => getClubs(signal),
+    queryKey: ['clubs', 'list', sort],
+    queryFn: ({ signal }) => getClubs(sort, signal),
   })
 }

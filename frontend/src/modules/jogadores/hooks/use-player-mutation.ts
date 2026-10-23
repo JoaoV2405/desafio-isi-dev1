@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { dashboardQueryOptions } from '@/modules/inicio/hooks/use-dashboard'
+import { dashboardQueryOptions } from '@/shared/hooks/use-dashboard'
 
 export function usePlayerMutation<TInput, TResult>(
   mutationFn: (input: TInput) => Promise<TResult>,

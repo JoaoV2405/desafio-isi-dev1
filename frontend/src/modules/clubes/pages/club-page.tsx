@@ -4,7 +4,7 @@ import type { ClubPlayer } from '../types/club-details'
 import type { PlayerSale } from '../types/player-sale'
 import type { ClubTab } from '../components/club-tabs'
 import { ClubPageHeader } from '../components/club-page-header'
-import { ClubSummaryCard } from '../components/club-summary-card'
+import { SummaryCard } from '@/components/custom/summary-card'
 import { ClubTabs } from '../components/club-tabs'
 import { useClub } from '../hooks/use-club'
 import { SellPlayerModal } from '../components/club-modal/sell-player-modal'
@@ -82,14 +82,14 @@ export function ClubPage({ clubId }: { clubId: string }) {
         aria-label="Indicadores do clube"
         className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
       >
-        <ClubSummaryCard
+        <SummaryCard
           title="Caixa"
           value={formatMoney(club.cash)}
           unit="moedas"
           description="Disponível para contratações"
           icon={<WalletMinimal />}
         />
-        <ClubSummaryCard
+        <SummaryCard
           title="Valor do elenco"
           value={
             club.squad_value === undefined ? '—' : formatMoney(club.squad_value)
@@ -98,7 +98,7 @@ export function ClubPage({ clubId }: { clubId: string }) {
           description="Valor de mercado dos jogadores"
           icon={<Coins />}
         />
-        <ClubSummaryCard
+        <SummaryCard
           title="Patrimônio"
           value={
             club.net_worth === undefined ? '—' : formatMoney(club.net_worth)
@@ -107,7 +107,7 @@ export function ClubPage({ clubId }: { clubId: string }) {
           description="Caixa e valor do elenco"
           icon={<Landmark />}
         />
-        <ClubSummaryCard
+        <SummaryCard
           title="Elenco"
           value={club.players?.length ?? '—'}
           description="Jogadores vinculados ao clube"

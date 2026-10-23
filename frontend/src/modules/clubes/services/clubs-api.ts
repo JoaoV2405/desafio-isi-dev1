@@ -2,6 +2,7 @@ import type { ClubDetails } from '../types/club-details'
 import type { CreateClubInput } from '../types/club-input'
 import type { ClubLineup, SaveClubLineupInput } from '../types/club-lineup'
 import type { PlayerSale } from '../types/player-sale'
+import type { ClubsSort } from '../types/clubs-query'
 import type { Club } from '@/shared/types/club'
 import { apiJson } from '@/shared/lib/api-client'
 
@@ -13,9 +14,11 @@ export function createClub(input: CreateClubInput): Promise<Club> {
   })
 }
 
-// Preserva os campos e a ordem recebidos do endpoint atual, sem completar dados com fixtures.
-export function getClubs(signal?: AbortSignal): Promise<Club[]> {
-  return apiJson<Club[]>('/clubs', { signal })
+export function getClubs(
+  sort: ClubsSort = 'name',
+  signal?: AbortSignal,
+): Promise<Club[]> {
+  return apiJson<Club[]>(`/clubs?sort=${sort}`, { signal })
 }
 
 export function getClub(

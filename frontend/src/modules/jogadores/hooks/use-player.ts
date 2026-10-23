@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { getPlayer } from '../services/get-player'
+import { getPlayer } from '../services/players-api'
 
 export function usePlayer(playerId: number, enabled = true) {
   return useQuery({

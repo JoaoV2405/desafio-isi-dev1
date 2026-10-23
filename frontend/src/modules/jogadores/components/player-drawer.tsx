@@ -8,7 +8,7 @@ import {
   TrendingUp,
   X,
 } from 'lucide-react'
-import { PLAYER_ATTRIBUTE_FIELDS } from '../lib/create-player-form'
+import { PLAYER_ATTRIBUTE_FIELDS } from '@/shared/lib/player-presentation'
 import { usePlayer } from '../hooks/use-player'
 import type { Player } from '@/shared/types/player'
 import { useClubs } from '@/modules/clubes/hooks/use-clubs'

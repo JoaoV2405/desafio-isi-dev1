@@ -133,27 +133,6 @@ export function PlayersFilters({
           ))}
         </NativeSelect>
       </label>
-      {/* <fieldset className="min-w-0 space-y-1">
-        <legend className="text-sm">Idade</legend>
-        <div className="flex gap-2">
-          <Input
-            aria-label="Idade mínima"
-            type="number"
-            min={16}
-            max={45}
-            placeholder="Mínima"
-            {...registerFilter('minAge')}
-          />
-          <Input
-            aria-label="Idade máxima"
-            type="number"
-            min={16}
-            max={45}
-            placeholder="Máxima"
-            {...registerFilter('maxAge')}
-          />
-        </div>
-      </fieldset> */}
       <div className="min-w-0 space-y-1">
         <span className="text-sm font-medium">Valor de mercado</span>
         <Popover>

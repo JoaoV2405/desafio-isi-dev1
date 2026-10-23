@@ -1,9 +1,9 @@
-import { useDashboard } from '../hooks/use-dashboard'
+import { useDashboard } from '@/shared/hooks/use-dashboard'
 import { HomeIntroduction } from './home-introduction'
 import { HomeStats } from './home-stats'
 import { ErrorAlert } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import { useStandings } from '@/modules/classificacao/use-classificacao'
+import { useStandings } from '@/modules/classificacao/hooks/use-standings'
 
 export function HomeOverview() {
   const dashboard = useDashboard({ refetchOnMount: 'always' })

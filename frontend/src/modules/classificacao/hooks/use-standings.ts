@@ -11,7 +11,7 @@ export interface Standings {
   losses: number
   goals_for: number
   goals_against: number
-  goal_difference?: number
+  goal_difference: number
   points: number
 }
 

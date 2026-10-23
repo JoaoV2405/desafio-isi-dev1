@@ -1,9 +1,7 @@
 import { useFormContext } from 'react-hook-form'
 import type { CreatePlayerFormValues } from '../lib/create-player-form'
-import {
-  CREATE_PLAYER_FORM_RULES,
-  PLAYER_ATTRIBUTE_FIELDS,
-} from '../lib/create-player-form'
+import { CREATE_PLAYER_FORM_RULES } from '../lib/create-player-form'
+import { PLAYER_ATTRIBUTE_FIELDS } from '@/shared/lib/player-presentation'
 import { PlayerFormField } from './player-form-field'
 
 const technicalFields = [

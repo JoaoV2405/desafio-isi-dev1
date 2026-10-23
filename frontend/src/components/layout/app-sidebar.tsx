@@ -22,7 +22,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar'
 import { RoutePaths } from '@/router/route-paths'
-import { useDashboard } from '@/modules/inicio/hooks/use-dashboard'
+import { useDashboard } from '@/shared/hooks/use-dashboard'
 
 export function AppSidebar({
   clubs,
@@ -214,7 +214,6 @@ export function AppSidebar({
                 {dashboard.data?.total_clubs ?? '—'} clubes ·{' '}
                 {dashboard.data?.total_players ?? '—'} jogadores
               </p>
-              
             </div>
             <SidebarLatestMatch />
             <p className="flex items-center gap-2 border-t pt-3 text-xs text-muted-foreground">

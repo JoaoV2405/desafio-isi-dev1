@@ -1,10 +1,8 @@
 import { useState } from 'react'
 import { CreatePlayerModal } from '../components/player-modal/create-player-modal'
 import { CreatePlayerSuccessModal } from '../components/player-modal/create-player-success-modal'
-import {
-  EditPlayerModal,
-  EditPlayerConditionModal,
-} from '../components/player-modal/edit-player-modal'
+import { EditPlayerModal } from '../components/player-modal/edit-player-modal'
+import { EditPlayerConditionModal } from '../components/player-modal/edit-player-condition-modal'
 import { DeletePlayerModal } from '../components/player-modal/delete-player-modal'
 import { BuyPlayerModal } from '../components/player-modal/buy-player-modal'
 import { BuyPlayerSuccessModal } from '../components/player-modal/buy-player-success-modal'
@@ -24,8 +22,8 @@ import {
   updatePlayer,
   updatePlayerCondition,
   buyPlayer,
-} from '../services/player-mutations'
-import { deletePlayer } from '../services/delete-player'
+  deletePlayer,
+} from '../services/players-api'
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
 import { toast } from '@/components/ui/toast'
 import { formatMoney } from '@/shared/lib/format-money'

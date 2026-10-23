@@ -1,17 +1,7 @@
 import type { RegisterOptions } from 'react-hook-form'
 import type { PlayerFormValues } from './player-form'
 import { integerRules, PLAYER_FORM_RULES } from './player-form'
-
-export const PLAYER_ATTRIBUTE_FIELDS = [
-  { key: 'pace', label: 'Velocidade' },
-  { key: 'shooting', label: 'Finalização' },
-  { key: 'passing', label: 'Passe' },
-  { key: 'dribbling', label: 'Drible' },
-  { key: 'defending', label: 'Defesa' },
-  { key: 'physical', label: 'Físico' },
-] as const
-
-export type PlayerAttributeKey = (typeof PLAYER_ATTRIBUTE_FIELDS)[number]['key']
+import type { PlayerAttributeKey } from '@/shared/lib/player-presentation'
 
 // O cadastro acrescenta atributos e potencial aos quatro campos compartilhados.
 export interface CreatePlayerFormValues

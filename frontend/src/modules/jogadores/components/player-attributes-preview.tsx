@@ -1,23 +1,12 @@
 import { useFormContext, useWatch } from 'react-hook-form'
 import type { CreatePlayerFormValues } from '../lib/create-player-form'
-import { PLAYER_ATTRIBUTE_FIELDS } from '../lib/create-player-form'
+import { PLAYER_ATTRIBUTE_FIELDS } from '@/shared/lib/player-presentation'
 import { AttributeProgressRow } from '@/shared/components/attribute-progress-row'
 
 export function PlayerAttributesPreview() {
-  // Observa apenas atributos e potencial para atualizar a prévia enquanto o usuário digita.
+  // Acessa cada atributo pelo nome para manter os valores ligados aos seus rótulos.
   const { control } = useFormContext<CreatePlayerFormValues>()
-  const values = useWatch({
-    control,
-    name: [
-      'pace',
-      'shooting',
-      'passing',
-      'dribbling',
-      'defending',
-      'physical',
-      'potential',
-    ],
-  })
+  const values = useWatch({ control, compute: (formValues) => formValues })
   return (
     <aside
       aria-label="Prévia dos atributos"
@@ -27,12 +16,12 @@ export function PlayerAttributesPreview() {
         Prévia dos atributos
       </h3>
       <div className="space-y-4">
-        {PLAYER_ATTRIBUTE_FIELDS.map(({ key, label }, index) => (
+        {PLAYER_ATTRIBUTE_FIELDS.map(({ key, label }) => (
           <AttributeProgressRow
             key={key}
             label={label}
-            value={values[index]}
-            potential={values[6]}
+            value={values[key]}
+            potential={values.potential}
           />
         ))}
       </div>

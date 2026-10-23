@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react'
-import { IconPlaceholder } from '@/components/layout/icon-placeholder'
 import { cn } from '@/lib/utils'
 
 interface SummaryCardProps {
@@ -7,7 +6,7 @@ interface SummaryCardProps {
   value: ReactNode
   unit?: string
   description: string
-  icon?: ReactNode
+  icon: ReactNode
   iconPosition?: 'left' | 'right'
 }
 
@@ -16,7 +15,7 @@ export function SummaryCard({
   value,
   unit,
   description,
-  icon = <IconPlaceholder />,
+  icon,
   iconPosition = 'right',
 }: SummaryCardProps) {
   return (

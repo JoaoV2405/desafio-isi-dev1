@@ -1,5 +1,5 @@
 import { BadgeCheck, Shield, Swords, UserRound, UsersRound } from 'lucide-react'
-import type { DashboardSummary } from '../services/dashboard-api'
+import type { DashboardSummary } from '@/shared/services/dashboard-api'
 
 interface HomeStatsProps {
   summary: DashboardSummary | undefined

@@ -9,6 +9,7 @@ import { getDuelLineOrders } from '../lib/match-presentation'
 import { ClubIdentity } from '@/shared/components/club-identity'
 import { PlayerIdentity } from '@/shared/components/player-identity'
 import { PLAYER_CONDITIONS } from '@/shared/types/player'
+import { PLAYER_ATTRIBUTE_LABELS } from '@/shared/lib/player-presentation'
 import type { ClubSummary } from '@/shared/types/club'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -20,13 +21,6 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import './match-duels-table.css'
-
-const attributeLabels: Record<DuelParticipant['attribute'], string> = {
-  shooting: 'Finalização',
-  passing: 'Passe',
-  dribbling: 'Drible',
-  defending: 'Defesa',
-}
 
 function Participant({
   player,
@@ -62,7 +56,7 @@ function Participant({
 function Attribute({ player }: { player: DuelParticipant }) {
   return (
     <span className="text-muted-foreground">
-      {attributeLabels[player.attribute]}{' '}
+      {PLAYER_ATTRIBUTE_LABELS[player.attribute]}{' '}
       <strong className="font-bold text-black">{player.value}</strong>
     </span>
   )

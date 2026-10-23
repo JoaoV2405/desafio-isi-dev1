@@ -75,8 +75,6 @@ export function PlayersTable({
     clubId: filters.clubId
       ? `Clube: ${clubs.find((club) => String(club.id) === filters.clubId)?.name ?? filters.clubId}`
       : '',
-    minAge: filters.minAge ? `Idade mínima: ${filters.minAge}` : '',
-    maxAge: filters.maxAge ? `Idade máxima: ${filters.maxAge}` : '',
     minValue: filters.minValue
       ? `Valor mínimo: ${formatMoney(Number(filters.minValue))}`
       : '',
@@ -93,8 +91,6 @@ export function PlayersTable({
     position: filters.position || undefined,
     condition: filters.condition || undefined,
     club_id: filters.clubId ? Number(filters.clubId) : undefined,
-    min_age: filters.minAge ? Number(filters.minAge) : undefined,
-    max_age: filters.maxAge ? Number(filters.maxAge) : undefined,
     min_value: filters.minValue ? Number(filters.minValue) : undefined,
     max_value: filters.maxValue ? Number(filters.maxValue) : undefined,
   }

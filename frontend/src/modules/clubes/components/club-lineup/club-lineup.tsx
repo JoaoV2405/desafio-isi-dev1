@@ -95,23 +95,33 @@ export function ClubLineup({
               </Button>
             </ErrorAlert>
           )}
-          {lineup.data && !hasEnoughPlayers && !lineup.isError && (
-            <div className="px-4 pt-4">
-              <Alert variant="warning" role="status">
-                <AlertTitle>
-                  Escalação incompleta: o {clubName} não pode jogar partidas
-                </AlertTitle>
-                <AlertDescription>
-                  O elenco tem {players.length}{' '}
-                  {players.length === 1 ? 'jogador' : 'jogadores'}, e a
-                  escalação precisa de 5: 1 goleiro e 4 jogadores de linha.
-                  {players.length >= 5 &&
-                    ' Faltam jogadores disponíveis e compatíveis com as posições da formação.'}{' '}
-                  Compre jogadores e salve a escalação com os 5 titulares.
-                </AlertDescription>
-              </Alert>
-            </div>
-          )}
+          {lineup.data &&
+            (!hasEnoughPlayers ||
+              (lineup.data.formation && !lineup.data.complete)) &&
+            !lineup.isError && (
+              <div className="px-4 pt-4">
+                <Alert variant="warning" role="status">
+                  <AlertTitle>
+                    Escalação incompleta: o {clubName} não pode jogar partidas
+                  </AlertTitle>
+                  <AlertDescription>
+                    {hasEnoughPlayers ? (
+                      'Preencha as vagas restantes e salve a escalação com os 5 titulares.'
+                    ) : (
+                      <>
+                        O elenco tem {players.length}{' '}
+                        {players.length === 1 ? 'jogador' : 'jogadores'}, e a
+                        escalação precisa de 5: 1 goleiro e 4 jogadores de
+                        linha.
+                        {players.length >= 5 &&
+                          ' Faltam jogadores disponíveis e compatíveis com as posições da formação.'}{' '}
+                        Compre jogadores e salve a escalação com os 5 titulares.
+                      </>
+                    )}
+                  </AlertDescription>
+                </Alert>
+              </div>
+            )}
           <Controller
             control={form.control}
             name="formation"

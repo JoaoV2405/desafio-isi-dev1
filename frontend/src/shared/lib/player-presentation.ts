@@ -1,3 +1,18 @@
+export const PLAYER_ATTRIBUTE_LABELS = {
+  pace: 'Velocidade',
+  shooting: 'Finalização',
+  passing: 'Passe',
+  dribbling: 'Drible',
+  defending: 'Defesa',
+  physical: 'Físico',
+} as const
+
+export type PlayerAttributeKey = keyof typeof PLAYER_ATTRIBUTE_LABELS
+
+export const PLAYER_ATTRIBUTE_FIELDS = (
+  Object.keys(PLAYER_ATTRIBUTE_LABELS) as PlayerAttributeKey[]
+).map((key) => ({ key, label: PLAYER_ATTRIBUTE_LABELS[key] }))
+
 const PLAYER_AVATAR_CLASSES = [
   'bg-avatar-violet text-avatar-violet-foreground',
   'bg-avatar-pink text-avatar-pink-foreground',

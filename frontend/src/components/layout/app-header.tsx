@@ -13,14 +13,16 @@ import {
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
-import { RoutePaths } from '@/router/route-paths'
+import { useMatch } from '@/modules/partidas/hooks/use-match'
+import { formatMatchLabel } from '@/modules/partidas/lib/match-presentation'
 
 export function AppHeader({ clubs }: { clubs: SidebarClub[] }) {
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   })
   const { clubeId, partidaId } = useParams({ strict: false })
-  
+  const { data: match } = useMatch(partidaId)
+
   const group = navigationGroups.find((entry) =>
     entry.items.some(
       (item) => pathname === item.to || pathname.startsWith(`${item.to}/`),
@@ -33,7 +35,9 @@ export function AppHeader({ clubs }: { clubs: SidebarClub[] }) {
     ? (clubs.find((club) => String(club.id) === clubeId)?.name ??
       `Clube ${clubeId}`)
     : partidaId
-      ? `Partida ${partidaId}`
+      ? match
+        ? formatMatchLabel(match)
+        : `Partida ${partidaId}`
       : undefined
 
   return (
@@ -42,18 +46,10 @@ export function AppHeader({ clubs }: { clubs: SidebarClub[] }) {
       <Separator orientation="vertical" className="my-4" />
       <Breadcrumb>
         <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink render={<Link to={RoutePaths.home} />}>
-              Início
-            </BreadcrumbLink>
-          </BreadcrumbItem>
           {group && (
-            <>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <span>{group.label}</span>
-              </BreadcrumbItem>
-            </>
+            <BreadcrumbItem>
+              <span>{group.label}</span>
+            </BreadcrumbItem>
           )}
           {item && (
             <>

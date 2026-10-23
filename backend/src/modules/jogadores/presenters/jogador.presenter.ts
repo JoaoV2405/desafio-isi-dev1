@@ -1,3 +1,4 @@
+import { centavosParaNumero } from '../../../core/money/conversoes-monetarias.js';
 import type { JogadorResponse } from '../dto/jogador.response.js';
 import type { Jogador } from '../entities/jogador.entity.js';
 
@@ -32,4 +33,3 @@ export class JogadorPresenter {
     };
   }
 }
-import { centavosParaNumero } from '../../../core/money/conversoes-monetarias.js';

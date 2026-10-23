@@ -54,14 +54,14 @@ describe('OpenAPI da exportação de transações', () => {
         400: {
           content: {
             'application/json': {
-              schema: { $ref: '#/components/schemas/ErroMercadoResponse' },
+              schema: { $ref: '#/components/schemas/ErroResponse' },
             },
           },
         },
         404: {
           content: {
             'application/json': {
-              schema: { $ref: '#/components/schemas/ErroMercadoResponse' },
+              schema: { $ref: '#/components/schemas/ErroResponse' },
             },
           },
         },

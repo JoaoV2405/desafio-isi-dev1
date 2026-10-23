@@ -45,14 +45,6 @@ export class ClubeResponse {
   net_worth: number;
 }
 
-export class ErroClubeResponse {
-  @ApiProperty({
-    type: String,
-    description: 'Mensagem segura que descreve o erro',
-    example: 'Clube não encontrado',
-  })
-  message: string;
-}
 export class ContratoElencoResponse {
   @ApiProperty({
     type: Number,

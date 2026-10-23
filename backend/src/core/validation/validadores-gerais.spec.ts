@@ -2,13 +2,7 @@ import { BadRequestException } from '@nestjs/common';
 import {
   normalizarTexto,
   obterCampoObrigatorio,
-  validarBooleanoJson,
-  validarBooleanoQuery,
   validarDataBrasilia,
-  validarDecimalQuery,
-  validarEnum,
-  validarInteiroJson,
-  validarInteiroQuery,
   validarObjetoJson,
   validarString,
 } from './validadores-gerais.js';
@@ -37,29 +31,9 @@ describe('validadores gerais', () => {
     });
   });
 
-  it('preserva tipos JSON sem coerção', () => {
+  it('preserva strings sem coerção', () => {
     expect(validarString('10', 'campo')).toBe('10');
-    expect(validarInteiroJson(50.0, 'campo')).toBe(50);
-    expect(validarBooleanoJson(false, 'campo')).toBe(false);
     expect(() => validarString(10, 'campo')).toThrow(BadRequestException);
-    expect(() => validarInteiroJson('50', 'campo')).toThrow(
-      BadRequestException,
-    );
-    expect(() => validarInteiroJson(50.5, 'campo')).toThrow(
-      BadRequestException,
-    );
-    expect(() => validarBooleanoJson('false', 'campo')).toThrow(
-      BadRequestException,
-    );
-  });
-
-  it('valida enums sem alterar a caixa', () => {
-    const valores = ['APTO', 'DOENTE'] as const;
-
-    expect(validarEnum('APTO', 'condition', valores)).toBe('APTO');
-    expect(() => validarEnum('apto', 'condition', valores)).toThrow(
-      BadRequestException,
-    );
   });
 
   describe('normalizarTexto', () => {
@@ -73,51 +47,6 @@ describe('validadores gerais', () => {
         BadRequestException,
       );
     });
-  });
-
-  describe('validarInteiroQuery', () => {
-    it.each(['1', '50', '9007199254740991'])(
-      'aceita o inteiro positivo %s',
-      (valor) => {
-        expect(validarInteiroQuery(valor, 'page')).toBe(Number(valor));
-      },
-    );
-
-    it.each(['', '0', '01', '+1', '-1', '1.0', '1e2', '9007199254740992'])(
-      'recusa a sintaxe %s',
-      (valor) => {
-        expect(() => validarInteiroQuery(valor, 'page')).toThrow(
-          BadRequestException,
-        );
-      },
-    );
-  });
-
-  describe('validarDecimalQuery', () => {
-    it.each(['0', '0.1', '0.01', '10', '10.5', '10.55'])(
-      'aceita o decimal %s sem perder precisão',
-      (valor) => {
-        expect(validarDecimalQuery(valor, 'min_value')).toBe(valor);
-      },
-    );
-
-    it.each(['', '00', '01', '.5', '1.', '1.555', '-1', '+1', '1e2', '1,5'])(
-      'recusa a sintaxe %s',
-      (valor) => {
-        expect(() => validarDecimalQuery(valor, 'min_value')).toThrow(
-          BadRequestException,
-        );
-      },
-    );
-  });
-
-  it('valida booleanos de query sem coerção', () => {
-    expect(validarBooleanoQuery('true', 'free')).toBe(true);
-    expect(validarBooleanoQuery('false', 'free')).toBe(false);
-    expect(() => validarBooleanoQuery('TRUE', 'free')).toThrow(
-      BadRequestException,
-    );
-    expect(() => validarBooleanoQuery('', 'free')).toThrow(BadRequestException);
   });
 
   describe('validarDataBrasilia', () => {

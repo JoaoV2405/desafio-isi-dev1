@@ -2,15 +2,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import { TipoTransacao } from '../entities/transacao.entity.js';
 import { SituacaoContrato } from '../entities/contrato.entity.js';
 
-export class ErroMercadoResponse {
-  @ApiProperty({
-    type: String,
-    description: 'Mensagem segura que descreve o erro',
-    example: 'O recurso solicitado não foi encontrado',
-  })
-  message: string;
-}
-
 export class TransacaoResponse {
   @ApiProperty({ type: Number, description: 'Identificador da transação' })
   id: number;
@@ -87,7 +78,10 @@ export class VendaResponse extends TransacaoResponse {
   @ApiProperty({ type: Number, description: 'Percentual da multa' })
   penalty_rate: number;
 
-  @ApiProperty({ enum: SituacaoContrato, description: 'Situação final do contrato' })
+  @ApiProperty({
+    enum: SituacaoContrato,
+    description: 'Situação final do contrato',
+  })
   contract_status: SituacaoContrato;
 
   @ApiProperty({ type: Number, description: 'Caixa do clube após a venda' })
@@ -112,9 +106,15 @@ export class ResumoTransacoesResponse {
 }
 
 export class HistoricoTransacoesResponse {
-  @ApiProperty({ type: [TransacaoResponse], description: 'Transações filtradas' })
+  @ApiProperty({
+    type: [TransacaoResponse],
+    description: 'Transações filtradas',
+  })
   data: TransacaoResponse[];
 
-  @ApiProperty({ type: ResumoTransacoesResponse, description: 'Resumo filtrado' })
+  @ApiProperty({
+    type: ResumoTransacoesResponse,
+    description: 'Resumo filtrado',
+  })
   summary: ResumoTransacoesResponse;
 }

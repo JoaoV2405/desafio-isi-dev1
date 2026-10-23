@@ -2,7 +2,7 @@ import { registerDecorator, type ValidationOptions } from 'class-validator';
 import {
   ORDENACOES_JOGADORES,
   type OrdenacaoJogadores,
-} from './ordenacao-jogadores.js';
+} from '../dto/ordenacao-jogadores.js';
 
 const DIGITO = /[0-9]/u;
 const LETRA = /\p{L}/u;

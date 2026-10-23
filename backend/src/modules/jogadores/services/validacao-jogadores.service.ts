@@ -2,7 +2,6 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
-  Logger,
 } from '@nestjs/common';
 import { CriarJogadorDto } from '../dto/criar-jogador.dto.js';
 import { EditarJogadorDto } from '../dto/editar-jogador.dto.js';
@@ -20,8 +19,6 @@ import {
 
 @Injectable()
 export class ValidacaoJogadoresService {
-      
-
   validateCreation(dto: CriarJogadorDto): void {
     // Estes limites combinam atributos, potencial, idade e agilidade e por isso complementam os decorators do DTO.
     const attributes = this.getAttributes(dto);
@@ -113,10 +110,6 @@ export class ValidacaoJogadoresService {
     }
   }
 
-  // Guia do item 2: manter a fórmula e as duas assinaturas deste método.
-  // O ajuste é no chamador: calculatePlayer deixa de chamá-lo; na listagem, presentPlayer
-  // o chama somente após o slice. No cadastro, ele continua necessário para o valor base.
-  // Não armazenar o resultado na entity nem criar cache persistente para essa otimização.
   calculateOverall(dto: CriarJogadorDto): number;
   calculateOverall(jogador: Jogador): number;
   calculateOverall(input: CriarJogadorDto | Jogador): number {
@@ -135,8 +128,6 @@ export class ValidacaoJogadoresService {
   }
 
   calculateBaseValueInCents(dto: CriarJogadorDto): number {
-    // Guia do item 2: preservar esta chamada a calculateOverall; ela calcula o valor base
-    // uma única vez no cadastro e não participa do trabalho antecipado da paginação.
     return calcularValorBaseEmCentavos(
       this.calculateOverall(dto),
       dto.potential,
@@ -145,9 +136,6 @@ export class ValidacaoJogadoresService {
   }
 
   calculateMarketValueInCents(jogador: Jogador): number {
-    // Guia do item 2: preservar este cálculo antes dos filtros e da ordenação por valor.
-    // O resultado em centavos deve ser reaproveitado ao montar a resposta após o slice,
-    // pelo argumento opcional de presentPlayer descrito no guia de JogadoresService.
     return calcularValorMercadoEmCentavos(
       jogador.valorBase,
       jogador.condicao,

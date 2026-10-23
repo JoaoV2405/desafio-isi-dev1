@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsDefined, IsEnum, IsInt, Max, Min } from 'class-validator';
 import { NormalizarTexto } from '../../../core/validation/normalizar-texto.transform.js';
 import { PosicaoJogador } from '../entities/jogador.entity.js';
-import { IsNomeJogador } from './jogador-input.validator.js';
+import { IsNomeJogador } from '../validators/jogador-input.validator.js';
 
 export class CriarJogadorDto {
   @ApiProperty({

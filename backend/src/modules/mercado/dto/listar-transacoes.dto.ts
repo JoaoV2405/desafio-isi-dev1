@@ -1,8 +1,9 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsString, registerDecorator } from 'class-validator';
 import { IsIntegerQuery } from '../../../core/validation/query-value.validator.js';
+import { TipoTransacao } from '../entities/transacao.entity.js';
 
-const TIPOS_TRANSACAO = ['COMPRA', 'VENDA'] as const;
+const TIPOS_TRANSACAO = Object.values(TipoTransacao);
 
 function IsListaTipoTransacao(): PropertyDecorator {
   return (target: object, propertyKey: string | symbol): void => {
@@ -19,7 +20,7 @@ function IsListaTipoTransacao(): PropertyDecorator {
           return (
             tipos.length > 0 &&
             tipos.every((tipo) =>
-              TIPOS_TRANSACAO.includes(tipo as (typeof TIPOS_TRANSACAO)[number]),
+              TIPOS_TRANSACAO.includes(tipo as TipoTransacao),
             ) &&
             new Set(tipos).size === tipos.length
           );
@@ -54,10 +55,10 @@ export class ListarTransacoesDto {
   readonly player_id?: string;
 }
 
-export function parseTiposTransacao(value: string | undefined):
-  | readonly ('COMPRA' | 'VENDA')[]
-  | undefined {
+export function parseTiposTransacao(
+  value: string | undefined,
+): readonly TipoTransacao[] | undefined {
   return value === undefined
     ? undefined
-    : (value.split(',') as ('COMPRA' | 'VENDA')[]);
+    : (value.split(',') as TipoTransacao[]);
 }

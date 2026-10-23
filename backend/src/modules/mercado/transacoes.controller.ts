@@ -7,12 +7,10 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import type { Response } from 'express';
+import { ErroResponse } from '../../core/http/erro.response.js';
 import { IdPositivoPipe } from '../../core/validation/id-positivo.pipe.js';
 import { ListarTransacoesDto } from './dto/listar-transacoes.dto.js';
-import {
-  ErroMercadoResponse,
-  HistoricoTransacoesResponse,
-} from './dto/transacao.response.js';
+import { HistoricoTransacoesResponse } from './dto/transacao.response.js';
 import { MercadoService } from './services/mercado.service.js';
 
 @ApiTags('transactions')
@@ -72,12 +70,12 @@ export class TransacoesController {
   })
   @ApiResponse({
     status: 400,
-    type: ErroMercadoResponse,
+    type: ErroResponse,
     description: 'Filtro inválido; resposta JSON',
   })
   @ApiResponse({
     status: 404,
-    type: ErroMercadoResponse,
+    type: ErroResponse,
     description:
       'Id de rota inválido, clube ausente ou jogador ausente/excluído; resposta JSON',
   })
@@ -101,8 +99,8 @@ export class TransacoesController {
   @ApiQuery({ name: 'type', required: false, type: String })
   @ApiQuery({ name: 'player_id', required: false, type: String })
   @ApiResponse({ status: 200, type: HistoricoTransacoesResponse })
-  @ApiResponse({ status: 400, type: ErroMercadoResponse })
-  @ApiResponse({ status: 404, type: ErroMercadoResponse })
+  @ApiResponse({ status: 400, type: ErroResponse })
+  @ApiResponse({ status: 404, type: ErroResponse })
   listar(
     @Param('id', IdPositivoPipe) clubeId: number,
     @Query() filtros: ListarTransacoesDto,

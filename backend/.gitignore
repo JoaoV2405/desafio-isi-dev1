@@ -71,9 +71,9 @@ docs/explicacao/*
 
 !/test/
 /test/*
-!/test/escalacao.e2e-spec.ts
-!/test/partidas.e2e-spec.ts
+!/test/*.e2e-spec.ts
 !/test/fixtures/
+!/test/support/
 
 # CSV export plan and HTTP regression coverage
 !/docs/planning/
@@ -81,7 +81,3 @@ docs/explicacao/*
 !/docs/planning/README.md
 !/docs/planning/exportacao-historico-csv.md
 !/docs/planning/classificacao.md
-!/test/transacoes-csv.e2e-spec.ts
-!/test/classificacao.e2e-spec.ts
-!/test/inicio.e2e-spec.ts
-!/test/api-errors.e2e-spec.ts

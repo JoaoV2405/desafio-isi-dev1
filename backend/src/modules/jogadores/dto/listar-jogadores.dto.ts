@@ -13,7 +13,7 @@ import {
   IsIntegerQuery,
 } from '../../../core/validation/query-value.validator.js';
 import { CondicaoJogador, PosicaoJogador } from '../entities/jogador.entity.js';
-import { IsOrdenacaoJogadores } from './jogador-input.validator.js';
+import { IsOrdenacaoJogadores } from '../validators/jogador-input.validator.js';
 import type { OrdenacaoJogadores } from './ordenacao-jogadores.js';
 
 export {

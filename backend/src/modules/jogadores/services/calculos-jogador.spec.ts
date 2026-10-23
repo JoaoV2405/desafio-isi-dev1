@@ -1,9 +1,9 @@
-import { CondicaoJogador, PosicaoJogador } from '../../entities/jogador.entity.js';
+import { CondicaoJogador, PosicaoJogador } from '../entities/jogador.entity.js';
 import {
   calcularOverall,
   calcularValorBaseEmCentavos,
   calcularValorMercadoEmCentavos,
-} from '../calculos-jogador.js';
+} from './calculos-jogador.js';
 
 describe('cálculos de jogador', () => {
   it('calcula o overall usando os pesos da posição e meio para cima', () => {

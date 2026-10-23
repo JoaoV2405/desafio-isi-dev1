@@ -1,10 +1,7 @@
 import type { Response } from 'express';
-import {
-  CondicaoJogador,
-  PosicaoJogador,
-} from '../../entities/jogador.entity.js';
-import { JogadoresController } from '../../jogadores.controller.js';
-import { JogadoresService } from '../jogadores.service.js';
+import { CondicaoJogador, PosicaoJogador } from './entities/jogador.entity.js';
+import { JogadoresController } from './jogadores.controller.js';
+import { JogadoresService } from './services/jogadores.service.js';
 
 const jogadorResponse = {
   id: 2,

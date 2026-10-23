@@ -5,7 +5,13 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, In, IsNull, type Repository } from 'typeorm';
+import {
+  DataSource,
+  In,
+  IsNull,
+  type EntityManager,
+  type Repository,
+} from 'typeorm';
 import { formatarDataBrasilia } from '../../../core/date/formatar-data-brasilia.js';
 import {
   centavosParaDecimal,
@@ -67,32 +73,13 @@ export class MercadoService {
     );
 
     return this.dataSource.transaction(async (manager) => {
-      const jogador = await manager
-        .getRepository(Jogador)
-        .createQueryBuilder('jogador')
-        .setLock('pessimistic_write')
-        .where('jogador.id = :jogadorId', { jogadorId })
-        .andWhere('jogador.excluido_em IS NULL')
-        .getOne();
-
-      if (!jogador) {
-        throw new NotFoundException('Jogador não encontrado');
-      }
+      const jogador = await this.findPlayerForUpdate(manager, jogadorId);
 
       if (jogador.clubeId !== null) {
         throw new ConflictException('O jogador não está livre');
       }
 
-      const clube = await manager
-        .getRepository(Clube)
-        .createQueryBuilder('clube')
-        .setLock('pessimistic_write')
-        .where('clube.id = :clubeId', { clubeId: dto.club_id })
-        .getOne();
-
-      if (!clube) {
-        throw new NotFoundException('Clube não encontrado');
-      }
+      const clube = await this.findClubForUpdate(manager, dto.club_id);
 
       const instante = new Date();
       const limiteFidelidade =
@@ -186,31 +173,13 @@ export class MercadoService {
   async vender(jogadorId: number): Promise<VendaResponse> {
     return this.dataSource.transaction(async (manager) => {
       const jogadoresRepository = manager.getRepository(Jogador);
-      const jogador = await jogadoresRepository
-        .createQueryBuilder('jogador')
-        .setLock('pessimistic_write')
-        .where('jogador.id = :jogadorId', { jogadorId })
-        .andWhere('jogador.excluido_em IS NULL')
-        .getOne();
-
-      if (!jogador) {
-        throw new NotFoundException('Jogador não encontrado');
-      }
+      const jogador = await this.findPlayerForUpdate(manager, jogadorId);
 
       if (jogador.clubeId === null) {
         throw new ConflictException('Jogador livre não pode ser vendido');
       }
 
-      const clube = await manager
-        .getRepository(Clube)
-        .createQueryBuilder('clube')
-        .setLock('pessimistic_write')
-        .where('clube.id = :clubeId', { clubeId: jogador.clubeId })
-        .getOne();
-
-      if (!clube) {
-        throw new NotFoundException('Clube não encontrado');
-      }
+      const clube = await this.findClubForUpdate(manager, jogador.clubeId);
 
       const contratoRepository = manager.getRepository(Contrato);
       const contrato = await contratoRepository.findOne({
@@ -305,6 +274,43 @@ export class MercadoService {
     return presentTransactionsCsv(
       await this.findTransactions(clubeId, filtros),
     );
+  }
+
+  private async findPlayerForUpdate(
+    manager: EntityManager,
+    jogadorId: number,
+  ): Promise<Jogador> {
+    const jogador = await manager
+      .getRepository(Jogador)
+      .createQueryBuilder('jogador')
+      .setLock('pessimistic_write')
+      .where('jogador.id = :jogadorId', { jogadorId })
+      .andWhere('jogador.excluido_em IS NULL')
+      .getOne();
+
+    if (!jogador) {
+      throw new NotFoundException('Jogador não encontrado');
+    }
+
+    return jogador;
+  }
+
+  private async findClubForUpdate(
+    manager: EntityManager,
+    clubeId: number,
+  ): Promise<Clube> {
+    const clube = await manager
+      .getRepository(Clube)
+      .createQueryBuilder('clube')
+      .setLock('pessimistic_write')
+      .where('clube.id = :clubeId', { clubeId })
+      .getOne();
+
+    if (!clube) {
+      throw new NotFoundException('Clube não encontrado');
+    }
+
+    return clube;
   }
 
   private async findTransactions(

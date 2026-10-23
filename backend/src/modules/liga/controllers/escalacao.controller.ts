@@ -7,7 +7,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { IdPositivoPipe } from '../../../core/validation/id-positivo.pipe.js';
-import { ErroResponse } from '../../jogadores/dto/jogador.response.js';
+import { ErroResponse } from '../../../core/http/erro.response.js';
 import { EscalacaoResponse } from '../dto/escalacao.response.js';
 import { SubstituirEscalacaoDto } from '../dto/substituir-escalacao.dto.js';
 import { EscalacoesService } from '../services/escalacao.service.js';

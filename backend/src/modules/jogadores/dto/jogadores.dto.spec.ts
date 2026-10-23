@@ -1,10 +1,10 @@
 import { BadRequestException, type ArgumentMetadata } from '@nestjs/common';
-import { CriarClubeDto } from '../../../clubes/dto/criar-clube.dto.js';
-import { createValidationPipe } from '../../../../core/bootstrap/validation.config.js';
-import { AlterarCondicaoJogadorDto } from '../alterar-condicao-jogador.dto.js';
-import { CriarJogadorDto } from '../criar-jogador.dto.js';
-import { EditarJogadorDto } from '../editar-jogador.dto.js';
-import { ListarJogadoresDto } from '../listar-jogadores.dto.js';
+import { CriarClubeDto } from '../../clubes/dto/criar-clube.dto.js';
+import { createValidationPipe } from '../../../core/bootstrap/validation.config.js';
+import { AlterarCondicaoJogadorDto } from './alterar-condicao-jogador.dto.js';
+import { CriarJogadorDto } from './criar-jogador.dto.js';
+import { EditarJogadorDto } from './editar-jogador.dto.js';
+import { ListarJogadoresDto } from './listar-jogadores.dto.js';
 
 const validPlayer = {
   name: '  João   da Silva  ',

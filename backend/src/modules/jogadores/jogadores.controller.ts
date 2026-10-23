@@ -20,12 +20,12 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import type { Response } from 'express';
+import { ErroResponse } from '../../core/http/erro.response.js';
 import { IdPositivoPipe } from '../../core/validation/id-positivo.pipe.js';
 import { AlterarCondicaoJogadorDto } from './dto/alterar-condicao-jogador.dto.js';
 import { CriarJogadorDto } from './dto/criar-jogador.dto.js';
 import { EditarJogadorDto } from './dto/editar-jogador.dto.js';
 import {
-  ErroResponse,
   ListaJogadoresResponse,
   JogadorResponse,
 } from './dto/jogador.response.js';

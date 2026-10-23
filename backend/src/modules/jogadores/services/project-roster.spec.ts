@@ -1,10 +1,10 @@
-import { projectRoster } from '../../index.js';
+import { projectRoster } from '../index.js';
 import {
   CondicaoJogador,
   Jogador,
   PosicaoJogador,
-} from '../../entities/jogador.entity.js';
-import * as calculos from '../calculos-jogador.js';
+} from '../entities/jogador.entity.js';
+import * as calculos from './calculos-jogador.js';
 
 function criarJogador(alteracoes: Partial<Jogador> = {}): Jogador {
   return Object.assign(new Jogador(), {

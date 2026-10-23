@@ -19,7 +19,7 @@ import {
 } from '@nestjs/swagger';
 import type { Response } from 'express';
 import { IdPositivoPipe } from '../../../core/validation/id-positivo.pipe.js';
-import { ErroResponse } from '../../jogadores/dto/jogador.response.js';
+import { ErroResponse } from '../../../core/http/erro.response.js';
 import { CriarPartidaDto } from '../dto/criar-partida.dto.js';
 import { ListarPartidasDto } from '../dto/listar-partidas.dto.js';
 import {

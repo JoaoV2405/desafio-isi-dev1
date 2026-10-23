@@ -1,13 +1,13 @@
 import { BadRequestException, ConflictException } from '@nestjs/common';
-import { CriarJogadorDto } from '../../dto/criar-jogador.dto.js';
-import { EditarJogadorDto } from '../../dto/editar-jogador.dto.js';
-import type { FiltrosJogadores } from '../../dto/listar-jogadores.dto.js';
+import { CriarJogadorDto } from '../dto/criar-jogador.dto.js';
+import { EditarJogadorDto } from '../dto/editar-jogador.dto.js';
+import type { FiltrosJogadores } from '../dto/listar-jogadores.dto.js';
 import {
   CondicaoJogador,
   Jogador,
   PosicaoJogador,
-} from '../../entities/jogador.entity.js';
-import { ValidacaoJogadoresService } from '../validacao-jogadores.service.js';
+} from '../entities/jogador.entity.js';
+import { ValidacaoJogadoresService } from './validacao-jogadores.service.js';
 
 function createCreationDto(
   changes: Partial<CriarJogadorDto> = {},

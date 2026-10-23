@@ -1,14 +1,14 @@
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { DataSource, type EntityManager, type Repository } from 'typeorm';
-import { Clube } from '../../../clubes/entities/clube.entity.js';
-import { Escalacao } from '../../../liga/entities/escalacao.entity.js';
+import { Clube } from '../../clubes/entities/clube.entity.js';
+import { Escalacao } from '../../liga/entities/escalacao.entity.js';
 import {
   CondicaoJogador,
   Jogador,
   PosicaoJogador,
-} from '../../entities/jogador.entity.js';
-import { JogadoresService } from '../jogadores.service.js';
-import { ValidacaoJogadoresService } from '../validacao-jogadores.service.js';
+} from '../entities/jogador.entity.js';
+import { JogadoresService } from './jogadores.service.js';
+import { ValidacaoJogadoresService } from './validacao-jogadores.service.js';
 
 function criarJogador(alteracoes: Partial<Jogador> = {}): Jogador {
   return Object.assign(new Jogador(), {

@@ -1,3 +1,4 @@
+import { decimalParaCentavos } from '../../../core/money/conversoes-monetarias.js';
 import {
   type FiltrosJogadores,
   type ListarJogadoresDto,
@@ -36,9 +37,7 @@ export class FiltrosJogadoresMapper {
       return undefined;
     }
 
-    const [integers, decimals = ''] = value.split('.');
-
-    return Number(integers) * 100 + Number(decimals.padEnd(2, '0'));
+    return decimalParaCentavos(value);
   }
 
   private static toSort(value?: string): readonly OrdenacaoJogadores[] {

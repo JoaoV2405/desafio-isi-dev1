@@ -20,13 +20,15 @@ import type {
   CriarPartidaInput,
   EscalacaoPartida,
 } from '../types/partida.types.js';
-import { isEscalacaoCompleta } from '../validators/escalacao-completa.js';
+import {
+  isEscalacaoCompleta,
+  isFormacaoClube,
+} from '../validators/escalacao.validator.js';
 import {
   calculateDuels,
   calculateResult,
   calculateScore,
 } from './calculos-partida.js';
-import { isFormacaoClube } from './formacao-validation.service.js';
 
 const ID_MAXIMO = 2_147_483_647;
 
@@ -47,7 +49,7 @@ export class PartidasService {
       throw new BadRequestException(
         'Informe dois clubes distintos com ids inteiros positivos',
       );
-    } // validação deve acontecer no dto, não há necessidade de ver no serviço se o id é um safe integer
+    }
     if (clubesIds.some((id) => id > ID_MAXIMO)) {
       throw new NotFoundException('Clube não encontrado');
     }
@@ -160,7 +162,7 @@ export class PartidasService {
       const visitante = clubes.find((clube) => clube.id === visitanteId);
       if (!mandante || !visitante) {
         throw new NotFoundException('Clube não encontrado');
-      } //verificar se há exceção específica pro clube
+      }
 
       const escalacoes = await manager
         .getRepository(Escalacao)
@@ -185,7 +187,6 @@ export class PartidasService {
       ) {
         throw new Error('Conjunto inválido de duelos calculados');
       }
-      //transferir validação para metodo proprio
       const placar = calculateScore(duelos);
 
       const partidasRepository = manager.getRepository(Partida);

@@ -17,12 +17,9 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import type { Response } from 'express';
+import { ErroResponse } from '../../core/http/erro.response.js';
 import { IdPositivoPipe } from '../../core/validation/id-positivo.pipe.js';
-import {
-  ClubeDetailResponse,
-  ClubeResponse,
-  ErroClubeResponse,
-} from './dto/clube-response.js';
+import { ClubeDetailResponse, ClubeResponse } from './dto/clube-response.js';
 import { CriarClubeDto } from './dto/criar-clube.dto.js';
 import { ListarClubesDto } from './dto/listar-clubes.dto.js';
 import { ClubesService } from './services/clubes.service.js';
@@ -37,8 +34,8 @@ export class ClubesController {
   @ApiOperation({ summary: 'Cria um clube' })
   @ApiBody({ type: CriarClubeDto })
   @ApiResponse({ status: 201, type: ClubeResponse })
-  @ApiResponse({ status: 400, type: ErroClubeResponse })
-  @ApiResponse({ status: 409, type: ErroClubeResponse })
+  @ApiResponse({ status: 400, type: ErroResponse })
+  @ApiResponse({ status: 409, type: ErroResponse })
   async create(
     @Body() corpo: CriarClubeDto,
     @Res({ passthrough: true }) response: Pick<Response, 'location'>,
@@ -53,7 +50,7 @@ export class ClubesController {
   @Get()
   @ApiOperation({ summary: 'Lista os clubes' })
   @ApiResponse({ status: 200, type: [ClubeResponse] })
-  @ApiResponse({ status: 400, type: ErroClubeResponse })
+  @ApiResponse({ status: 400, type: ErroResponse })
   findAll(@Query() query: ListarClubesDto): Promise<ClubeResponse[]> {
     return this.clubesService.findAll(query);
   }
@@ -62,10 +59,10 @@ export class ClubesController {
   @ApiOperation({ summary: 'Consulta um clube pelo identificador' })
   @ApiParam({ name: 'id', type: Number, description: 'Identificador do clube' })
   @ApiResponse({ status: 200, type: ClubeDetailResponse })
-  @ApiResponse({ status: 404, type: ErroClubeResponse })
+  @ApiResponse({ status: 404, type: ErroResponse })
   @ApiResponse({
     status: 500,
-    type: ErroClubeResponse,
+    type: ErroResponse,
     description: 'Falha interna ou inconsistência dos dados do elenco',
   })
   findById(

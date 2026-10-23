@@ -33,8 +33,6 @@ import { ValidacaoJogadoresService } from './validacao-jogadores.service.js';
 
 type JogadorCalculado = {
   jogador: Jogador;
-  // Guia do item 2, passo 1: remover response deste tipo e do retorno de calculatePlayer.
-  // Manter jogador, marketValueInCents e normalizedName para filtrar e ordenar.
   response: JogadorResponse;
   marketValueInCents: number;
   normalizedName: string;
@@ -65,12 +63,6 @@ export class JogadoresService {
   async findAll(query: ListarJogadoresDto): Promise<ListaJogadoresResponse> {
     const filtros = FiltrosJogadoresMapper.fromDto(query);
     this.validacaoJogadoresService.validateFilters(filtros);
-    // Item 3, passo 1: adicionar esta variável antes de percorrer os jogadores.
-    // O DTO já ajustou os espaços; aqui preparamos caixa e acentos uma vez por pedido.
-    // const normalizedSearch =
-    //   filtros.search === undefined
-    //     ? undefined
-    //     : normalizeForComparison(filtros.search);
 
     if (
       filtros.clubId !== undefined &&
@@ -83,19 +75,10 @@ export class JogadoresService {
     const jogadores = await this.jogadoresRepository.find();
     const jogadoresFiltrados = jogadores
       .map((jogador) => this.calculatePlayer(jogador))
-      // Item 3, passo 2: substituir a chamada de filter abaixo por esta versão.
-      // .filter((jogador) =>
-      //   this.matchesFilters(jogador, filtros, normalizedSearch),
-      // )
       .filter((jogador) => this.matchesFilters(jogador, filtros))
       .sort((a, b) => this.comparePlayers(a, b, filtros.sort));
     const totalItems = jogadoresFiltrados.length;
     const start = (filtros.page - 1) * filtros.limit;
-    // Guia do item 2, passo 4: preservar filtros, ordenação e totalItems antes do slice.
-    // No map após o slice, receber jogador e marketValueInCents e chamar presentPlayer
-    // com os dois argumentos (ver passo 3). Assim, overall e resposta completa serão
-    // produzidos apenas para a página; página vazia não executará esses cálculos.
-    // Na verificação, comparar data e meta e cobrir página além do fim e sem resultados.
     const data = jogadoresFiltrados
       .slice(start, start + filtros.limit)
       .map(({ response }) => response);
@@ -130,7 +113,6 @@ export class JogadoresService {
 
   async update(id: number, dto: EditarJogadorDto): Promise<JogadorResponse> {
     const jogador = await this.findEntityById(id);
-    // chaamar save do repository
     this.validacaoJogadoresService.validateUpdate(dto, jogador);
     const jogadorAtualizado = JogadorMapper.applyUpdate(jogador, dto);
 
@@ -192,10 +174,6 @@ export class JogadoresService {
   }
 
   private presentPlayer(jogador: Jogador): JogadorResponse {
-    // Guia do item 2, passo 3: aceitar marketValueInCents como segundo argumento opcional.
-    // No campo marketValueInCents abaixo, usar o argumento com ?? e calcular só se ausente.
-    // Manter o cálculo de overall aqui. findAll reutilizará o valor de mercado já
-    // calculado; cadastro, consulta individual e alterações seguem com um argumento.
     return JogadorPresenter.present(jogador, {
       overall: this.validacaoJogadoresService.calculateOverall(jogador),
       marketValueInCents:
@@ -204,10 +182,6 @@ export class JogadoresService {
   }
 
   private calculatePlayer(jogador: Jogador): JogadorCalculado {
-    // Guia do item 2, passo 2: manter o cálculo de mercado e a normalização do nome,
-    // necessários antes de filtrar e ordenar. Remover somente o campo response abaixo,
-    // incluindo sua chamada ao presenter e ao cálculo de overall. A montagem da resposta
-    // passa para o map após o slice em findAll, usando presentPlayer conforme os passos 3 e 4.
     const marketValueInCents =
       this.validacaoJogadoresService.calculateMarketValueInCents(jogador);
 
@@ -225,19 +199,9 @@ export class JogadoresService {
   private matchesFilters(
     calculado: JogadorCalculado,
     filtros: FiltrosJogadores,
-    // Item 3, passo 3: adicionar este parâmetro para receber a busca já preparada.
-    // normalizedSearch: string | undefined,
   ): boolean {
     const { jogador, marketValueInCents, normalizedName } = calculado;
 
-    // Item 3, passo 4: substituir somente o if de busca abaixo por este bloco.
-    // Sem search, o teste é ignorado; os demais filtros continuam como estão.
-    // if (
-    //   normalizedSearch !== undefined &&
-    //   !normalizedName.includes(normalizedSearch)
-    // ) {
-    //   return false;
-    // }
     if (
       filtros.search &&
       !normalizedName.includes(normalizeForComparison(filtros.search))

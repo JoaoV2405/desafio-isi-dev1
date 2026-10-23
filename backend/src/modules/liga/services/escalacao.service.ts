@@ -13,8 +13,10 @@ import { JogadoresService } from '../../jogadores/services/jogadores.service.js'
 import { EscalacaoResponse } from '../dto/escalacao.response.js';
 import { SubstituirEscalacaoDto } from '../dto/substituir-escalacao.dto.js';
 import { Escalacao } from '../entities/escalacao.entity.js';
-import { isEscalacaoCompleta } from '../validators/escalacao-completa.js';
-import { isComposicaoEscalacaoValida } from './formacao-validation.service.js';
+import {
+  isComposicaoEscalacaoValida,
+  isEscalacaoCompleta,
+} from '../validators/escalacao.validator.js';
 
 @Injectable()
 export class EscalacoesService {

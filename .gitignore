@@ -1,2 +1,4 @@
-docs
+docs/*
 docs-enunciado
+!docs/frontend/
+!docs/frontend/README.md

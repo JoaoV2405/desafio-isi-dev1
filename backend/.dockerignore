@@ -5,3 +5,5 @@ coverage
 .gitignore
 npm-debug.log*
 README.md
+.env
+.env.*

@@ -51,6 +51,37 @@ yarn-error.log
 build/config\.gypi
 
 .npmrc
+!/.npmrc
 pnpm-lock.yaml
 /.history
 /dist
+
+# Backend architecture and product documentation
+!/docs/
+!/docs/**
+
+.env
+docs
+!docs/
+docs/*
+!docs/README.md
+!docs/explicacao/
+docs/explicacao/*
+!docs/explicacao/jogadores.md
+
+!/test/
+/test/*
+!/test/escalacao.e2e-spec.ts
+!/test/partidas.e2e-spec.ts
+!/test/fixtures/
+
+# CSV export plan and HTTP regression coverage
+!/docs/planning/
+/docs/planning/*
+!/docs/planning/README.md
+!/docs/planning/exportacao-historico-csv.md
+!/docs/planning/classificacao.md
+!/test/transacoes-csv.e2e-spec.ts
+!/test/classificacao.e2e-spec.ts
+!/test/inicio.e2e-spec.ts
+!/test/api-errors.e2e-spec.ts

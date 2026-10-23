@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useLocation } from '@tanstack/react-router'
+import { useLocation, useNavigate } from '@tanstack/react-router'
 import type { ClubPlayer } from '../types/club-details'
 import type { PlayerSale } from '../types/player-sale'
 import type { ClubTab } from '../components/club-tabs'
@@ -16,10 +16,14 @@ import { PageHeader } from '@/components/page/page-header'
 import { PageSection } from '@/components/page/page-section'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { ContentErrorState } from '@/components/custom/content-error-state'
+import { ContentState } from '@/components/custom/content-state'
+import { RoutePaths } from '@/router/route-paths'
 import { ApiError } from '@/shared/lib/api-error'
 import { formatMoney } from '@/shared/lib/format-money'
+import { Coins, Landmark, Shirt, WalletMinimal } from 'lucide-react'
 
 export function ClubPage({ clubId }: { clubId: string }) {
+  const navigate = useNavigate()
   const createdClubId = useLocation({
     select: (location) => location.state.createdClubId,
   })
@@ -55,14 +59,24 @@ export function ClubPage({ clubId }: { clubId: string }) {
     return (
       <PageContainer>
         <PageHeader title="Clube" />
-        <ContentErrorState
-          title={
-            error instanceof ApiError && error.status === 404
-              ? 'Clube não encontrado'
-              : 'Não foi possível carregar o clube'
-          }
-          error={error}
-        />
+        {error instanceof ApiError && error.status === 404 ? (
+          <ContentState
+            variant="not-found"
+            title="Clube não encontrado"
+            description={error.message}
+            action={{
+              label: 'Voltar para clubes',
+              onClick: () => {
+                void navigate({ to: RoutePaths.clubs })
+              },
+            }}
+          />
+        ) : (
+          <ContentErrorState
+            title="Não foi possível carregar o clube"
+            error={error}
+          />
+        )}
       </PageContainer>
     )
   }
@@ -87,6 +101,7 @@ export function ClubPage({ clubId }: { clubId: string }) {
           value={formatMoney(club.cash)}
           unit="moedas"
           description="Disponível para contratações"
+          icon={<WalletMinimal/>}
         />
         <ClubSummaryCard
           title="Valor do elenco"
@@ -95,6 +110,7 @@ export function ClubPage({ clubId }: { clubId: string }) {
           }
           unit={club.squad_value === undefined ? undefined : 'moedas'}
           description="Valor de mercado dos jogadores"
+          icon={<Coins/>}
         />
         <ClubSummaryCard
           title="Patrimônio"
@@ -103,11 +119,13 @@ export function ClubPage({ clubId }: { clubId: string }) {
           }
           unit={club.net_worth === undefined ? undefined : 'moedas'}
           description="Caixa e valor do elenco"
+          icon={<Landmark/>}
         />
         <ClubSummaryCard
           title="Elenco"
           value={club.players?.length ?? '—'}
           description="Jogadores vinculados ao clube"
+          icon={<Shirt/>}
         />
       </PageSection>
       <PageSection aria-label="Elenco, escalação e histórico">

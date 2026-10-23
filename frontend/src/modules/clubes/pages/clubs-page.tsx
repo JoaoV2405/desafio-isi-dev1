@@ -4,12 +4,14 @@ import { useNavigate, useSearch } from '@tanstack/react-router'
 import { CreateClubModal } from '../components/club-modal/create-club-modal'
 import { createClub } from '../services/clubs-api'
 import type { CreateClubInput } from '../types/club-input'
-import { IconPlaceholder } from '@/components/layout/icon-placeholder'
+import { Plus, Shield } from 'lucide-react'
+import { PageIcon } from '@/components/page/page-icon'
 import { PageContainer } from '@/components/page/page-container'
 import { PageHeader } from '@/components/page/page-header'
 import { PageSection } from '@/components/page/page-section'
 import { Button } from '@/components/ui/button'
 import { ClubsTable } from '../components/club-table/clubs-table'
+import { dashboardQueryOptions } from '@/modules/inicio/hooks/use-dashboard'
 
 export function ClubsPage() {
   const { create: isCreateModalOpen } = useSearch({ from: '/mercado/clubes' })
@@ -20,7 +22,13 @@ export function ClubsPage() {
     mutationFn: createClub,
     retry: false,
     onSuccess: async (club) => {
-      await queryClient.invalidateQueries({ queryKey: ['clubs'] })
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['clubs'] }),
+        queryClient.invalidateQueries({ queryKey: ['classificacao'] }),
+        queryClient.invalidateQueries({
+          queryKey: dashboardQueryOptions.queryKey,
+        }),
+      ])
       // Remove a intenção de criação antes de abrir o detalhe: Voltar não reabre o modal.
       await navigate({ to: '/mercado/clubes', search: {}, replace: true })
       await navigate({
@@ -53,7 +61,7 @@ export function ClubsPage() {
   return (
     <PageContainer>
       <PageHeader
-        icon={<IconPlaceholder />}
+        icon={<PageIcon icon={Shield} />}
         title="Clubes"
         description="Acompanhe os clubes e gerencie sua participação na liga."
         actions={
@@ -62,7 +70,7 @@ export function ClubsPage() {
             disabled={creation.isPending}
             onClick={() => changeCreateModalOpen(true)}
           >
-            <IconPlaceholder />
+            <Plus aria-hidden="true" />
             Criar clube
           </Button>
         }

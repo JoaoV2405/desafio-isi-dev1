@@ -9,7 +9,8 @@ import { BuyPlayerModal } from '../components/player-modal/buy-player-modal'
 import { BuyPlayerSuccessModal } from '../components/player-modal/buy-player-success-modal'
 import type { PlayerPurchase } from '../types/player-purchase'
 import type { Player } from '@/shared/types/player'
-import { IconPlaceholder } from '@/components/layout/icon-placeholder'
+import { Plus, UsersRound } from 'lucide-react'
+import { PageIcon } from '@/components/page/page-icon'
 import { PageContainer } from '@/components/page/page-container'
 import { PageHeader } from '@/components/page/page-header'
 import { PageSection } from '@/components/page/page-section'
@@ -35,6 +36,8 @@ export function PlayersPage() {
     null,
   )
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  // Estas ações compartilham um jogador e abrem um único modal/drawer por vez.
+  // Outros fluxos da página podem manter estados e callbacks próprios, como o cadastro acima.
   const [selectedAction, setSelectedAction] = useState<{
     type: PlayerAction
     player: Player
@@ -87,6 +90,8 @@ export function PlayersPage() {
     purchase.reset()
   }
 
+  // A tabela chama este callback para selecionar o jogador e abrir a interface da ação.
+  // A requisição só acontece quando o usuário confirma no modal.
   function handlePlayerAction(type: PlayerAction, player: Player) {
     if (isSubmitting) return
     resetErrors()
@@ -116,7 +121,7 @@ export function PlayersPage() {
   return (
     <PageContainer>
       <PageHeader
-        icon={<IconPlaceholder />}
+        icon={<PageIcon icon={UsersRound} />}
         title="Jogadores"
         description="Gerencie os jogadores e acompanhe o mercado da liga."
         actions={
@@ -125,8 +130,8 @@ export function PlayersPage() {
             disabled={isSubmitting}
             onClick={() => changeCreateModalOpen(true)}
           >
-            <IconPlaceholder />
-            Cadastrar jogador
+            <Plus />
+            Adicionar jogador
           </Button>
         }
       />
@@ -139,7 +144,11 @@ export function PlayersPage() {
         </Alert>
       )}
       <PageSection aria-label="Jogadores">
-        <PlayersTable onPlayerAction={handlePlayerAction} />
+        {/* O filho recebe o callback; a página mantém a seleção e controla os modais. */}
+        <PlayersTable
+          onPlayerAction={handlePlayerAction}
+          onCreatePlayer={() => changeCreateModalOpen(true)}
+        />
       </PageSection>
       {isCreateModalOpen && (
         <CreatePlayerModal
@@ -205,6 +214,7 @@ export function PlayersPage() {
           open
           player={selectedAction.player}
           onOpenChange={changeActionModalOpen}
+          // A confirmação conecta o modal à mutation da página, que chama o serviço HTTP.
           onConfirm={(input) =>
             purchase.submit({ playerId: selectedAction.player.id, input })
           }

@@ -1,9 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 import { getMatches } from '../services/matches-api'
 
-export function useMatches() {
+export function useMatches(clubId: number | null = null) {
   return useQuery({
-    queryKey: ['matches', 'list'],
-    queryFn: ({ signal }) => getMatches(signal),
+    queryKey:
+      clubId === null ? ['matches', 'list'] : ['matches', 'list', { clubId }],
+    queryFn: ({ signal }) => getMatches(signal, clubId),
   })
 }

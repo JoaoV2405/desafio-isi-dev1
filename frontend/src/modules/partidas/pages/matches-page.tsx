@@ -1,58 +1,34 @@
-import { useNavigate } from '@tanstack/react-router'
-import { ContentState } from '@/components/custom/content-state'
-import { ContentErrorState } from '@/components/custom/content-error-state'
-import { useClubs } from '@/modules/clubes/hooks/use-clubs'
-import { IconPlaceholder } from '@/components/layout/icon-placeholder'
+import { useState } from 'react'
+import { Plus, Swords } from 'lucide-react'
+import { CreateMatchModal } from '../components/create-match-modal'
+import { LatestMatchCard } from '../components/latest-match-card'
+import { MatchesHistory } from '../components/matches-history'
+import { PageIcon } from '@/components/page/page-icon'
 import { PageContainer } from '@/components/page/page-container'
 import { PageHeader } from '@/components/page/page-header'
-import { PageSection } from '@/components/page/page-section'
 import { Button } from '@/components/ui/button'
-import { DataTable } from '#/components/data-table/data-table'
 
 export function MatchesPage() {
-  const clubs = useClubs()
-  const navigate = useNavigate()
+  const [isCreateMatchOpen, setIsCreateMatchOpen] = useState(false)
 
   return (
     <PageContainer>
       <PageHeader
-        icon={<IconPlaceholder />}
+        icon={<PageIcon icon={Swords} />}
         title="Partidas"
         description="Consulte o histórico e organize os confrontos da liga."
         actions={
-          // TODO: abrir o formulário de nova partida.
-          <Button disabled>
-            <IconPlaceholder />
-            Criar partida
+          <Button type="button" onClick={() => setIsCreateMatchOpen(true)}>
+            <Plus aria-hidden="true" />
+            Nova partida
           </Button>
         }
       />
-      <PageSection aria-label="Histórico de partidas">
-        {clubs.isPending ? (
-          <p role="status">Carregando clubes...</p>
-        ) : clubs.isError ? (
-          <ContentErrorState
-            title="Não foi possível carregar os clubes"
-            error={clubs.error}
-          />
-        ) : clubs.data.length === 0 ? (
-          <ContentState
-            variant="empty"
-            title="Nenhum clube cadastrado"
-            description="Crie um clube para começar a preparar os confrontos da liga."
-            action={{
-              label: 'Criar clube',
-              onClick: () =>
-                void navigate({
-                  to: '/mercado/clubes',
-                  search: { create: true },
-                }),
-            }}
-          />
-        ) : (
-          <p>Você está na página de Partidas</p>
-        )}
-      </PageSection>
+      <LatestMatchCard />
+      <MatchesHistory />
+      {isCreateMatchOpen && (
+        <CreateMatchModal onOpenChange={setIsCreateMatchOpen} />
+      )}
     </PageContainer>
   )
 }

@@ -12,11 +12,16 @@
 }
 
 .soccer-field[data-presentation='match'] {
+  height: 30rem;
   --marker-size: clamp(14px, 4.5cqw, 40px);
   --marker-font: clamp(7px, 1.5cqw, 13px);
   /* The keeper and central defender can share a row, 8.46% apart. */
   --marker-label-width: 8cqw;
   --marker-label-font: clamp(7px, 1.3cqw, 12px);
+}
+
+.soccer-field[data-presentation='match'] > svg {
+  height: 100%;
 }
 
 .soccer-field-players {
@@ -49,13 +54,25 @@
   line-height: 1;
 }
 
-.soccer-field-marker-condition {
+.soccer-field-marker-condition,
+.soccer-field-marker-goal {
   width: clamp(12px, 6cqw, 18px);
   height: clamp(12px, 6cqw, 18px);
   transform: translate(-15%, -15%);
 }
 
-.soccer-field-marker-condition > svg {
+.soccer-field-marker-goal {
+  transform: translate(15%, -15%);
+}
+
+.soccer-field[data-presentation='match']
+  :is(.soccer-field-marker-condition, .soccer-field-marker-goal) {
+  width: clamp(10px, 1.5cqw, 14px);
+  height: clamp(10px, 1.5cqw, 14px);
+}
+
+.soccer-field-marker-condition > svg,
+.soccer-field-marker-goal > svg {
   width: 75%;
   height: 75%;
 }
@@ -77,4 +94,8 @@
   text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.soccer-field[data-presentation='match'] > svg [stroke] {
+  stroke-width: 0.3;
 }

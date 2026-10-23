@@ -1,13 +1,16 @@
 import { useId, useRef, useState } from 'react'
 import type { SubmitEvent } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
+import { matchDetailKey } from '../hooks/use-match'
 import { createMatch } from '../services/matches-api'
 import type { CreateMatchInput } from '../services/matches-api'
 import { useClubs } from '@/modules/clubes/hooks/use-clubs'
 import { Modal } from '@/components/modal/modal'
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { toast } from '@/components/ui/toast'
+import { ErrorAlert } from '@/components/ui/alert'
+import { RoutePaths } from '@/router/route-paths'
+import { dashboardQueryOptions } from '@/modules/inicio/hooks/use-dashboard'
 
 export function CreateMatchModal({
   onOpenChange,
@@ -21,20 +24,25 @@ export function CreateMatchModal({
   const [validationError, setValidationError] = useState('')
   const clubs = useClubs()
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
   const creation = useMutation({
     mutationFn: createMatch,
     retry: false,
     onSuccess: async (match) => {
-      toast.add({
-        type: 'success',
-        title: 'Partida realizada',
-        description: `${match.home.club_name} ${match.home.goals} x ${match.away.goals} ${match.away.club_name}`,
-      })
-      await Promise.all([
+      void Promise.all([
         queryClient.invalidateQueries({ queryKey: ['classificacao'] }),
         queryClient.invalidateQueries({ queryKey: ['matches'] }),
+        queryClient.invalidateQueries({
+          queryKey: dashboardQueryOptions.queryKey,
+        }),
       ])
+      queryClient.setQueryData(matchDetailKey(String(match.id)), match)
       onOpenChange(false)
+      await navigate({
+        to: RoutePaths.match,
+        params: { partidaId: String(match.id) },
+        state: { createdMatchId: match.id },
+      })
     },
     onSettled: () => {
       inFlight.current = false
@@ -74,15 +82,28 @@ export function CreateMatchModal({
         disabled: clubs.isPending || clubs.isError || clubs.data.length < 2,
       }}
       isSubmitting={creation.isPending}
+      feedback={
+        <>
+          {clubs.isError && (
+            <ErrorAlert title="Não foi possível carregar os clubes">
+              {clubs.error.message}
+            </ErrorAlert>
+          )}
+          {(validationError || creation.error) && (
+            <ErrorAlert
+              title="Não foi possível jogar a partida"
+              descriptionClassName="whitespace-pre-line"
+            >
+              {validationError || creation.error?.message}
+            </ErrorAlert>
+          )}
+        </>
+      }
     >
       <form id={formId} onSubmit={submitMatch} className="space-y-4">
         {clubs.isPending ? (
           <p role="status">Carregando clubes...</p>
-        ) : clubs.isError ? (
-          <Alert variant="destructive">
-            <AlertDescription>{clubs.error.message}</AlertDescription>
-          </Alert>
-        ) : clubs.data.length < 2 ? (
+        ) : clubs.isError ? null : clubs.data.length < 2 ? (
           <p role="status" className="text-sm text-muted-foreground">
             Cadastre pelo menos dois clubes para jogar uma partida.
           </p>
@@ -139,13 +160,6 @@ export function CreateMatchModal({
               </NativeSelect>
             </div>
           </fieldset>
-        )}
-        {(validationError || creation.error) && (
-          <Alert variant="destructive">
-            <AlertDescription className="whitespace-pre-line">
-              {validationError || creation.error?.message}
-            </AlertDescription>
-          </Alert>
         )}
       </form>
     </Modal>

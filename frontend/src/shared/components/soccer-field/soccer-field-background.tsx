@@ -20,13 +20,19 @@ export function SoccerFieldBackground({
       viewBox={`0 0 ${width} ${height}`}
       width={width}
       height={height}
+      preserveAspectRatio={presentation === 'match' ? 'none' : 'xMidYMid meet'}
       fill="none"
       aria-hidden="true"
       focusable="false"
       data-presentation={presentation}
       className={cn('block h-auto w-full', className)}
     >
-      <rect width={width} height={height} rx="6" fill="#0D542B" />
+      <rect
+        width={width}
+        height={height}
+        rx={presentation === 'match' ? 0 : 6}
+        fill="#0D542B"
+      />
       <rect {...boundary} stroke="white" strokeOpacity="0.4" />
       {presentation === 'lineup' ? (
         <>

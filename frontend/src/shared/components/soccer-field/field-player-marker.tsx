@@ -7,6 +7,7 @@ import type {
   MatchSide,
 } from './types'
 import { AvatarBadge } from '@/components/ui/avatar'
+import { FootballIcon } from '@/shared/components/football-icon'
 import { getPlayerInitials } from '@/shared/lib/player-presentation'
 import { PLAYER_CONDITIONS, PLAYER_POSITIONS } from '@/shared/types/player'
 import { cn } from '@/lib/utils'
@@ -28,7 +29,7 @@ export function FieldPlayerMarker({
 }: FieldPlayerMarkerProps) {
   const slotLabel = getFieldSlotLabel(slot)
   const description = player
-    ? `${slotLabel}: ${player.name}, ${PLAYER_POSITIONS[player.position]}${player.condition ? `, ${PLAYER_CONDITIONS[player.condition]}` : ''}`
+    ? `${slotLabel}: ${player.name}, ${PLAYER_POSITIONS[player.position]}${player.condition ? `, ${PLAYER_CONDITIONS[player.condition]}` : ''}${player.scored ? ', Gol no duelo' : ''}`
     : `${slotLabel}: vaga vazia`
 
   return (
@@ -49,27 +50,32 @@ export function FieldPlayerMarker({
         className={cn(
           'soccer-field-marker-circle',
           player
-            ? presentation === 'lineup'
+            ? presentation === 'lineup' || side === 'home'
               ? 'border-white bg-blue-600 text-white'
-              : side === 'away'
-                ? 'border-amber-100 bg-amber-200 text-amber-950'
-                : 'border-white bg-white text-green-950'
+              : 'border-white bg-white text-black'
             : side === 'away'
-              ? 'border-dashed border-amber-200 bg-green-950/20 text-amber-100'
+              ? 'border-dashed border-white bg-green-950/20 text-white'
               : 'border-dashed border-white/90 bg-green-950/20 text-white',
         )}
       >
         {player ? getPlayerInitials(player.name) : '+'}
       </span>
-      {presentation === 'lineup' &&
-        player?.condition === 'MAL_CONDICIONADO' && (
-          <AvatarBadge
-            aria-hidden="true"
-            className="soccer-field-marker-condition top-0 right-auto bottom-auto left-0 bg-warning text-white ring-white"
-          >
-            <HeartPlus aria-hidden="true" />
-          </AvatarBadge>
-        )}
+      {player?.condition === 'MAL_CONDICIONADO' && (
+        <AvatarBadge
+          aria-hidden="true"
+          className="soccer-field-marker-condition top-0 right-auto bottom-auto left-0 bg-warning text-white ring-white"
+        >
+          <HeartPlus aria-hidden="true" />
+        </AvatarBadge>
+      )}
+      {presentation === 'match' && player?.scored && (
+        <AvatarBadge
+          aria-hidden="true"
+          className="soccer-field-marker-goal top-0 right-0 bottom-auto left-auto bg-white text-black ring-white"
+        >
+          <FootballIcon aria-hidden="true" />
+        </AvatarBadge>
+      )}
       {showName && (
         <span aria-hidden="true" className="soccer-field-marker-name">
           {player?.name ?? slotLabel}

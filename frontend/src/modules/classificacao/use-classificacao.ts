@@ -19,9 +19,14 @@ export function getStandings(signal?: AbortSignal): Promise<Standings[]> {
   return apiJson<Standings[]>('/standings', { signal })
 }
 
-export function useStandings() {
+export function useStandings({
+  refetchOnMount = true,
+}: {
+  refetchOnMount?: boolean | 'always'
+} = {}) {
   return useQuery({
     queryKey: ['classificacao'],
     queryFn: ({ signal }) => getStandings(signal),
+    refetchOnMount,
   })
 }

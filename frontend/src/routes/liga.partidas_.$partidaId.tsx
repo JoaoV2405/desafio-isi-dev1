@@ -8,5 +8,5 @@ export const Route = createFileRoute('/liga/partidas_/$partidaId')({
 function MatchRoute() {
   const { partidaId } = Route.useParams()
 
-  return <MatchPage matchId={partidaId} />
+  return <MatchPage key={partidaId} matchId={partidaId} />
 }

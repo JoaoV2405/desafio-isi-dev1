@@ -35,7 +35,7 @@ export type FormationSlots = readonly [
 ]
 
 export type FieldPlayer = Pick<Player, 'id' | 'name' | 'position'> &
-  Partial<Pick<Player, 'condition'>>
+  Partial<Pick<Player, 'condition'>> & { scored?: boolean }
 
 /** A missing entry or null means that the formation's vacancy is empty. */
 export type FieldOccupants = Partial<Record<FieldSlotId, FieldPlayer | null>>

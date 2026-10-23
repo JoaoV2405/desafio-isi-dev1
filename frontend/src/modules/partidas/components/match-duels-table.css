@@ -1,0 +1,50 @@
+.match-duels-table table {
+  display: grid;
+  min-width: max-content;
+  grid-template-columns:
+    max-content max-content minmax(2rem, 1fr)
+    max-content max-content minmax(2rem, 1fr)
+    max-content max-content;
+}
+
+.match-duels-table :is(thead, tbody, tr) {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+}
+
+.match-duels-table tr {
+  align-items: center;
+}
+.match-duels-table th {
+  display: flex;
+  align-items: center;
+}
+.match-duels-table td {
+  padding-block: 1rem;
+}
+.match-duels-table :is(th, td):nth-child(1) {
+  grid-column: 1;
+  padding-left: 1.25rem;
+}
+.match-duels-table :is(th, td):nth-child(2) {
+  grid-column: 2;
+}
+.match-duels-table :is(th, td):nth-child(3) {
+  grid-column: 4;
+}
+.match-duels-table :is(th, td):nth-child(4) {
+  grid-column: 5;
+  padding-left: 2rem;
+}
+.match-duels-table :is(th, td):nth-child(5) {
+  grid-column: 7;
+}
+.match-duels-table :is(th, td):nth-child(6) {
+  grid-column: 8;
+  padding-right: 1.25rem;
+}
+.match-duels-table td[colspan] {
+  grid-column: 1 / -1;
+  padding: 0.75rem 1.25rem;
+}

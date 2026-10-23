@@ -7,7 +7,9 @@ import { RoutePaths } from '@/router/route-paths'
 
 export function RootLayout() {
   const isHome = useRouterState({
-    select: (state) => state.location.pathname === RoutePaths.home,
+    // O layout acompanha o conteúdo do Outlet, mesmo enquanto a próxima rota carrega.
+    select: (state) =>
+      state.matches.some((match) => match.routeId === RoutePaths.home),
   })
 
   return (

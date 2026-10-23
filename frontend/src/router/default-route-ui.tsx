@@ -1,7 +1,8 @@
 import type { ErrorComponentProps } from '@tanstack/react-router'
-import { Link, useRouter } from '@tanstack/react-router'
+import { useRouter } from '@tanstack/react-router'
 
 import { RoutePaths } from './route-paths'
+import { ContentState } from '@/components/custom/content-state'
 
 export function RouterPendingComponent() {
   return <p className="p-8">Carregando...</p>
@@ -29,10 +30,21 @@ export function RouterErrorComponent({ error, reset }: ErrorComponentProps) {
 }
 
 export function RouterNotFoundComponent() {
+  const router = useRouter()
+
   return (
     <main className="p-8">
-      <h1>Página não encontrada</h1>
-      <Link to={RoutePaths.home}>Voltar ao início</Link>
+      <ContentState
+        variant="error"
+        title="Página não encontrada"
+        description="A página que você tentou acessar não existe."
+        action={{
+          label: 'Voltar ao início',
+          onClick: () => {
+            void router.navigate({ to: RoutePaths.home })
+          },
+        }}
+      />
     </main>
   )
 }

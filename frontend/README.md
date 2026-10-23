@@ -55,9 +55,13 @@ As consultas e mutações usam TanStack Query. O cliente compartilhado usa `fetc
 
 ## Validação
 
-Na pasta `frontend`, depois de instalar as dependências:
+Para validar a partir do ambiente Docker, use os [comandos de validação da raiz](../README.md#validações-disponíveis), que incluem a instalação das dependências na imagem.
+
+Com Node.js instalado no host, abra outro terminal na raiz do repositório e execute:
 
 ```bash
+cd frontend
+npm ci
 npm run typecheck
 npm run build
 npm run lint -- --no-fix

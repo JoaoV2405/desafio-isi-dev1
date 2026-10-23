@@ -14,7 +14,7 @@ O Dockerfile utiliza `node:22-alpine` para build, instalação de dependências 
 
 ## Instalar e executar localmente
 
-Este é um caminho alternativo ao Docker completo. A partir da raiz, inicie somente o banco:
+Este é um caminho alternativo ao Docker completo. Ao escolher a execução local, mantenha apenas o banco em Docker e execute a API e o frontend com Node.js no host. A partir da raiz, inicie somente o banco:
 
 ```bash
 docker compose up -d --wait database
@@ -64,7 +64,7 @@ CORS não autoriza outras origens do navegador. Requisições sem `Origin`, como
 
 O schema é mantido em `src/infrastructure/db/migrations/`, com `synchronize: false`. A criação inicial deixa o banco sem registros de domínio. A recriação completa, incluindo a remoção do volume, está no [README da raiz](../README.md#criar-e-recriar-o-banco-do-zero).
 
-Para consultar ou reverter a última migration em desenvolvimento, na pasta `backend`, com o banco em execução:
+Os comandos abaixo são de manutenção opcional, com a API parada e o banco em execução. Para consultar ou reverter a última migration em desenvolvimento, na pasta `backend`:
 
 ```bash
 npm run migration:show
@@ -100,9 +100,13 @@ A partida recebe apenas os dois clubes; o backend calcula placar e seis duelos e
 
 ## Validação
 
-Na pasta `backend`, após `npm ci`:
+Para validar a partir do ambiente Docker, use os [comandos de validação da raiz](../README.md#validações-disponíveis), que incluem a instalação das dependências na imagem.
+
+Com Node.js instalado no host, abra outro terminal na raiz do repositório e execute:
 
 ```bash
+cd backend
+npm ci
 npm run lint
 npm run test
 npm run build

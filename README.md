@@ -50,6 +50,8 @@ O Vite incorpora `VITE_API_ORIGIN` durante a compilação: uma alteração exige
 
 ## Instalar e executar
 
+Este é o caminho principal para a preparação da banca. Siga o bloco abaixo uma vez, na ordem apresentada; ao terminar, frontend e API ficam disponíveis nos endereços da tabela. As seções de recriação do banco, manutenção e validação têm finalidades próprias e indicam quando usar seus comandos. Os caminhos locais dos READMEs de backend e frontend são alternativas ao ambiente completo em Docker.
+
 O fluxo constrói as imagens a partir deste repositório, cria um banco vazio e aplica as migrations antes de iniciar a API. Não há carga automática de jogadores, clubes, transações ou partidas.
 
 Na raiz do repositório:
@@ -73,7 +75,7 @@ docker compose ps
 
 O prefixo dos endpoints é `/api/v1`. Com o banco vazio, a lista de jogadores responde HTTP 200 com `data: []`. Para verificar a comunicação do frontend, abra **Mercado de jogadores**: a tela deve mostrar a lista vazia, sem erro de conexão.
 
-Para construir e subir os três serviços, incluindo migrations, em **um único comando**, também na raiz:
+Como alternativa ao bloco de preparação acima, é possível construir e subir os três serviços, incluindo migrations, em **um único comando**, também na raiz. Escolha uma das duas formas de preparação:
 
 ```bash
 docker compose build && docker compose up -d --wait database && docker compose run --rm --no-deps backend node node_modules/typeorm/cli.js migration:run -d dist/infrastructure/db/data-source.js && docker compose up -d --no-build --wait backend frontend
@@ -89,13 +91,12 @@ docker compose logs --tail 100 backend frontend database
 
 ## Criar e recriar o banco do zero
 
-A criação inicial é feita pelos comandos de instalação acima. Antes de cada roteiro de avaliação, use o procedimento abaixo para **apagar todos os dados**, criar um novo banco vazio, aplicar as migrations e iniciar novamente frontend e API.
+A criação inicial é feita pelos comandos de instalação acima. Antes de cada roteiro de avaliação, use o procedimento abaixo para **apagar todos os dados**, criar um novo banco vazio, aplicar as migrations e iniciar novamente frontend e API. Ele pressupõe que as imagens já foram construídas na preparação; não é necessário recompilá-las para limpar os dados.
 
 Na raiz do repositório:
 
 ```bash
 docker compose down --volumes
-docker compose build
 docker compose up -d --wait database
 docker compose run --rm --no-deps backend node node_modules/typeorm/cli.js migration:run -d dist/infrastructure/db/data-source.js
 docker compose up -d --no-build --wait backend frontend
@@ -104,6 +105,8 @@ docker compose up -d --no-build --wait backend frontend
 O volume PostgreSQL deste projeto Compose é removido, inclusive seus dados. O procedimento não carrega exemplos. Após a recriação, os endereços continuam sendo os da tabela de execução.
 
 ## Atualizar, parar e retomar
+
+Esta seção reúne operações de manutenção, utilizadas conforme a necessidade após a preparação.
 
 Após atualizar o código, reconstrua e aplique as migrations antes de retomar a API:
 
@@ -120,6 +123,13 @@ Para parar preservando os dados e retomar com as imagens já construídas:
 ```bash
 docker compose down
 docker compose up -d --no-build --wait
+```
+
+Para reiniciar frontend e API durante a avaliação, preservando os dados e o banco em execução:
+
+```bash
+docker compose restart backend frontend
+docker compose ps
 ```
 
 Para consultar as migrations aplicadas, com o banco em execução:
@@ -168,7 +178,23 @@ Os fluxos obrigatórios de jogadores, clubes, mercado, histórico/CSV, escalaç�
 
 ## Validações disponíveis
 
-Os comandos de testes unitários, lint e build do backend estão em [backend/README.md](backend/README.md#validação). Os comandos de tipos, build e lint do frontend estão em [frontend/README.md](frontend/README.md#validação).
+Para verificar o código e o diferencial de testes unitários, execute os comandos abaixo **na raiz do repositório**. Esta etapa é separada da inicialização da aplicação. As imagens de validação são construídas localmente a partir dos Dockerfiles do projeto, com Node.js 22 e as dependências instaladas por `npm ci`; elas não dependem de Node.js no host nem de imagens publicadas pelo candidato.
+
+Backend: construa a etapa de build e execute lint, testes unitários e build. O comando de testes termina sozinho e inclui a verificação do valor de mercado:
+
+```bash
+docker build --target build --tag passe-backend-check ./backend
+docker run --rm passe-backend-check sh -c 'npm run lint && npm run test && npm run build'
+```
+
+Frontend: a construção da etapa de build executa a verificação de tipos e gera os arquivos estáticos; depois, execute o lint:
+
+```bash
+docker build --target build --tag passe-frontend-check ./frontend
+docker run --rm passe-frontend-check npm run lint -- --no-fix
+```
+
+As verificações não alteram o banco nem interrompem os serviços. Para execução com Node.js no host, os comandos equivalentes estão nos READMEs do [backend](backend/README.md#validação) e do [frontend](frontend/README.md#validação). A documentação interativa pode ser conferida na [URL do Swagger](http://localhost:3003/docs) após a inicialização.
 
 ## Uso de inteligência artificial
 

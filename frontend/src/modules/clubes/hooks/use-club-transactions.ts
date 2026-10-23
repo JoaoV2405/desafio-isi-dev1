@@ -1,9 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import type { TransactionsQuery } from '../types/club-transactions'
-import {
-  getClubTransactions,
-  getTransactionPlayers,
-} from '../services/club-transactions-api'
+import { getClubTransactions } from '../services/club-transactions-api'
 
 export function useClubTransactions(
   clubId: number,
@@ -13,12 +10,5 @@ export function useClubTransactions(
     // Compra e venda já invalidam todas as consultas sob a chave clubs.
     queryKey: ['clubs', 'transactions', clubId, query],
     queryFn: ({ signal }) => getClubTransactions(clubId, query, signal),
-  })
-}
-
-export function useTransactionPlayers() {
-  return useQuery({
-    queryKey: ['players', 'transaction-options'],
-    queryFn: ({ signal }) => getTransactionPlayers(signal),
   })
 }

@@ -1,14 +1,11 @@
 import { useMemo, useRef, useState } from 'react'
 import { CircleAlert, Download, LoaderCircle } from 'lucide-react'
 import type {
-  TransactionPlayerOption,
   TransactionsQuery,
   TransactionType,
 } from '../../types/club-transactions'
-import {
-  useClubTransactions,
-  useTransactionPlayers,
-} from '../../hooks/use-club-transactions'
+import { useClubTransactions } from '../../hooks/use-club-transactions'
+import { getTransactionPlayerOptions } from '../../lib/transaction-player-options'
 import { exportClubTransactions } from '../../services/club-transactions-api'
 import { transactionColumns } from './transaction-columns'
 import { TransactionFilters } from './transaction-filters'
@@ -35,28 +32,10 @@ export function ClubHistory({ clubId }: { clubId: number }) {
   }
   const transactions = useClubTransactions(clubId, query)
   const history = useClubTransactions(clubId)
-  const availablePlayers = useTransactionPlayers()
-  const playerOptions = useMemo(() => {
-    const players = new Map<number, TransactionPlayerOption>()
-    // A consulta sem filtros mantém disponíveis jogadores que já saíram do clube.
-    for (const transaction of history.data?.data ?? []) {
-      if (!players.has(transaction.player_id)) {
-        players.set(transaction.player_id, {
-          id: transaction.player_id,
-          name: transaction.player_name,
-        })
-      }
-    }
-    for (const player of availablePlayers.data ?? []) {
-      if (player.id !== null) players.set(player.id, player)
-    }
-    return [
-      { id: null, name: 'Todos' },
-      ...Array.from(players.values()).sort((a, b) =>
-        a.name.localeCompare(b.name, 'pt-BR'),
-      ),
-    ]
-  }, [history.data, availablePlayers.data])
+  const playerOptions = useMemo(
+    () => getTransactionPlayerOptions(history.data?.data ?? []),
+    [history.data],
+  )
 
   async function handleExport() {
     if (exportInFlight.current) return
@@ -144,21 +123,6 @@ export function ClubHistory({ clubId }: { clubId: number }) {
         }}
         disabled={exportPending}
       />
-      {availablePlayers.isError && (
-        <ErrorAlert
-          title="Não foi possível carregar todos os jogadores"
-          descriptionClassName="space-y-2"
-        >
-          <p>{availablePlayers.error.message}</p>
-          <Button
-            variant="outline"
-            disabled={availablePlayers.isFetching}
-            onClick={() => void availablePlayers.refetch()}
-          >
-            Tentar novamente
-          </Button>
-        </ErrorAlert>
-      )}
       {exportError && (
         <ErrorAlert
           title="Não foi possível exportar o CSV"
@@ -217,11 +181,9 @@ export function ClubHistory({ clubId }: { clubId: number }) {
             }
           />
         )}
-        {!transactions.isError &&
-          !noPlayerTransactions &&
-          transactions.data && (
-            <TransactionSummary summary={transactions.data.summary} />
-          )}
+        {!transactions.isError && transactions.data && (
+          <TransactionSummary summary={transactions.data.summary} />
+        )}
       </div>
     </section>
   )
